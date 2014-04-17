@@ -68,7 +68,38 @@ DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
+# Parfeux minimal.
+IPRULES=OFF
+# Ping Externe
+IPRULE1=OFF
+# IP indésirables
+IPRULE2=OFF
+# connections ftp
+IPRULE3=ON
+# cups serveur , impriment partager sous cups
+IPRULE4=OFF
+# smtp + pop ssl thunderbird ...
+IPRULE5=ON
+#  smtp + pop thunderbird ...
+IPRULE6=OFF
+# client-transmission
+IPRULE7=OFF
+#Ryzom
+IPRULE8=ON
+# Regnum Online
+IPRULE10=ON
+# NeverWinter Nights 1
+IPRULE11=OFF
+# LandesEternelles
+IPRULE12=OFF
+# SecondeLife
+IPRULE13=OFF
+# Batel for Wesnoth
+IPRULE14=ON
+# Steam: CS 1.6
+IPRULE15=OFF
 EOF
+
 fi
 
 
@@ -97,7 +128,7 @@ DAYSPAM=( Mo Tu We Th Fr Sa Su )
 DAYSCRON=( mon tue wed thu fri sat sun )
 
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent "}
+DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
 
@@ -119,6 +150,11 @@ IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
 
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
+
+#### LOCALISATION du fichier de chargement de modules ####
+FILEMODULESLOAD=${MODULESLOAD:="/etc/modules-load.d/modules.conf"}
+
+RSYSLOGCTPARENTAL=${RSYSLOGCTPARENTAL:="/etc/rsyslog.d/iptables.conf"}
 
 #### COMMANDES D'ACTIVATION DES SERVICES AU DEMARAGE DU PC ####
 ENCRON=${ENCRON:=""}
@@ -169,6 +205,10 @@ fi
 
 
 interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) # suppose que la passerelle est la route par default
+ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   # suppose que la passerelle est la route par default
+ipinterface_WAN=$(ifconfig $interface_WAN | awk '/adr:/{print $2}' | cut -d":" -f2)
+reseau_box=$(ip route | grep / | grep "$interface_WAN" | cut -d" " -f1 )
+ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f2)
 
 DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
 DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
@@ -187,6 +227,7 @@ MFILEtmp=""
 UMFILEtmp=""
 fi
 BL_SERVER="dsi.ut-capitole.fr"
+FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
 CATEGORIES_ENABLED="$DIR_CONF/categories-enabled"
 BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
 WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
@@ -454,6 +495,243 @@ fi
 dnsmasqoff () {
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
 }
+ipMaskValide() {
+ip=$(echo $1 | cut -d"/" -f1)
+mask=$(echo $1 | grep "/" | cut -d"/" -f2)
+if [ $(echo $1 | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$") -eq 1 ];then
+	echo 1
+	return 1
+fi
+if [ ! $(echo $ip | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$") -eq 1 ];then
+	echo 0
+	return 0
+fi
+if [ $(echo $mask | grep -c "^\([1-9]\|[1-2][0-9]\|3[0-2]\)$") -eq 1 ];then
+	echo 1
+	return 1
+fi
+i=1 
+octn=255
+result=1
+while [ $i -le 4 ]
+do
+oct=$( echo $mask | grep '\.'| cut -d "." -f$i )
+if [ -z $oct ] ; then
+	result=0
+	break
+fi
+if [ ! $octn -eq 255 ];then
+	if [ ! $oct -eq 0 ];then
+		result=0
+		break
+	fi
+fi 
+octn=$oct
+if [ ! $oct -eq 255 ] &&  [ ! $oct -eq 254 ]  &&  [ ! $oct -eq 252 ] &&  [ ! $oct -eq 248 ] &&  [ ! $oct -eq 240 ] &&  [ ! $oct -eq 224 ] &&  [ ! $oct -eq 192 ] &&  [ ! $oct -eq 128 ] &&  [ ! $oct -eq 0 ]; then
+	result=0
+	break	
+  fi
+i=$( expr $i + 1 )
+done
+   echo $result
+   return $result
+}
+ipglobal () {
+	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
+    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
+    /sbin/iptables -F
+    /sbin/iptables -X
+    ### BLOQUE TOUT PAR DEFAUT (si aucune règle n'est définie par la suite) ###
+    /sbin/iptables -P INPUT DROP
+    /sbin/iptables -P OUTPUT DROP
+    /sbin/iptables -P FORWARD DROP
+    # TCP Syn Flood
+    /sbin/iptables -A INPUT -i $interface_WAN -p tcp --syn -m limit --limit 3/s -j ACCEPT
+    # UDP Syn Flood
+    /sbin/iptables -A INPUT -i $interface_WAN -p udp -m limit --limit 10/s -j ACCEPT
+    # Ping Externe
+	if [ $(cat $FILE_CONF | grep -c IPRULE1=ON ) -eq 1 ];then
+      iptables -A INPUT -i $interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
+      iptables -A INPUT -i $interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT
+	fi
+	### IP indésirables
+    if [ $(cat $FILE_CONF | grep -c IPRULE2=ON ) -eq 1 ];then
+       if [ -e $FILEIPBLACKLIST ]
+       then
+	   while read ligne
+	   do
+		ipdrop=`echo $ligne | cut -d " " -f1`  
+	    if [ $( ipMaskValide $ipdrop ) -eq 1 ] ;then
+			iptables -I INPUT  -s $ipdrop -j DROP
+			iptables -I OUTPUT  -d $ipdrop -j DROP
+		fi
+       done < $FILEIPBLACKLIST
+       else
+	    echo >  $FILEIPBLACKLIST
+	    chown root:root  $FILEIPBLACKLIST
+	    chmod 750  $FILEIPBLACKLIST
+       fi
+    fi
+    ### ACCEPT ALL interface loopback ###
+    iptables -A INPUT  -i lo -j ACCEPT
+    iptables -A OUTPUT -o lo -j ACCEPT
+    ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter 
+    ### les connexions initiées par sont propre PC)
+    iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+     
+    ### DHCP
+    iptables -A OUTPUT -o $interface_WAN -p udp --sport 68 --dport 67 -j ACCEPT
+    iptables -A INPUT -i $interface_WAN -p udp --sport 67 --dport 68 -j ACCEPT
+ 
+    ### DNS indispensable pour naviguer facilement sur le web ###
+    iptables -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+    iptables -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+    iptables -A OUTPUT -d 127.0.0.1 -p tcp -m tcp --dport 54 -j ACCEPT
+    iptables -A OUTPUT -d 127.0.0.1 -p udp -m udp --dport 54 -j ACCEPT
+ 
+    ### HTTP navigation internet non sécurisée ###
+    iptables -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    
+    ### HTTPS pour le site des banques .... ###
+    iptables -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
+    
+    ### ping ... autorise à "pinger" un ordinateur distant ###
+    iptables -A OUTPUT -p icmp -j ACCEPT
+    
+    ### clientNTP ... syncro à un serveur de temps ###
+    iptables -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    
+    ### ftp 
+    # on ajout la ligne #ip_conntrack_ftp dan le fichier $FILEMODULESLOAD si elle n'existe pas.
+    test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
+	if [ $test -ge "1" ] ; then
+		$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
+	else
+		echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
+	fi
+    if [ $(cat $FILE_CONF | grep -c IPRULE3=ON ) -eq 1 ];then
+		modprobe ip_conntrack_ftp	# chargement imédia du module permettent le suivi des connections ftp
+		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD # ajout du module au démarage du pc
+		iptables -A OUTPUT -p tcp --dport 21  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT 
+		iptables -A OUTPUT -p tcp --dport 1023:65535  -m state --state ESTABLISHED,RELATED -j ACCEPT
+    fi
+    
+    ### cups serveur , impriment partager sous cups
+	if [ $(cat $FILE_CONF | grep -c IPRULE4=ON ) -eq 1 ] ; then
+		iptables -A OUTPUT -d $ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
+		iptables -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT
+		iptables -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
+	fi
+    ### emesene,pindgin,amsn...  ####
+    if [ $(cat $FILE_CONF | grep -c IPRULE5=ON ) -eq 1 ] ; then
+		iptables -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT     
+		iptables -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
+		iptables -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
+    fi
+    
+    ### smtp + pop ssl thunderbird ...  ####
+    if [ $(cat $FILE_CONF | grep -c IPRULE6=ON ) -eq 1 ]
+    then
+		iptables -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl
+		iptables -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl
+		iptables -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl
+    fi
+    ###  smtp + pop thunderbird ...  ###
+    if [ $(cat $FILE_CONF | grep -c IPRULE7=ON ) -eq 1 ]
+	then
+        iptables -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT
+        iptables -A OUTPUT -p tcp -m tcp --dport 110 -j ACCEPT
+    fi
+
+    ### client-transmission
+    # ouvre beaucoup de ports
+    if [ $(cat $FILE_CONF | grep -c IPRULE8=ON ) -eq 1 ]
+    then
+       iptables -A OUTPUT -p udp -m udp --sport 51413 --dport 1023:65535  -j ACCEPT
+       iptables -A OUTPUT -p tcp -m tcp --sport 30000:65535 --dport 1023:65535  -j ACCEPT
+    fi
+ 
+	###Ryzom
+	if [ $(cat $FILE_CONF | grep -c IPRULE9=ON ) -eq 1 ]
+	then
+		srvupdateRtzom=178.33.44.72
+		srvRyzom1=176.31.229.93
+		iptables -A OUTPUT  -d $srvupdateRtzom -p tcp --dport 873 -j ACCEPT
+		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 43434 -j ACCEPT
+		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 50000 -j ACCEPT
+		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 40916 -j ACCEPT
+		iptables -A OUTPUT  -d $srvRyzom1 -p udp --dport 47851:47860 -j ACCEPT
+		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 47851:47860 -j ACCEPT
+	fi
+	
+    ### Regnum Online
+    if [ $(cat $FILE_CONF | grep -c IPRULE10=ON ) -eq 1 ]
+    then
+   	iptables -A OUTPUT  -d 91.123.197.131 -p tcp --dport 47300 -j ACCEPT # autentification
+	iptables -A OUTPUT  -d 91.123.197.142 -p tcp --dport 48000:48002  -j ACCEPT # nemon
+    fi
+    
+    ### NeverWinter Nights 1
+    if [ $(cat $FILE_CONF | grep -c IPRULE11=ON ) -eq 1 ];then
+       iptables -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT
+       iptables -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur 
+    fi
+ 
+    ### LandesEternelles
+    if [ $(cat $FILE_CONF | grep -c IPRULE12=ON ) -eq 1 ]
+    then
+        iptables -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT
+    fi
+    ### SecondeLife
+    if [ $(cat $FILE_CONF | grep -c IPRULE13=ON ) -eq 1 ]
+   then
+      
+       iptables -A INPUT  -s 216.82.0.0/18 -p tcp --dport 1023:65535 -j ACCEPT # Secondelife
+       iptables -A INPUT  -s 64.94.252.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+       iptables -A INPUT  -s 70.42.62.0/24 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+       iptables -A INPUT  -s 74.201.98.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+ 
+       iptables -A INPUT  -s 216.82.0.0/18 -p udp --dport 1023:65535 -j ACCEPT # Secondelife
+       iptables -A INPUT  -s 64.94.252.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
+       iptables -A INPUT  -s 70.42.62.0/24 -p udp --dport 1023:65535 -j ACCEPT # Voice
+       iptables -A INPUT  -s 74.201.98.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
+ 
+       iptables -A OUTPUT  -d 216.82.0.0/18 -p tcp --sport 1023:65535 -j ACCEPT # Secondelife
+       iptables -A OUTPUT  -d 64.94.252.0/23 -p tcp --sport 1023:65535 -j ACCEPT # Voice
+       iptables -A OUTPUT  -d 70.42.62.0/24 -p tcp --sport 1023:65535 -j ACCEPT # Voice
+       iptables -A OUTPUT  -d 74.201.98.0/23  -p tcp --sport 1023:65535 -j ACCEPT # Voice
+ 
+       iptables -A OUTPUT  -d 216.82.0.0/18 -p udp --sport 1023:65535 -j ACCEPT # Secondelife
+       iptables -A OUTPUT  -d 64.94.252.0/23 -p udp --sport 1023:65535 -j ACCEPT # Voice
+       iptables -A OUTPUT  -d 70.42.62.0/24 -p udp --sport 1023:65535 -j ACCEPT # Voice
+       iptables -A OUTPUT  -d 74.201.98.0/23  -p udp --sport 1023:65535 -j ACCEPT # Voice
+    fi
+    
+    ### Batel for Wesnoth
+    if [ $(cat $FILE_CONF | grep -c IPRULE14=ON ) -eq 1 ];then
+       #14998 pour version stable.
+       #14999 pour version stable précédente.
+       #15000 pour version de dévelopement. 
+       #15001 télécharger addons
+       iptables -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT
+       iptables -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT
+    fi
+    
+    # Steam: CS 1.6
+    if [ $(cat $FILE_CONF | grep -c IPRULE15=ON ) -eq 1 ];then
+	    
+        iptables -A INPUT -p tcp --sport 27030 -j ACCEPT
+        iptables -A OUTPUT -p udp --dport 27015:27020 -j ACCEPT
+	    iptables -A INPUT -p udp --sport 27015:27020 -j ACCEPT
+   	    iptables -A OUTPUT -p tcp --dport 27030 -j ACCEPT
+    fi
+    
+   ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente                   
+   /sbin/iptables -A OUTPUT -j LOG  --log-prefix "iptables: "
+   /sbin/iptables -A INPUT -j LOG   --log-prefix "iptables: "
+   /sbin/iptables -A FORWARD -j LOG  --log-prefix "iptables: "
+
+}
 iptableson () {
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
@@ -466,10 +744,26 @@ iptableson () {
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
       fi
       done
-   # Save configuration so that it survives a reboot
+   if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
+    ipglobal
+   fi
+
+cat << EOF > $RSYSLOGCTPARENTAL  
+:msg,contains,"iptables" /var/log/iptables.log
+& ~
+EOF
+
+# Save configuration so that it survives a reboot
    $IPTABLESsave
 }
 iptablesoff () {
+   #if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
+   /sbin/iptables -F
+   /sbin/iptables -X
+   /sbin/iptables -P INPUT ACCEPT
+   /sbin/iptables -P OUTPUT ACCEPT
+   /sbin/iptables -P FORWARD ACCEPT
+   #fi
    /sbin/iptables -t nat -D OUTPUT -j ctparental || /bin/true
    /sbin/iptables -t nat -F ctparental || /bin/true
    /sbin/iptables -t nat -X ctparental || /bin/true
