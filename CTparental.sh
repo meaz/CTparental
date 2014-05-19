@@ -735,6 +735,8 @@ ipglobal () {
 iptableson () {
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
+
+
    /sbin/iptables -t nat -N ctparental
    /sbin/iptables -t nat -A OUTPUT -j ctparental
    # Force non priviledged users to use dnsmasq
@@ -744,6 +746,7 @@ iptableson () {
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
       fi
       done
+
    if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
     ipglobal
    fi
@@ -984,7 +987,7 @@ cp -rf CTadmin/* $DIRadminHTML/
 	clear
 	echo "Entrer le mot de passe de $loginhttp :"
 	while (true); do
-		 read -s password
+		 read password
 		 case $password in
 			 * )
 			 echo "password: $password" >> /root/passwordCTadmin
