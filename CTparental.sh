@@ -602,16 +602,8 @@ ipglobal () {
     iptables -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
     
     ### ftp 
-    # on ajout la ligne #ip_conntrack_ftp dan le fichier $FILEMODULESLOAD si elle n'existe pas.
-    test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
-	if [ $test -ge "1" ] ; then
-		$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
-	else
-		echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
-	fi
+
     if [ $(cat $FILE_CONF | grep -c IPRULE3=ON ) -eq 1 ];then
-		modprobe ip_conntrack_ftp	# chargement imédia du module permettent le suivi des connections ftp
-		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD # ajout du module au démarage du pc
 		iptables -A OUTPUT -p tcp --dport 21  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT 
 		iptables -A OUTPUT -p tcp --dport 1023:65535  -m state --state ESTABLISHED,RELATED -j ACCEPT
     fi
@@ -739,6 +731,7 @@ iptableson () {
 
    /sbin/iptables -t nat -N ctparental
    /sbin/iptables -t nat -A OUTPUT -j ctparental
+
    # Force non priviledged users to use dnsmasq
       for user in `listeusers` ; do
       if  [ $(groups $user | grep -c " ctoff$") -eq 0 ];then
@@ -898,7 +891,7 @@ auth.backend.htdigest.userfile = "$PASSWORDFILEHTTPD"
 
 server.document-root = "/var/www"
 server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
-server.errorlog = "/var/log/lighttpd/error.log"
+#server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
 server.pid-file = "$LIGHTTPpidfile"
 server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
@@ -1193,6 +1186,17 @@ install () {
       catChoice
       dnsmasqon
       $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=`date +%d-%m-%Y\ %T`?g" $FILE_CONF
+       
+      # on charge le(s) module(s) indispensable(s) pour iptables.
+		test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
+		if [ $test -ge "1" ] ; then
+			$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
+		else
+			echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
+		fi
+		modprobe ip_conntrack_ftp	
+		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD 
+	  ###
       FoncHTTPDCONF
       $ENCRON
       $ENLIGHTTPD
@@ -1274,7 +1278,16 @@ uninstall () {
 	 $CMDREMOVE $PACKAGECT 2> /dev/null
          done
    fi
-
+   # desactivation du modules ip_conntrack_ftp
+	test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
+	if [ $test -ge "1" ] ; then
+		$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
+	else
+		echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
+	fi
+	modprobe -r ip_conntrack_ftp	
+	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
+	###
    rm -rf $DIR_CONF
 }
 
