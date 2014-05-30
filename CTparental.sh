@@ -78,16 +78,18 @@ IPRULE2=OFF
 IPRULE3=ON
 # cups serveur , impriment partager sous cups
 IPRULE4=OFF
-# smtp + pop ssl thunderbird ...
-IPRULE5=ON
+# emesene,pindgin,amsn... 
+IPRULE5=OFF
+#  smtp + pop ssl thunderbird ...
+IPRULE6=ON
 #  smtp + pop thunderbird ...
-IPRULE6=OFF
-# client-transmission
 IPRULE7=OFF
-#Ryzom
-IPRULE8=ON
+# client-transmission
+IPRULE8=OFF
+# Ryzom
+IPRULE9=OFF
 # Regnum Online
-IPRULE10=ON
+IPRULE10=OFF
 # NeverWinter Nights 1
 IPRULE11=OFF
 # LandesEternelles
@@ -95,7 +97,7 @@ IPRULE12=OFF
 # SecondeLife
 IPRULE13=OFF
 # Batel for Wesnoth
-IPRULE14=ON
+IPRULE14=OFF
 # Steam: CS 1.6
 IPRULE15=OFF
 EOF
