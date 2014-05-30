@@ -1710,7 +1710,6 @@ readTimeFILECONF () {
 		echo "*;*;$PCUSER;$HORAIRESPAM" >> $FILEPAMTIMECONF
 	else
 		echo "*;*;$PCUSER;Al0000-2400" >> $FILEPAMTIMECONF 
-		echo "sed "/^$PCUSER=/d" $FILE_HCOMPT" > /tmp/infoct
 		$SED "/^$PCUSER=/d" $FILE_HCOMPT 
 		passwd -u $PCUSER
 	fi
