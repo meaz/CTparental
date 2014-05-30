@@ -1413,7 +1413,7 @@ updatetimelogin () {
 			   
 			else
 			# on efface les ligne relative a cette utilisateur
-			$SED "/^$PCUSER$/d" $FILE_HCOMPT
+			$SED "/^$PCUSER=/d" $FILE_HCOMPT
 			fi
 
 		done	
@@ -1709,7 +1709,10 @@ readTimeFILECONF () {
 	if [ $userisconfigured -eq 1 ] ; then
 		echo "*;*;$PCUSER;$HORAIRESPAM" >> $FILEPAMTIMECONF
 	else
-		echo "*;*;$PCUSER;Al0000-2400" >> $FILEPAMTIMECONF
+		echo "*;*;$PCUSER;Al0000-2400" >> $FILEPAMTIMECONF 
+		echo "sed "/^$PCUSER=/d" $FILE_HCOMPT" > /tmp/infoct
+		$SED "/^$PCUSER=/d" $FILE_HCOMPT 
+		passwd -u $PCUSER
 	fi
    done
 echo "PATH=$PATH"  > /etc/cron.d/CTparentalmaxtimelogin  
