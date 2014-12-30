@@ -726,10 +726,22 @@ ipglobal () {
    /sbin/iptables -A FORWARD -j LOG  --log-prefix "iptables: "
 
 }
+resolvconffix () {
+resolvconf --help 2&> /dev/null
+if [ $? -eq 0 ];then
+	if [ -f /run/resolvconf/interface/original.resolvconf] ; then
+		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
+	fi
+	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient] ; then
+		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
+	fi
+fi
+	
+}
 iptableson () {
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
-
+	resolvconffix
 
    /sbin/iptables -t nat -N ctparental
    /sbin/iptables -t nat -A OUTPUT -j ctparental
@@ -1160,6 +1172,7 @@ install () {
       mkdir -p $DIR_CONF
       initblenabled
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
+	  resolvconffix
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
