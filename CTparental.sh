@@ -727,13 +727,17 @@ ipglobal () {
 
 }
 resolvconffix () {
-resolvconf --help 2&> /dev/null
+resolvconf -u 2&> /dev/null
 if [ $? -eq 0 ];then
 	if [ -f /run/resolvconf/interface/original.resolvconf] ; then
 		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
 	fi
 	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient] ; then
 		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
+	fi
+	if [ -f /run/resolvconf/interface/NetworkManager] ; then
+		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
+	fi
 	fi
 fi
 	
