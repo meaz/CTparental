@@ -738,7 +738,6 @@ if [ $? -eq 0 ];then
 	if [ -f /run/resolvconf/interface/NetworkManager] ; then
 		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
 	fi
-	fi
 fi
 	
 }
