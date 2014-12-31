@@ -214,6 +214,29 @@ ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f
 
 DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
 DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+resolvconffix () {
+resolvconf -u 2&> /dev/null
+if [ $? -eq 1 ];then
+	if [ -f /run/resolvconf/interface/original.resolvconf ] ; then
+		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
+		DNS1=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
+		DNS2=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+	fi
+	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient ] ; then
+		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
+		DNS1=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
+		DNS2=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+	fi
+	if [ -f /run/resolvconf/interface/NetworkManager ] ; then
+		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
+		DNS1=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
+		DNS2=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+	fi
+fi
+}
 resolvconffix
 
 PRIVATE_IP="127.0.0.10"
@@ -728,29 +751,7 @@ ipglobal () {
    /sbin/iptables -A FORWARD -j LOG  --log-prefix "iptables: "
 
 }
-resolvconffix () {
-resolvconf -u 2&> /dev/null
-if [ $? -eq 1 ];then
-	if [ -f /run/resolvconf/interface/original.resolvconf ] ; then
-		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
-	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient ] ; then
-		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
-	if [ -f /run/resolvconf/interface/NetworkManager ] ; then
-		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
-fi
-}
+
 iptableson () {
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
