@@ -731,12 +731,15 @@ resolvconf -u 2&> /dev/null
 if [ $? -eq 1 ];then
 	if [ -f /run/resolvconf/interface/original.resolvconf ] ; then
 		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
 	fi
 	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient ] ; then
 		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
 	fi
 	if [ -f /run/resolvconf/interface/NetworkManager ] ; then
 		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
+		resolvconf -u
 	fi
 fi
 }
@@ -1832,6 +1835,7 @@ case $arg1 in
       exit 0
       ;;
    -off | --off )
+	  desactivegourpectoff
       autoupdateoff 
       dnsmasqoff
       iptablesoff
