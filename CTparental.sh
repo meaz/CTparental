@@ -3,14 +3,14 @@
 #
 # par Guillaume MARSAT
 # Corrections orthographiques par Pierre-Edouard TESSIER
-# une parti du code est tiré du script alcasar-bl.sh créé par Franck BOUIJOUX et Richard REY
-# présent dans le code du projet alcasar en version 2.6.1 ; web page http://www.alcasar.net/
+# une partie du code est tirée du script alcasar-bl.sh créé par Franck BOUIJOUX et Richard REY
+# présente dans le code du projet alcasar en version 2.6.1 ; web page http://www.alcasar.net/
  
 # This script is distributed under the Gnu General Public License (GPL)
 arg1=${1}
 if [ $# -ge 1 ];then
 if [ $arg1 != "-listusers" ] ; then
-if [ ! $UID -le 499 ]; then # considaire comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet a apt-get,urpmi,yum... de lance le scripte sans erreur.
+if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
    echo "Il vous faut des droits root pour lancer ce script"
    exit 1
 fi
@@ -206,8 +206,8 @@ fi
 
 
 
-interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) # suppose que la passerelle est la route par default
-ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   # suppose que la passerelle est la route par default
+interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) 
+ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   # suppose que la passerelle est la route par défaut
 ipinterface_WAN=$(ifconfig $interface_WAN | awk '/adr:/{print $2}' | cut -d":" -f2)
 reseau_box=$(ip route | grep / | grep "$interface_WAN" | cut -d" " -f1 )
 ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f2)
@@ -400,7 +400,7 @@ adapt() {
          for DOMAINE in `cat  $CATEGORIES_AVAILABLE`  # pour chaque catégorie
          do
             echo -n "."
-            # suppression des @IP, de caractères acccentués et des lignes commentées ou vide
+              # suppression des @IP, de caractères acccentués et des lignes commentées ou vides
             cp -f $tempDIR/blacklists/$DOMAINE/domains $FILE_tmp
             $SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' $FILE_tmp
 	    $SED "/[äâëêïîöôüû]/d" $FILE_tmp
@@ -419,7 +419,7 @@ adapt() {
    else
          mkdir   $tempDIR
          echo -n "."
- 	 # suppression des @IP, de caractères acccentués et des lignes commentées ou vide
+			# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
          cp -f $DNS_FILTER_OSSI $FILE_tmp
          $SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' $FILE_tmp
          $SED "/[äâëêïîöôüû]/d" $FILE_tmp 
@@ -492,7 +492,7 @@ date +%H:%M:%S
 }
 
 dnsmasqon () {
-   categorie1=`sed -n "1 p" $CATEGORIES_ENABLED` # on considère que si la 1ère categorie activée est un blacklist on fonctionne par blacklist.
+   categorie1=`sed -n "1 p" $CATEGORIES_ENABLED` # on considère que si la 1ère catégorie activée est un blacklist on fonctionne par blacklist.
    is_blacklist=`grep $categorie1 $BL_CATEGORIES_AVAILABLE |wc -l`
    if [ $is_blacklist -ge "1" ] ; then
    $SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
@@ -1239,14 +1239,14 @@ install () {
 
 
 updatelistgctoff () {
-	## on ajoutes tous les utilisateurs manquant dans la liste
+	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in `listeusers`
 	do
 		if [ $(cat $FILE_GCTOFFCONF | sed -e "s/#//g" | grep -c -E "^$PCUSER$") -eq 0 ];then
 			echo $PCUSER >> $FILE_GCTOFFCONF
 		fi
 	done
-	## on suprime tous ceux qui n'existe plus sur le pc.
+	## on supprime tout ceux qui n'existent plus sur le pc.
 	for PCUSER in $(cat $FILE_GCTOFFCONF | sed -e "s/#//g" )
 	do
 		if [ $( listeusers | grep -c -E "^$PCUSER$") -eq 0 ];then
@@ -1379,7 +1379,7 @@ done
 
 errortime1 () {
 clear
-echo -e "L'heure de début doit être strictement inférieure a l'heure de fin: $RougeD$input$Fcolor "
+echo -e "L'heure de début doit être strictement inférieure  à l'heure de fin: $RougeD$input$Fcolor "
 echo "exemple: 08h00 à 23h59 ou 08h00 à 12h00 et 14h00 à 23h59"
 echo -e -n "$RougeD$PCUSER$Fcolor est autorisé à se connecter le $BleuD${DAYS[$NumDAY]}$Fcolor de :"
 }
@@ -1425,15 +1425,15 @@ updatetimelogin () {
 					$SED "s?^$PCUSER=.*?$PCUSER=$count?g" $FILE_HCOMPT
 					temprest=$(($(cat $FILE_HCONF | grep ^$PCUSER=user= | cut -d "=" -f3 ) - $count ))
 					echo $temprest
-					# si le compteur de l'usager depace la valeur max autoriser on verrouille le compte et on deconnect l'utilisateur.
+					# si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on deconnecte l'utilisateur.
 					if [ $temprest -le 0 ];then
 						/usr/bin/skill -KILL -u$PCUSER
 						passwd -l $PCUSER
 					else
 						# On allerte l'usager que sont quota temps arrive a expiration 5-4-3-2-1 minutes avant.
-						if [ $temprest -le 5 ];then
+						if [ $temprest -le 10 ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connection restent est de $temprest minutes "
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connexion restant est de $temprest minutes "
 						fi
 					fi
 			   fi
@@ -1499,7 +1499,7 @@ activetimelogin () {
 	 N| n )
          alltime="N"
          clear
-         echo -e "$PCUSER est autorisé a se connecter X minutes par jours" 
+         echo -e "$PCUSER est autorisé à se connecter X minutes par jours" 
          echo -e -n "X (1 a 1440) = " 
          while (true); do
          read choi
@@ -1633,7 +1633,7 @@ for PCUSER in `listeusers`
 do
 	passwd -u $PCUSER
 done
-# on remait tous les compteurs a zero.
+# on remet tous les compteurs à zéro.
 echo "date=$(date +%D)" > $FILE_HCOMPT
 echo > $FILE_HCONF
 $CRONrestart
@@ -1708,7 +1708,7 @@ readTimeFILECONF () {
 		                      	fi
 					echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental${DAYS[$NumDAY]}
 					echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental${DAYS[$NumDAY]}
-					for count in 1 2 3 4 5
+					for count in 1 2 3 4 5 6 7 8 9 10
 					do
 					echo "$(timecronalert $count $h2 $m2 $NumDAY) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental${DAYS[$NumDAY]}
 					echo "$(timecronalert $count $h4 $m4 $NumDAY) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental${DAYS[$NumDAY]}
@@ -1721,7 +1721,7 @@ readTimeFILECONF () {
 				        else
 				           HORAIRESPAM="$HORAIRESPAM${DAYSPAM[$NumDAY]}$h1$m1-$h2$m2|"
 				        fi
-					for count in 1 2 3 4 5
+					for count in 1 2 3 4 5 6 7 8 9 10
 					do
 					echo "$(timecronalert $count $h2 $m2 $NumDAY) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental${DAYS[$NumDAY]}
 					done
@@ -1776,24 +1776,24 @@ usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -
 -aupon  => active la mise à jour automatique de la blacklist de Toulouse (tous les 7 jours).
 -aupoff => désactive la mise à jour automatique de la blacklist de Toulouse.
 -aup    => comme -dl mais seulement si il n'y a pas eu de mise à jour depuis plus de 7 jours.
--nodep  => si placer aprés -i ou -u permet de ne pas installer/désinstaller les dépendances, utiles si 
-            on préfaire les installer a la mains , ou pour le scripte de postinst et prerm 
+-nodep  => si placé aprés -i ou -u permet de ne pas installer/désinstaller les dépendances, utiles si  
+            on préfère les installer à la main , ou pour le script de postinst et prerm  
             du deb.
             exemples:
                      CTparental.sh -i -nodep	
 		     CTparental.sh -i -dirhtml /home/toto/html/ -nodep   
 		     CTparental.sh -u -nodep 
--nomanuel => utiliser uniquement pour le scripte de postinst et prerm 
+-nomanuel =>  utilisé uniquement pour le script de postinst et prerm  
             du deb.
--gcton	  => créer un group de privilégier ne subisent pas le filtrage.
+-gcton	  => créé un groupe de privilégiés ne subissant pas le filtrage.
 			 exemple:CTparental.sh -gctulist
-			 editer $FILE_GCTOFFCONF et y commanter tous les utilisateurs que l'on veut filtrer.
+			 editer $FILE_GCTOFFCONF et y commenter tous les utilisateurs que l'on veut filtrer.
 			 CTparental.sh -gctalist
--gctoff   => suprime le group de privilégier .
-			 tous les utilisateurs du system subisse le filtrages!!
--gctulist => Mes a jour le fichier de conf du group , $FILE_GCTOFFCONF
-			 en fonction des utilisateur ajouter ou suprimer du pc.
--gctalist => Ajoute/Suprime les utilisateurs dans le group ctoff en fonction du fichier de conf.
+-gctoff   => supprime le groupe de privilégiés .
+			 tous les utilisateurs du système subissent le filtrages!!
+-gctulist => Met a jour le fichier de conf du groupe , $FILE_GCTOFFCONF
+			 en fonction des utilisateurs ajoutés ou supprimés du pc.
+-gctalist => Ajoute/Supprime les utilisateurs dans le group ctoff en fonction du fichier de conf.
 	 
  "
 case $arg1 in
@@ -1907,7 +1907,7 @@ case $arg1 in
 	  iptableson
       ;;
     -uctl )
-	  # apelet toute les minute par cron pour activer desactiver les usagers ayant des restrictions de temps journalier de connection.
+	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  updatetimelogin
       ;;      
       
