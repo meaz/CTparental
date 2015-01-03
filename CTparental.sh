@@ -600,74 +600,74 @@ ipglobal () {
        fi
     fi
     ### ACCEPT ALL interface loopback ###
-    iptables -A INPUT  -i lo -j ACCEPT
-    iptables -A OUTPUT -o lo -j ACCEPT
+    /sbin/iptables -A INPUT  -i lo -j ACCEPT
+    /sbin/iptables -A OUTPUT -o lo -j ACCEPT
     ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter 
     ### les connexions initiées par sont propre PC)
-    iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    /sbin/iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
      
     ### DHCP
-    iptables -A OUTPUT -o $interface_WAN -p udp --sport 68 --dport 67 -j ACCEPT
-    iptables -A INPUT -i $interface_WAN -p udp --sport 67 --dport 68 -j ACCEPT
+    /sbin/iptables -A OUTPUT -o $interface_WAN -p udp --sport 68 --dport 67 -j ACCEPT
+    /sbin/iptables -A INPUT -i $interface_WAN -p udp --sport 67 --dport 68 -j ACCEPT
  
     ### DNS indispensable pour naviguer facilement sur le web ###
-    iptables -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
-    iptables -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
-    iptables -A OUTPUT -d 127.0.0.1 -p tcp -m tcp --dport 54 -j ACCEPT
-    iptables -A OUTPUT -d 127.0.0.1 -p udp -m udp --dport 54 -j ACCEPT
+    /sbin/iptables -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+    /sbin/iptables -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+    /sbin/iptables -A OUTPUT -d 127.0.0.1 -p tcp -m tcp --dport 54 -j ACCEPT
+    /sbin/iptables -A OUTPUT -d 127.0.0.1 -p udp -m udp --dport 54 -j ACCEPT
  
     ### HTTP navigation internet non sécurisée ###
-    iptables -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    /sbin/iptables -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
     
     ### HTTPS pour le site des banques .... ###
-    iptables -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
+    /sbin/iptables -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
     
     ### ping ... autorise à "pinger" un ordinateur distant ###
-    iptables -A OUTPUT -p icmp -j ACCEPT
+    /sbin/iptables -A OUTPUT -p icmp -j ACCEPT
     
     ### clientNTP ... syncro à un serveur de temps ###
-    iptables -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    /sbin/iptables -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
     
     ### ftp 
 
     if [ $(cat $FILE_CONF | grep -c IPRULE3=ON ) -eq 1 ];then
-		iptables -A OUTPUT -p tcp --dport 21  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT 
-		iptables -A OUTPUT -p tcp --dport 1023:65535  -m state --state ESTABLISHED,RELATED -j ACCEPT
+		/sbin/iptables -A OUTPUT -p tcp --dport 21  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT 
+		/sbin/iptables -A OUTPUT -p tcp --dport 1023:65535  -m state --state ESTABLISHED,RELATED -j ACCEPT
     fi
     
     ### cups serveur , impriment partager sous cups
 	if [ $(cat $FILE_CONF | grep -c IPRULE4=ON ) -eq 1 ] ; then
-		iptables -A OUTPUT -d $ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
-		iptables -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT
-		iptables -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
+		/sbin/iptables -A OUTPUT -d $ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
+		/sbin/iptables -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT
+		/sbin/iptables -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
 	fi
     ### emesene,pindgin,amsn...  ####
     if [ $(cat $FILE_CONF | grep -c IPRULE5=ON ) -eq 1 ] ; then
-		iptables -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT     
-		iptables -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
-		iptables -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
+		/sbin/iptables -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT     
+		/sbin/iptables -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
+		/sbin/iptables -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
     fi
     
     ### smtp + pop ssl thunderbird ...  ####
     if [ $(cat $FILE_CONF | grep -c IPRULE6=ON ) -eq 1 ]
     then
-		iptables -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl
-		iptables -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl
-		iptables -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl
+		/sbin/iptables -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl
+		/sbin/iptables -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl
+		/sbin/iptables -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl
     fi
     ###  smtp + pop thunderbird ...  ###
     if [ $(cat $FILE_CONF | grep -c IPRULE7=ON ) -eq 1 ]
 	then
-        iptables -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT
-        iptables -A OUTPUT -p tcp -m tcp --dport 110 -j ACCEPT
+        /sbin/iptables -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT
+        /sbin/iptables -A OUTPUT -p tcp -m tcp --dport 110 -j ACCEPT
     fi
 
     ### client-transmission
     # ouvre beaucoup de ports
     if [ $(cat $FILE_CONF | grep -c IPRULE8=ON ) -eq 1 ]
     then
-       iptables -A OUTPUT -p udp -m udp --sport 51413 --dport 1023:65535  -j ACCEPT
-       iptables -A OUTPUT -p tcp -m tcp --sport 30000:65535 --dport 1023:65535  -j ACCEPT
+       /sbin/iptables -A OUTPUT -p udp -m udp --sport 51413 --dport 1023:65535  -j ACCEPT
+       /sbin/iptables -A OUTPUT -p tcp -m tcp --sport 30000:65535 --dport 1023:65535  -j ACCEPT
     fi
  
 	###Ryzom
@@ -675,55 +675,55 @@ ipglobal () {
 	then
 		srvupdateRtzom=178.33.44.72
 		srvRyzom1=176.31.229.93
-		iptables -A OUTPUT  -d $srvupdateRtzom -p tcp --dport 873 -j ACCEPT
-		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 43434 -j ACCEPT
-		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 50000 -j ACCEPT
-		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 40916 -j ACCEPT
-		iptables -A OUTPUT  -d $srvRyzom1 -p udp --dport 47851:47860 -j ACCEPT
-		iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 47851:47860 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvupdateRtzom -p tcp --dport 873 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 43434 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 50000 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 40916 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvRyzom1 -p udp --dport 47851:47860 -j ACCEPT
+		/sbin/iptables -A OUTPUT  -d $srvRyzom1 -p tcp --dport 47851:47860 -j ACCEPT
 	fi
 	
     ### Regnum Online
     if [ $(cat $FILE_CONF | grep -c IPRULE10=ON ) -eq 1 ]
     then
-   	iptables -A OUTPUT  -d 91.123.197.131 -p tcp --dport 47300 -j ACCEPT # autentification
-	iptables -A OUTPUT  -d 91.123.197.142 -p tcp --dport 48000:48002  -j ACCEPT # nemon
+   	/sbin/iptables -A OUTPUT  -d 91.123.197.131 -p tcp --dport 47300 -j ACCEPT # autentification
+	/sbin/iptables -A OUTPUT  -d 91.123.197.142 -p tcp --dport 48000:48002  -j ACCEPT # nemon
     fi
     
     ### NeverWinter Nights 1
     if [ $(cat $FILE_CONF | grep -c IPRULE11=ON ) -eq 1 ];then
-       iptables -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT
-       iptables -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur 
+       /sbin/iptables -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT
+       /sbin/iptables -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur 
     fi
  
     ### LandesEternelles
     if [ $(cat $FILE_CONF | grep -c IPRULE12=ON ) -eq 1 ]
     then
-        iptables -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT
+        /sbin/iptables -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT
     fi
     ### SecondeLife
     if [ $(cat $FILE_CONF | grep -c IPRULE13=ON ) -eq 1 ]
    then
       
-       iptables -A INPUT  -s 216.82.0.0/18 -p tcp --dport 1023:65535 -j ACCEPT # Secondelife
-       iptables -A INPUT  -s 64.94.252.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
-       iptables -A INPUT  -s 70.42.62.0/24 -p tcp --dport 1023:65535 -j ACCEPT # Voice
-       iptables -A INPUT  -s 74.201.98.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 216.82.0.0/18 -p tcp --dport 1023:65535 -j ACCEPT # Secondelife
+       /sbin/iptables -A INPUT  -s 64.94.252.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 70.42.62.0/24 -p tcp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 74.201.98.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
  
-       iptables -A INPUT  -s 216.82.0.0/18 -p udp --dport 1023:65535 -j ACCEPT # Secondelife
-       iptables -A INPUT  -s 64.94.252.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
-       iptables -A INPUT  -s 70.42.62.0/24 -p udp --dport 1023:65535 -j ACCEPT # Voice
-       iptables -A INPUT  -s 74.201.98.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 216.82.0.0/18 -p udp --dport 1023:65535 -j ACCEPT # Secondelife
+       /sbin/iptables -A INPUT  -s 64.94.252.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 70.42.62.0/24 -p udp --dport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A INPUT  -s 74.201.98.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
  
-       iptables -A OUTPUT  -d 216.82.0.0/18 -p tcp --sport 1023:65535 -j ACCEPT # Secondelife
-       iptables -A OUTPUT  -d 64.94.252.0/23 -p tcp --sport 1023:65535 -j ACCEPT # Voice
-       iptables -A OUTPUT  -d 70.42.62.0/24 -p tcp --sport 1023:65535 -j ACCEPT # Voice
-       iptables -A OUTPUT  -d 74.201.98.0/23  -p tcp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 216.82.0.0/18 -p tcp --sport 1023:65535 -j ACCEPT # Secondelife
+       /sbin/iptables -A OUTPUT  -d 64.94.252.0/23 -p tcp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 70.42.62.0/24 -p tcp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 74.201.98.0/23  -p tcp --sport 1023:65535 -j ACCEPT # Voice
  
-       iptables -A OUTPUT  -d 216.82.0.0/18 -p udp --sport 1023:65535 -j ACCEPT # Secondelife
-       iptables -A OUTPUT  -d 64.94.252.0/23 -p udp --sport 1023:65535 -j ACCEPT # Voice
-       iptables -A OUTPUT  -d 70.42.62.0/24 -p udp --sport 1023:65535 -j ACCEPT # Voice
-       iptables -A OUTPUT  -d 74.201.98.0/23  -p udp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 216.82.0.0/18 -p udp --sport 1023:65535 -j ACCEPT # Secondelife
+       /sbin/iptables -A OUTPUT  -d 64.94.252.0/23 -p udp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 70.42.62.0/24 -p udp --sport 1023:65535 -j ACCEPT # Voice
+       /sbin/iptables -A OUTPUT  -d 74.201.98.0/23  -p udp --sport 1023:65535 -j ACCEPT # Voice
     fi
     
     ### Batel for Wesnoth
@@ -732,17 +732,17 @@ ipglobal () {
        #14999 pour version stable précédente.
        #15000 pour version de dévelopement. 
        #15001 télécharger addons
-       iptables -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT
-       iptables -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT
+       /sbin/iptables -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT
+       /sbin/iptables -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT
     fi
     
     # Steam: CS 1.6
     if [ $(cat $FILE_CONF | grep -c IPRULE15=ON ) -eq 1 ];then
 	    
-        iptables -A INPUT -p tcp --sport 27030 -j ACCEPT
-        iptables -A OUTPUT -p udp --dport 27015:27020 -j ACCEPT
-	    iptables -A INPUT -p udp --sport 27015:27020 -j ACCEPT
-   	    iptables -A OUTPUT -p tcp --dport 27030 -j ACCEPT
+        /sbin/iptables -A INPUT -p tcp --sport 27030 -j ACCEPT
+        /sbin/iptables -A OUTPUT -p udp --dport 27015:27020 -j ACCEPT
+	    /sbin/iptables -A INPUT -p udp --sport 27015:27020 -j ACCEPT
+   	    /sbin/iptables -A OUTPUT -p tcp --dport 27030 -j ACCEPT
     fi
     
    ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente                   
@@ -765,6 +765,14 @@ iptableson () {
       if  [ $(groups $user | grep -c " ctoff$") -eq 0 ];then
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+         #force passage par dansgourdian si présent
+         if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:8080 | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:8080
+			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:8888 | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 8888
+			    /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -d 127.0.0.10 -p tcp --dport 80 -j DNAT --to 127.0.0.10:80
+				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 8888 -j DNAT --to 127.0.0.1:8080
+				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:8080
+			 fi
+        fi
       fi
       done
 
