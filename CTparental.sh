@@ -306,6 +306,8 @@ confdansguardian () {
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
+  rm /etc/dansguardian/languages/french/template.html
+  ln -s $DIRHTML/index.html /etc/dansguardian/languages/french/template.html
 
 $DANSGOUARDIANrestart
   
