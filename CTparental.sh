@@ -172,6 +172,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 
 FILEConfPriv=${FILEConfPriv:="/etc/privoxy/config"}
 FILEConfDans=${FILEConfDans:="/etc/dansguardian/dansguardian.conf"}
+FILEConfDansf1=${FILEConfDansf1:="/etc/dansguardian/dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -306,8 +307,8 @@ confdansguardian () {
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
-  rm /etc/dansguardian/languages/french/template.html
-  ln -s $DIRHTML/index.html /etc/dansguardian/languages/french/template.html
+  echo "#le filtrage de domaines est géré par dnsmasq, ne pa toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
+
 
 $DANSGOUARDIANrestart
   
@@ -874,7 +875,7 @@ cat << EOF > $DIRHTML/index.html
 </HEAD>
 <BODY LANG="fr-FR" DIR="LTR">
 <CENTER>
-<img alt="Site dangereux pour des mineurs"
+<img alt="Site dangereux pour des mineurs boquer par dnsmasq"
   HEIGHT="600"   
   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKIAAACgCAYAAACPOrcQAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
 AAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAuGSURB
@@ -938,6 +939,9 @@ EOF
 
 fi
 ## GENERATION
+
+cat $DIRHTML/index.html > /etc/dansguardian/languages/french/template.html
+$SED "s/dnsmasq/dansguardian/g"  /etc/dansguardian/languages/french/template.html  
 
 ln -s  $DIRHTML/index.html $DIRHTML/err404.html
 USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
@@ -1274,8 +1278,7 @@ install () {
       $ENNWMANAGER
       $ENIPTABLESSAVE
 
-
-      
+    
 }
 
 
@@ -1868,6 +1871,7 @@ case $arg1 in
       adapt
       catChoice
       dnsmasqon
+       
       exit 0
       ;;
    -uhtml | --updatehtml )
