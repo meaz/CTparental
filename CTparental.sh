@@ -128,9 +128,10 @@ DAYS=${DAYS:="lundi mardi mercredi jeudi vendredi samedi dimanche "}
 DAYS=( $DAYS )
 DAYSPAM=( Mo Tu We Th Fr Sa Su )
 DAYSCRON=( mon tue wed thu fri sat sun )
-
+PROXYport=${PROXYport:="8888"}
+DANSGport=${DANSGport:="8080"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog "}
+DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
 
@@ -149,7 +150,8 @@ NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
-
+DANSGOUARDIANrestart=${DANSGOUARDIANrestart:="$CMDSERVICE dansgouardian restart"}
+PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
 
@@ -167,6 +169,8 @@ ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=1000}
 
+FILEConfPriv=${FILEConfPriv:="/etc/privoxy/config"}
+FILEConfDans=${FILEConfDans:="/etc/dansguardian/dansguardian.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -288,6 +292,27 @@ ossi
 EOF
          
 
+}
+confdansguardian () {
+  $SED "s?.*loglevel =.*?loglevel = 0?g" $FILEConfDans   
+  $SED "s?.*languagedir =.*?languagedir = '/etc/dansguardian/languages'?g" $FILEConfDans  
+  $SED "s?.*language =.*?language = 'french'?g" $FILEConfDans  
+  $SED "s?.*logexceptionhits =.*?logexceptionhits = 0?g" $FILEConfDans 
+  $SED "s?.*filterip =.*?filterip = 127.0.0.1?g" $FILEConfDans
+  $SED "s?.*proxyip =.*?proxyip = 127.0.0.1?g" $FILEConfDans  
+  $SED "s?.*filterport =.*?filterport = $DANSGport?g" $FILEConfDans 
+  $SED "s?.*proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
+  $SED "s?.*proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
+  $SED "s?.*accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
+  $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
+
+$DANSGOUARDIANrestart
+  
+}
+confprivoxy () {
+$SED "s?.*debug.*?debug = 0?g"  $FILEConfPriv   
+$SED "s?.*listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $FILEConfPriv  
+$PRIVOXYrestart
 }
 
 addadminhttpd() {
@@ -766,11 +791,12 @@ iptableson () {
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
          #force passage par dansgourdian si présent
-         if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:8080 | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:8080
-			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:8888 | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 8888
+         if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$DANSGport | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:$DANSGport
+			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$PROXYport | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 127.0.0.1:$PROXYport
 			    /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -d 127.0.0.10 -p tcp --dport 80 -j DNAT --to 127.0.0.10:80
-				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 8888 -j DNAT --to 127.0.0.1:8080
-				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:8080
+				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
+				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
+				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport
 			 fi
         fi
       fi
@@ -1234,6 +1260,8 @@ install () {
 		modprobe ip_conntrack_ftp	
 		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD 
 	  ###
+	  confdansguardian
+	  confprivoxy
       FoncHTTPDCONF
       $ENCRON
       $ENLIGHTTPD
