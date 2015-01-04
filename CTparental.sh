@@ -518,6 +518,26 @@ echo
 $UMFILEtmp
 rm -f $FILE_tmp
 date +%H:%M:%S
+## on force a passer par forcesafesearch.google.com de maninière transparente
+forcesafesearchgoogle=`host -ta forcesafesearch.google.com|cut -d" " -f4`	# retrieve forcesafesearch.google.com ip
+echo "# nosslsearch redirect server for google" > $DIR_DNS_BLACKLIST_ENABLED/googlenosslsearch.conf	
+for subdomaingoogle in `curl https://www.google.com/supported_domains `  # pour chaque sous domain de google
+do 
+echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf	
+done
+## on force a passer par safe.duckduckgo.com
+for ipsafeduckduckgo in `host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias`
+do
+echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+done
+echo "address=/duckduckgo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+
+## on bloque les moteurs de recherche pas asser sur
+echo "address=/search.yahoo.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+echo "address=/www.bing.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+
+
+
 }
 
 dnsmasqon () {
@@ -802,6 +822,7 @@ iptableson () {
 			    /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
 				/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
 				#/sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
+				/sbin/iptables -A OUTPUT -d 127.0.0.0/24 -m owner --uid-owner "$user" -p tcp --dport 443 -j ACCEPT
 				/sbin/iptables -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
 			 fi
         fi
@@ -1099,11 +1120,40 @@ fastcgi.server = (
 \$SERVER["socket"] == "$PRIVATE_IP:80" {
 server.document-root = "$DIRHTML"
 server.errorfile-prefix = "$DIRHTML/err" 
-#ssl.engine = "enable" 
-#ssl.pemfile = "/etc/lighttpd/ssl/$PRIVATE_IP.pem" 
+}
+\$HTTP["host"] =~ "search.yahoo.com" {
+	\$SERVER["socket"] == ":443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
+	server.document-root = "/var/www/CTparental"
+	server.errorfile-prefix = "/var/www/CTparental/err" 
+	}
 }
 
+\$HTTP["host"] =~ "localhost" {
+	\$SERVER["socket"] == ":443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
+	}
+}
+\$HTTP["host"] =~ "duckduckgo" {
+	\$SERVER["socket"] == ":443" {
+	ssl.engine = "enable"
+	ssl.pemfile = "/etc/ssl/private/duckduckgo.pem" 
+	url.redirect  = (".*" => "https://safe.duckduckgo.com" )
+	}
+}
+
+
 EOF
+# génération du cetificat autosigner pour lighttpd
+openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
+cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/localhost.pem
+# génération du certificat autosigné pour la redirection forcer de duckduckgo.com vers safe.duckduckgo.com
+openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
+cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/duckduckgo.pem
+rm /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt
+
 chown root:$GROUPHTTPD $DREAB
 chmod 660 $DREAB
 chown root:$GROUPHTTPD $DNS_FILTER_OSSI
@@ -1272,6 +1322,8 @@ install () {
 	  confdansguardian
 	  confprivoxy
       FoncHTTPDCONF
+      iptablesoff
+      iptableson
       $ENCRON
       $ENLIGHTTPD
       $ENDNSMASQ
