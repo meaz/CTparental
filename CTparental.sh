@@ -181,6 +181,8 @@ DIRHTML=${DIRHTML:="/var/www/CTparental"}
 DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
+CADIR=${CADIR:="/usr/share/ca-certificates/ctparental/"}
+PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
@@ -1133,15 +1135,15 @@ server.errorfile-prefix = "$DIRHTML/err"
 \$HTTP["host"] =~ "localhost" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
-	#ssl.ca-file = "/usr/share/ca-certificates/ctparental/cactparental.crt"
+	ssl.pemfile = "$PEMSRVDIR/localhost.pem" 	
+	#ssl.ca-file = "$CADIR/cactparental.crt"
 	}
 }
 \$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "/etc/ssl/private/duckduckgo.pem" 
-	#ssl.ca-file = "/usr/share/ca-certificates/ctparental/cactparental.crt"
+	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
+	#ssl.ca-file = "$CADIR/cactparental.crt"
 	url.redirect  = (".*" => "https://safe.duckduckgo.com/\$0" )
 	}
 }
@@ -1217,9 +1219,8 @@ CActparental () {
 
 DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
 mkdir $DIR_TMP
-CADIR=/usr/share/ca-certificates/ctparental/
 mkdir $CADIR
-PEMSRVDIR=/etc/ssl/private
+
 ## création de la clef priver ca et du certificat ca
 openssl genrsa  1024 > $DIR_TMP/cactparental.key
 openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt
@@ -1252,14 +1253,15 @@ install () {
 		if [ $? -eq 0 ] ; then
 		EDIT="vim "
 		fi
-		mono -h 2&> /dev/null
+		nano -h 2&> /dev/null
 		if [ $? -eq 0 ] ; then
-		EDIT=${EDIT:="mono "}
+		EDIT=${EDIT:="nano "}
 		fi
 		vi -h 2&> /dev/null
 		if [ $? -eq 0 ] ; then
-		EDIT=${EDIT:="vi "}
+			EDIT=${EDIT:="vi "}
 		fi
+	
 		if [ -f gpl-3.0.fr.txt ] ; then
 			cp -f gpl-3.0.fr.txt /usr/local/share/CTparental/
 		fi
@@ -1441,6 +1443,9 @@ uninstall () {
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
 	###
    rm -rf $DIR_CONF
+   rm -rf $PEMSRVDIR/localhost.pem
+   rm -rf $PEMSRVDIR/duckduckgo.pem
+   rm -f $CADIR/cactparental.crt
 }
 
 choiblenabled () {
