@@ -1136,11 +1136,11 @@ server.errorfile-prefix = "$DIRHTML/err"
 	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
 	}
 }
-\$HTTP["host"] =~ "duckduckgo" {
+\$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "/etc/ssl/private/duckduckgo.pem" 
-	url.redirect  = (".*" => "https://safe.duckduckgo.com" )
+	url.redirect  = (".*" => "https://safe.duckduckgo.com/\$0" )
 	}
 }
 
@@ -1150,7 +1150,7 @@ EOF
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
 cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/localhost.pem
 # génération du certificat autosigné pour la redirection forcer de duckduckgo.com vers safe.duckduckgo.com
-openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=duckduckgo" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
+openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=duckduckgo.com" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
 cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/duckduckgo.pem
 rm /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt
 
