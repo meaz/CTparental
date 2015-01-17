@@ -1134,25 +1134,22 @@ server.errorfile-prefix = "$DIRHTML/err"
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
+	#ssl.ca-file = "/usr/share/ca-certificates/ctparental/cactparental.crt"
 	}
 }
 \$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "/etc/ssl/private/duckduckgo.pem" 
+	#ssl.ca-file = "/usr/share/ca-certificates/ctparental/cactparental.crt"
 	url.redirect  = (".*" => "https://safe.duckduckgo.com/\$0" )
 	}
 }
 
 
 EOF
-# génération du cetificat autosigner pour lighttpd
-openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
-cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/localhost.pem
-# génération du certificat autosigné pour la redirection forcer de duckduckgo.com vers safe.duckduckgo.com
-openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=duckduckgo.com" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
-cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/duckduckgo.pem
-rm /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt
+
+CActparental
 
 chown root:$GROUPHTTPD $DREAB
 chmod 660 $DREAB
@@ -1216,6 +1213,36 @@ if [ ! $test -eq 0 ];then
 	exit 1
 fi
 }
+CActparental () {
+
+DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
+mkdir $DIR_TMP
+CADIR=/usr/share/ca-certificates/ctparental/
+mkdir $CADIR
+PEMSRVDIR=/etc/ssl/private
+## création de la clef priver ca et du certificat ca
+openssl genrsa  1024 > $DIR_TMP/cactparental.key
+openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt
+
+## création de la clef privée serveur localhost
+openssl genrsa 1024 > $DIR_TMP/localhost.key
+## création certificat localhost et signature par la ca
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
+openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
+
+## création de la clef privée serveur duckduckgo
+openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
+## création certificat duckduckgo.com et signature par la ca
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr
+openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
+## instalation de la CA dans les ca de confiance.
+cp $DIR_TMP/cactparental.crt $CADIR
+cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
+cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
+
+rm -rf $DIR_TMP
+}
+
 
 install () {
 	groupadd ctoff
