@@ -132,7 +132,7 @@ PROXYport=${PROXYport:="8888"}
 DANSGport=${DANSGport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy "}
+DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
 
@@ -1150,7 +1150,7 @@ EOF
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
 cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/localhost.pem
 # génération du certificat autosigné pour la redirection forcer de duckduckgo.com vers safe.duckduckgo.com
-openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=localhost" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
+openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=/ST=/L=/O=ctparental/CN=duckduckgo" -keyout /etc/ssl/private/localhost.key  -out /etc/ssl/private/localhost.crt
 cat /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt > /etc/ssl/private/duckduckgo.pem
 rm /etc/ssl/private/localhost.key /etc/ssl/private/localhost.crt
 
