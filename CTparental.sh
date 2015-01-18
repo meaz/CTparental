@@ -181,7 +181,7 @@ DIRHTML=${DIRHTML:="/var/www/CTparental"}
 DIRadminHTML=${DIRadminHTML:="/var/www/CTadmin"}
 PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
-CADIR=${CADIR:="/usr/share/ca-certificates/ctparental/"}
+CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 
@@ -818,7 +818,8 @@ iptableson () {
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
          #force passage par dansgourdian si présent
-         /sbin/iptables -t nat -A ctparental -d 127.0.0.10 -p tcp --dport 80 -j DNAT --to 127.0.0.10:80
+         /sbin/iptables -t nat -A ctparental -d $PRIVATE_IP -p tcp --dport 80 -j DNAT --to $PRIVATE_IP:80
+         /sbin/iptables -t nat -A ctparental -d 127.0.0.1 -p tcp --dport 80 -j DNAT --to 127.0.0.1:80
          if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$DANSGport | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:$DANSGport
 			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$PROXYport | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 127.0.0.1:$PROXYport
 			    /sbin/iptables -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
@@ -871,6 +872,7 @@ dnsmasqwhitelistonly  () {
    bogus-priv
    server=$DNS1
    server=$DNS2
+   address=/localhost/127.0.0.1
    address=/#/$PRIVATE_IP #redirige vers $PRIVATE_IP pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
 
@@ -955,6 +957,7 @@ C0zyXE1c3gMeAR5DteXeY23NIJZzU/eVuFXLpgPD/RZUt/3AKtwqW0vyPvXW0vpBLCcyDJiGC+XF
 xZ+Heq2pz0FgNS54K4DVPi7H8iWsIFZy+8dcAEwGxpd9nZpwz9txl16VvtYBr9e7FUQrCjuIAxEZ
 CYzDhXIccDzQjrsyqL3i59LVQnuAnrLv5T9/BWzBhW4Lqna/d4X/A/bydTBs1YRqAAAAAElFTkSu
 QmCC" />
+<br><a href="http://localhost/CTparental/cactparental.crt">Installer le certificat racine de CTparental</a><br>
 </CENTER>
 </BODY>
 </HTML>
@@ -1119,10 +1122,8 @@ fastcgi.server = (
                  )
 
 }
-\$SERVER["socket"] == "$PRIVATE_IP:80" {
-server.document-root = "$DIRHTML"
-server.errorfile-prefix = "$DIRHTML/err" 
-}
+
+
 \$HTTP["host"] =~ "search.yahoo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
@@ -1148,6 +1149,10 @@ server.errorfile-prefix = "$DIRHTML/err"
 	}
 }
 
+\$SERVER["socket"] == "$PRIVATE_IP:80" {
+server.document-root = "$DIRHTML"
+server.errorfile-prefix = "$DIRHTML/err" 
+}
 
 EOF
 
@@ -1242,7 +1247,9 @@ openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" 
 openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
 
 ## instalation de la CA dans les ca de confiance.
-cp $DIR_TMP/cactparental.crt $CADIR
+cp $DIR_TMP/cactparental.crt $CADIR/
+cp $DIR_TMP/cactparental.crt $DIRHTML
+## instalation des certificats serveur
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
