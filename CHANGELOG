@@ -1,4 +1,5 @@
 # 18/01/2015
+# Version 3.90-2 corection de bug certificat search.yahoo.com 
 # Version 3.90-1 corection de bug sur la redirection forcer vers safe.duckduckgo.com
 # Version 3.90  ajout de dansguardian + privoxy + force SafeSearch google + force SafeSearch duckduckgo + bloquage Search bing et yahoo
 # Version 3.84  Abendont des scripte a l'ouverture de session au profit de règles iptables dedier au utilisateur filtrée.
