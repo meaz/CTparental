@@ -1126,9 +1126,9 @@ server.errorfile-prefix = "$DIRHTML/err"
 \$HTTP["host"] =~ "search.yahoo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "/etc/ssl/private/localhost.pem" 	
-	server.document-root = "/var/www/CTparental"
-	server.errorfile-prefix = "/var/www/CTparental/err" 
+	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 	
+	server.document-root = "$DIRHTML"
+	server.errorfile-prefix = "$DIRHTML/err"
 	}
 }
 
@@ -1144,7 +1144,7 @@ server.errorfile-prefix = "$DIRHTML/err"
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
 	#ssl.ca-file = "$CADIR/cactparental.crt"
-	url.redirect  = (".*" => "https://safe.duckduckgo.com/\$0" )
+	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
 	}
 }
 
@@ -1231,16 +1231,21 @@ openssl genrsa 1024 > $DIR_TMP/localhost.key
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
 openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
 
-## création de la clef privée serveur duckduckgo
+## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
 openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
-## création certificat duckduckgo.com et signature par la ca
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr
 openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
+
+## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
+openssl genrsa 1024 > $DIR_TMP/search.yahoo.com.key
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key $DIR_TMP/search.yahoo.com.key > $DIR_TMP/search.yahoo.com.csr
+openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
+
 ## instalation de la CA dans les ca de confiance.
 cp $DIR_TMP/cactparental.crt $CADIR
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
-
+cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
 }
 
