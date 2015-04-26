@@ -184,7 +184,7 @@ REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
 CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
-IPTABLES=${IPTABLES:="$IPTABLES"}
+IPTABLES=${IPTABLES:="/sbin/iptables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
