@@ -269,6 +269,7 @@ DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
 DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
 DNS_FILTER_OSSI="$DIR_CONF/blacklist-local"
 DREAB="$DIR_CONF/domaine-rehabiliter" 
+DANSXSITELIST="/etc/dansguardian/lists/exceptionsitelist"
 THISDAYS=$(expr $(date +%Y) \* 365 + $(date +%j))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
 CHEMINCTPARENTLE=$(readlink -f $0)
@@ -514,6 +515,7 @@ do
 		done
         fi
 done
+cat $DREAB | sed -e"s/^\.//g" | sed -e"s/^www.//g" > $DANSXSITELIST
 echo -n "."
 cat $DREAB | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  $DIR_DNS_WHITELIST_ENABLED/whiteliste.ossi.conf
 echo
@@ -570,12 +572,16 @@ dnsmasqon () {
    
 EOF
 $DNSMASQrestart
+$DANSGOUARDIANrestart
+$PRIVOXYrestart
 else
   dnsmasqwhitelistonly
 fi
 }
 dnsmasqoff () {
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
+   $DANSGOUARDIANrestart
+$PRIVOXYrestart
 }
 ipMaskValide() {
 ip=$(echo $1 | cut -d"/" -f1)
@@ -882,6 +888,8 @@ dnsmasqwhitelistonly  () {
 EOF
 
 $DNSMASQrestart
+$DANSGOUARDIANrestart
+$PRIVOXYrestart
 }
 
 
