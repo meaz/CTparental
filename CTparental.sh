@@ -523,7 +523,7 @@ date +%H:%M:%S
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=`host -ta forcesafesearch.google.com|cut -d" " -f4`	# retrieve forcesafesearch.google.com ip
 echo "# nosslsearch redirect server for google" > $DIR_DNS_BLACKLIST_ENABLED/googlenosslsearch.conf	
-for subdomaingoogle in `curl https://www.google.com/supported_domains `  # pour chaque sous domain de google
+for subdomaingoogle in `wget https://www.google.com/supported_domains -O - 2> /dev/null `  # pour chaque sous domain de google
 do 
 echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf	
 done
@@ -533,8 +533,12 @@ do
 echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 done
 echo "address=/duckduckgo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+## on force a passer par search.yahoo.com pour redirection url par lighttpd
+#ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
+#echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+#echo "address=/search.yahoo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
-## on bloque les moteurs de recherche pas asser sur
+# on bloque les moteurs de recherche pas asser sur
 echo "address=/search.yahoo.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 echo "address=/www.bing.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
@@ -1127,9 +1131,10 @@ fastcgi.server = (
 \$HTTP["host"] =~ "search.yahoo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 	
+	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 
 	server.document-root = "$DIRHTML"
-	server.errorfile-prefix = "$DIRHTML/err"
+	server.errorfile-prefix = "$DIRHTML/err" 
+#	url.redirect  = (".*" => "http://safe.search.yahoo.com\$0&vm=r " )	
 	}
 }
 
