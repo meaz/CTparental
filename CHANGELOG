@@ -1,4 +1,5 @@
 # 26/04/2015
+# Version 3.90-5 corectif bug Noms de domaine réhabilités non pris en compte par dansguardian.
 # Version 3.90-4 corectif bug SafeSearch google qui ne fonctioner pas si curl n'était pas installer .
 # Version 3.90-3 ajout d'un liens pour Installer le certificat racine de CTparental sur la page d'erreur
 # Version 3.90-2 corection de bug certificat search.yahoo.com 
