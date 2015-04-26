@@ -1254,10 +1254,11 @@ openssl genrsa 1024 > $DIR_TMP/localhost.key
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
 openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
 
-## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
+## création du certificat duckduckgo et r.duckduckgo pour redirection vers safe.duckduckgo.com
 openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
 openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr
 openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
+
 
 ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
 openssl genrsa 1024 > $DIR_TMP/search.yahoo.com.key
