@@ -535,6 +535,7 @@ do
 echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 done
 echo "address=/duckduckgo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+
 ## on force a passer par search.yahoo.com pour redirection url par lighttpd
 #ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
 #echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
@@ -1159,6 +1160,9 @@ fastcgi.server = (
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
 	#ssl.ca-file = "$CADIR/cactparental.crt"
+	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
+	}
+	\$SERVER["socket"] == "127.0.0.1:80" {
 	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
 	}
 }
