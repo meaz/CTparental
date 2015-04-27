@@ -170,7 +170,7 @@ ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=1000}
 
-FILEConfPriv=${FILEConfPriv:="/etc/privoxy/config"}
+
 FILEConfDans=${FILEConfDans:="/etc/dansguardian/dansguardian.conf"}
 FILEConfDansf1=${FILEConfDansf1:="/etc/dansguardian/dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -187,6 +187,9 @@ CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
+PRIVOXYCONF=${PRIVOXYCONF:="/etc/privoxy/config"}
+PRIVOXYUSERA=${PRIVOXYUSERA:="/etc/privoxy/user.action"}
+PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
    CMDINSTALL=${CMDINSTALL:="yum install "}
@@ -317,8 +320,23 @@ $DANSGOUARDIANrestart
   
 }
 confprivoxy () {
-$SED "s?^debug.*?debug = 0?g"  $FILEConfPriv   
-$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $FILEConfPriv  
+$SED "s?^debug.*?debug = 0?g"  $PRIVOXYCONF  
+$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $PRIVOXYCONF 
+
+	test=$(grep "actionsfile ctparental.action" $PRIVOXYCONF |wc -l)
+	if [ $test -ge "1" ] ; then
+		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" $PRIVOXYCONF
+	else
+	    nline=$(grep "actionsfile.*user.action" $PRIVOXYCONF -n | cut -d":" -f1)
+		$SED $nline"i\actionsfile ctparental.action      # ctparental customizations" $PRIVOXYCONF
+	fi
+	unset test
+
+echo '# BING Add &adlt=strict' > $PRIVOXYCTA
+echo '{+redirect{s@$@&adlt=strict@}}' >> $PRIVOXYCTA
+echo '.bing./.*[&?]q=' >> $PRIVOXYCTA
+echo '{-redirect}' >> $PRIVOXYCTA
+echo '.bing./.*&adlt=strict' >> $PRIVOXYCTA
 $PRIVOXYrestart
 }
 
@@ -536,6 +554,11 @@ echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" >> $DIR_DNS_BLACKLIST_ENAB
 done
 echo "address=/duckduckgo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
+## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
+## et ainci forcer le safesearch via privoxy.
+## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
+echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4)" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+
 ## on force a passer par search.yahoo.com pour redirection url par lighttpd
 #ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
 #echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
@@ -543,7 +566,7 @@ echo "address=/duckduckgo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafe
 
 # on bloque les moteurs de recherche pas asser sur
 echo "address=/search.yahoo.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
-echo "address=/www.bing.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+
 
 
 
@@ -825,6 +848,10 @@ iptableson () {
 
    # Force non priviledged users to use dnsmasq
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+	 # echo "address=/.bing.com/$(host -ta www.bing.com|cut -d" " -f4)" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+	  ipbing=$(cat $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
+	  $IPTABLES -A OUTPUT -d $ipbing -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
+
       for user in `listeusers` ; do
       if  [ $(groups $user | grep -c " ctoff$") -eq 0 ];then
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
@@ -834,11 +861,12 @@ iptableson () {
          $IPTABLES -t nat -A ctparental -d 127.0.0.1 -p tcp --dport 80 -j DNAT --to 127.0.0.1:80
          if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$DANSGport | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:$DANSGport
 			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$PROXYport | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 127.0.0.1:$PROXYport
+				
 			    $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
 				$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
 				#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
 				$IPTABLES -A OUTPUT -d 127.0.0.0/24 -m owner --uid-owner "$user" -p tcp --dport 443 -j ACCEPT
-				$IPTABLES -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
+				
 			 fi
         fi
       fi
@@ -1916,6 +1944,7 @@ echo "*/1 * * * * root /usr/local/bin/CTparental.sh -uctl" >> /etc/cron.d/CTpare
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
+
 
 
 
