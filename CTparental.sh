@@ -854,7 +854,6 @@ iptableson () {
 
    # Force non priviledged users to use dnsmasq
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	 # echo "address=/.bing.com/$(host -ta www.bing.com|cut -d" " -f4)" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 	  ipbing=$(cat $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
 	  $IPTABLES -A OUTPUT -d $ipbing -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 	  
@@ -876,7 +875,7 @@ iptableson () {
 			    $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
 				$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
 				#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
-				$IPTABLES -A OUTPUT -d 127.0.0.0/24 -m owner --uid-owner "$user" -p tcp --dport 443 -j ACCEPT
+				$IPTABLES -A OUTPUT -d 127.0.0.0/24 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
 				
 			 fi
         fi
