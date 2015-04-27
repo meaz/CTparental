@@ -1420,7 +1420,6 @@ install () {
 	  confdansguardian
 	  confprivoxy
       FoncHTTPDCONF
-      CActparental
       iptablesoff
       iptableson
       $ENCRON
