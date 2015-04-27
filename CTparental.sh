@@ -337,6 +337,12 @@ echo '{+redirect{s@$@&adlt=strict@}}' >> $PRIVOXYCTA
 echo '.bing./.*[&?]q=' >> $PRIVOXYCTA
 echo '{-redirect}' >> $PRIVOXYCTA
 echo '.bing./.*&adlt=strict' >> $PRIVOXYCTA
+echo >> $PRIVOXYCTA
+echo '# dailymotion.com ' >> $PRIVOXYCTA
+echo '# remplace http://www.dailymotion.com/family_filter?enable=false....' >> $PRIVOXYCTA
+echo '# par http://www.dailymotion.com/family_filter?enable=true...' >> $PRIVOXYCTA
+echo '{+redirect{s@enable=[^&]+@enable=true@}}' >> $PRIVOXYCTA
+echo ' .dailymotion.*/.*enable=(?!true)' >> $PRIVOXYCTA
 $PRIVOXYrestart
 }
 
@@ -851,6 +857,11 @@ iptableson () {
 	 # echo "address=/.bing.com/$(host -ta www.bing.com|cut -d" " -f4)" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 	  ipbing=$(cat $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
 	  $IPTABLES -A OUTPUT -d $ipbing -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
+	  
+	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
+	  do 
+		$IPTABLES -A OUTPUT -d $ipdailymotion -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
+	  done
 
       for user in `listeusers` ; do
       if  [ $(groups $user | grep -c " ctoff$") -eq 0 ];then
