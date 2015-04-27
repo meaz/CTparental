@@ -1174,7 +1174,7 @@ server.errorfile-prefix = "$DIRHTML/err"
 
 EOF
 
-CActparental
+
 
 chown root:$GROUPHTTPD $DREAB
 chmod 660 $DREAB
@@ -1230,6 +1230,7 @@ chmod 660 $FILE_HCOMPT
 
 chown -R root:$GROUPHTTPD $DIRHTML
 chown -R root:$GROUPHTTPD $DIRadminHTML
+CActparental
 $LIGHTTPDstart
 test=$?
 if [ ! $test -eq 0 ];then
@@ -1273,6 +1274,15 @@ cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
+#on supprime les certificats dans les navigateurs des utilisateurs pour eviter les erreurs du aux nouveaux certificat.
+for user in `listeusers` ; do
+HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
+	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
+		#firefox iceweachel
+	 rm -f $HOMEPCUSER/.mozilla/firefox/$profilefirefox/cert8.db
+	 rm -f $HOMEPCUSER/.mozilla/firefox/$profilefirefox/cert_override.txt
+	done
+done
 }
 
 
@@ -1382,6 +1392,7 @@ install () {
 	  confdansguardian
 	  confprivoxy
       FoncHTTPDCONF
+      CActparental
       iptablesoff
       iptableson
       $ENCRON
