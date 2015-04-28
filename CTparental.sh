@@ -1944,8 +1944,8 @@ usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -
 -gctulist => Met a jour le fichier de conf du groupe , $FILE_GCTOFFCONF
 			 en fonction des utilisateurs ajoutés ou supprimés du pc.
 -gctalist => Ajoute/Supprime les utilisateurs dans le group ctoff en fonction du fichier de conf.
--ipton	  => Active les raigles de par feux personnalisées.
--iptoff   => Désactive les raigles de par feux personnalisées.
+-ipton	  => Active les règles de par feux personnalisées.
+-iptoff   => Désactive les règles de par feux personnalisées.
 	 
  "
 case $arg1 in
@@ -2057,7 +2057,7 @@ case $arg1 in
     -ipton )
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
       iptablesreload
-      echo -e "$RougeD pour ajouter des raigles personalisée éditer le fichier "
+      echo -e "$RougeD pour ajouter des règles personalisée éditer le fichier "
       echo " $FILEIPTABLES "
       echo -e " puis relancer la commande CTparental.sh -ipton $Fcolor"
       ;;
