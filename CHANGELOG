@@ -1,5 +1,6 @@
 # 28/04/2015
-# Version 3.91   ajout de la gestion de règle personnalisées pour iptables (en lig
+# Version 3.91   ajout de la gestion de règle personnalisées pour iptables .
+# Version 3.90-8 correction bug port 443 non bloquer pour les usager filtré qui pouvait passer outre le proxy.
 # Version 3.90-7 ajout du + force SafeSearch bing (en http seulement) sont acces étant verouiller en https pour les usagers filtré.
 # Version 3.90-6 corectif bug http://r.duckduckgo.com n'était pas redirigé sur safe.duckduckgo.com ce qui poser des problême l'ors de l'acces aux reponses.
 # Version 3.90-5 corectif bug Noms de domaine réhabilités non pris en compte par dansguardian.
