@@ -756,19 +756,18 @@ iptablesreload () {
    
    $IPTABLES -F
    $IPTABLES -X
-   $IPTABLES -P INPUT ACCEPT
-   $IPTABLES -P OUTPUT ACCEPT
-   $IPTABLES -P FORWARD ACCEPT
    $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
    $IPTABLES -t nat -F ctparental || /bin/true
    $IPTABLES -t nat -X ctparental || /bin/true
+   $IPTABLES -P INPUT ACCEPT
+   $IPTABLES -P OUTPUT ACCEPT
+   $IPTABLES -P FORWARD ACCEPT
+
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
 	resolvconffix
 	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
     ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
-    $IPTABLES -F
-    $IPTABLES -X
     $IPTABLES -t nat -N ctparental
     $IPTABLES -t nat -A OUTPUT -j ctparental
 
