@@ -748,10 +748,6 @@ initfileiptables () {
     echo '#15001 télécharger addons' >>  $FILEIPTABLES
     echo '#$IPTABLES -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT' >>  $FILEIPTABLES
     echo '#$IPTABLES -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT' >>  $FILEIPTABLES
-    echo "### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente" >>  $FILEIPTABLES                
-    echo '$IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "' >>  $FILEIPTABLES
-    echo '$IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "' >>  $FILEIPTABLES
-    echo '$IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "' >>  $FILEIPTABLES
 	chown root:root  $FILEIPTABLES
 	chmod 750  $FILEIPTABLES
 }
@@ -809,7 +805,10 @@ iptablesreload () {
    if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
     ipglobal
    fi
-
+### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
+$IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
+$IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
+$IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
 # Save configuration so that it survives a reboot
    $IPTABLESsave
