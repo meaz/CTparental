@@ -70,36 +70,6 @@ HOURSCONNECT=OFF
 GCTOFF=OFF
 # Parfeux minimal.
 IPRULES=OFF
-# Ping Externe
-IPRULE1=OFF
-# IP indésirables
-IPRULE2=OFF
-# connections ftp
-IPRULE3=ON
-# cups serveur , impriment partager sous cups
-IPRULE4=OFF
-# emesene,pindgin,amsn... 
-IPRULE5=OFF
-#  smtp + pop ssl thunderbird ...
-IPRULE6=ON
-#  smtp + pop thunderbird ...
-IPRULE7=OFF
-# client-transmission
-IPRULE8=OFF
-# Ryzom
-IPRULE9=OFF
-# Regnum Online
-IPRULE10=OFF
-# NeverWinter Nights 1
-IPRULE11=OFF
-# LandesEternelles
-IPRULE12=OFF
-# SecondeLife
-IPRULE13=OFF
-# Batel for Wesnoth
-IPRULE14=OFF
-# Steam: CS 1.6
-IPRULE15=OFF
 EOF
 
 fi
@@ -225,6 +195,7 @@ ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f
 
 DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
 DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+
 resolvconffix () {
 resolvconf -u 2&> /dev/null
 if [ $? -eq 1 ];then
@@ -264,6 +235,7 @@ UMFILEtmp=""
 fi
 BL_SERVER="dsi.ut-capitole.fr"
 FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
+FILEIPTABLES="$DIR_CONF/iptables"
 CATEGORIES_ENABLED="$DIR_CONF/categories-enabled"
 BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
 WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
@@ -655,10 +627,6 @@ done
    return $result
 }
 ipglobal () {
-	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
-    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
-    $IPTABLES -F
-    $IPTABLES -X
     ### BLOQUE TOUT PAR DEFAUT (si aucune règle n'est définie par la suite) ###
     $IPTABLES -P INPUT DROP
     $IPTABLES -P OUTPUT DROP
@@ -669,9 +637,8 @@ ipglobal () {
     $IPTABLES -A INPUT -i $interface_WAN -p udp -m limit --limit 10/s -j ACCEPT
 
 	### IP indésirables
-    if [ $(cat $FILE_CONF | grep -c IPRULE2=ON ) -eq 1 ];then
-       if [ -e $FILEIPBLACKLIST ]
-       then
+ 
+    if [ -e $FILEIPBLACKLIST ] ;  then
 	   while read ligne
 	   do
 		ipdrop=`echo $ligne | cut -d " " -f1`  
@@ -680,12 +647,12 @@ ipglobal () {
 			$IPTABLES -I OUTPUT  -d $ipdrop -j DROP
 		fi
        done < $FILEIPBLACKLIST
-       else
+    else
 	    echo >  $FILEIPBLACKLIST
 	    chown root:root  $FILEIPBLACKLIST
 	    chmod 750  $FILEIPBLACKLIST
-       fi
     fi
+   
     ### ACCEPT ALL interface loopback ###
     $IPTABLES -A INPUT  -i lo -j ACCEPT
     $IPTABLES -A OUTPUT -o lo -j ACCEPT
@@ -720,137 +687,94 @@ ipglobal () {
 	$IPTABLES -A OUTPUT -p tcp --dport 21 -j ACCEPT
 	$IPTABLES -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 	
-	# Ping Externe
-	if [ $(cat $FILE_CONF | grep -c IPRULE1=ON ) -eq 1 ];then
-      $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
-      $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT
-	fi	
-	source 
-    
-    ### cups serveur , impriment partager sous cups
-	if [ $(cat $FILE_CONF | grep -c IPRULE4=ON ) -eq 1 ] ; then
-		$IPTABLES -A OUTPUT -d $ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
-		$IPTABLES -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT
-		$IPTABLES -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
-	fi
-    ### emesene,pindgin,amsn...  ####
-    if [ $(cat $FILE_CONF | grep -c IPRULE5=ON ) -eq 1 ] ; then
-		$IPTABLES -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT     
-		$IPTABLES -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
-		$IPTABLES -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam
-    fi
-    
-    ### smtp + pop ssl thunderbird ...  ####
-    if [ $(cat $FILE_CONF | grep -c IPRULE6=ON ) -eq 1 ]
-    then
-		$IPTABLES -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl
-		$IPTABLES -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl
-		$IPTABLES -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl
-    fi
-    ###  smtp + pop thunderbird ...  ###
-    if [ $(cat $FILE_CONF | grep -c IPRULE7=ON ) -eq 1 ]
-	then
-        $IPTABLES -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT
-        $IPTABLES -A OUTPUT -p tcp -m tcp --dport 110 -j ACCEPT
+	if [ -e $FILEIPTABLES ] ;  then
+		source $FILEIPTABLES
+    else
+	    initfileiptables
     fi
 
-    ### client-transmission
-    # ouvre beaucoup de ports
-    if [ $(cat $FILE_CONF | grep -c IPRULE8=ON ) -eq 1 ]
-    then
-       $IPTABLES -A OUTPUT -p udp -m udp --sport 51413 --dport 1023:65535  -j ACCEPT
-       $IPTABLES -A OUTPUT -p tcp -m tcp --sport 30000:65535 --dport 1023:65535  -j ACCEPT
-    fi
- 
-	###Ryzom
-	if [ $(cat $FILE_CONF | grep -c IPRULE9=ON ) -eq 1 ]
-	then
-		srvupdateRtzom=178.33.44.72
-		srvRyzom1=176.31.229.93
-		$IPTABLES -A OUTPUT  -d $srvupdateRtzom -p tcp --dport 873 -j ACCEPT
-		$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 43434 -j ACCEPT
-		$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 50000 -j ACCEPT
-		$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 40916 -j ACCEPT
-		$IPTABLES -A OUTPUT  -d $srvRyzom1 -p udp --dport 47851:47860 -j ACCEPT
-		$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 47851:47860 -j ACCEPT
-	fi
-	
-    ### Regnum Online
-    if [ $(cat $FILE_CONF | grep -c IPRULE10=ON ) -eq 1 ]
-    then
-   	$IPTABLES -A OUTPUT  -d 91.123.197.131 -p tcp --dport 47300 -j ACCEPT # autentification
-	$IPTABLES -A OUTPUT  -d 91.123.197.142 -p tcp --dport 48000:48002  -j ACCEPT # nemon
-    fi
-    
-    ### NeverWinter Nights 1
-    if [ $(cat $FILE_CONF | grep -c IPRULE11=ON ) -eq 1 ];then
-       $IPTABLES -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT
-       $IPTABLES -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur 
-    fi
- 
-    ### LandesEternelles
-    if [ $(cat $FILE_CONF | grep -c IPRULE12=ON ) -eq 1 ]
-    then
-        $IPTABLES -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT
-    fi
-    ### SecondeLife
-    if [ $(cat $FILE_CONF | grep -c IPRULE13=ON ) -eq 1 ]
-   then
-      
-       $IPTABLES -A INPUT  -s 216.82.0.0/18 -p tcp --dport 1023:65535 -j ACCEPT # Secondelife
-       $IPTABLES -A INPUT  -s 64.94.252.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A INPUT  -s 70.42.62.0/24 -p tcp --dport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A INPUT  -s 74.201.98.0/23 -p tcp --dport 1023:65535 -j ACCEPT # Voice
- 
-       $IPTABLES -A INPUT  -s 216.82.0.0/18 -p udp --dport 1023:65535 -j ACCEPT # Secondelife
-       $IPTABLES -A INPUT  -s 64.94.252.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A INPUT  -s 70.42.62.0/24 -p udp --dport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A INPUT  -s 74.201.98.0/23 -p udp --dport 1023:65535 -j ACCEPT # Voice
- 
-       $IPTABLES -A OUTPUT  -d 216.82.0.0/18 -p tcp --sport 1023:65535 -j ACCEPT # Secondelife
-       $IPTABLES -A OUTPUT  -d 64.94.252.0/23 -p tcp --sport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A OUTPUT  -d 70.42.62.0/24 -p tcp --sport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A OUTPUT  -d 74.201.98.0/23  -p tcp --sport 1023:65535 -j ACCEPT # Voice
- 
-       $IPTABLES -A OUTPUT  -d 216.82.0.0/18 -p udp --sport 1023:65535 -j ACCEPT # Secondelife
-       $IPTABLES -A OUTPUT  -d 64.94.252.0/23 -p udp --sport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A OUTPUT  -d 70.42.62.0/24 -p udp --sport 1023:65535 -j ACCEPT # Voice
-       $IPTABLES -A OUTPUT  -d 74.201.98.0/23  -p udp --sport 1023:65535 -j ACCEPT # Voice
-    fi
-    
-    ### Batel for Wesnoth
-    if [ $(cat $FILE_CONF | grep -c IPRULE14=ON ) -eq 1 ];then
-       #14998 pour version stable.
-       #14999 pour version stable précédente.
-       #15000 pour version de dévelopement. 
-       #15001 télécharger addons
-       $IPTABLES -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT
-       $IPTABLES -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT
-    fi
-    
-    # Steam: CS 1.6
-    if [ $(cat $FILE_CONF | grep -c IPRULE15=ON ) -eq 1 ];then
-	    
-        $IPTABLES -A INPUT -p tcp --sport 27030 -j ACCEPT
-        $IPTABLES -A OUTPUT -p udp --dport 27015:27020 -j ACCEPT
-	    $IPTABLES -A INPUT -p udp --sport 27015:27020 -j ACCEPT
-   	    $IPTABLES -A OUTPUT -p tcp --dport 27030 -j ACCEPT
-    fi
-    
-   ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente                   
-   $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
-   $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
-   $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
 }
+initfileiptables () {
+    echo >  $FILEIPTABLES
+	echo '' >  $FILEIPTABLES
+	echo '# Ping Externe' >>  $FILEIPTABLES
+	echo '# $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT' >>  $FILEIPTABLES
+    echo '# $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT' >>  $FILEIPTABLES
+	echo '' >>  $FILEIPTABLES
+	echo '### cups serveur , impriment partager sous cups' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -d $ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle' >>  $FILEIPTABLES
+    echo '' >>  $FILEIPTABLES
+    echo '### emesene,pindgin,amsn...  ####' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT  ' >>  $FILEIPTABLES   
+	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
+    echo '' >>  $FILEIPTABLES
+    echo '### smtp + pop ssl thunderbird ...  ####' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl' >>  $FILEIPTABLES
+	echo '' >>  $FILEIPTABLES
+    echo '###  smtp + pop thunderbird ...  ###' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 110 -j ACCEPT' >>  $FILEIPTABLES
+    echo '### client-transmission' >>  $FILEIPTABLES
+    echo '# ouvre beaucoup de ports' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT -p udp -m udp --sport 51413 --dport 1023:65535  -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --sport 30000:65535 --dport 1023:65535  -j ACCEPT' >>  $FILEIPTABLES
+    echo '###Ryzom' >>  $FILEIPTABLES
+	echo '#srvupdateRtzom=178.33.44.72' >>  $FILEIPTABLES
+	echo '#srvRyzom1=176.31.229.93' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvupdateRtzom -p tcp --dport 873 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 43434 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 50000 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 40916 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvRyzom1 -p udp --dport 47851:47860 -j ACCEPT' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d $srvRyzom1 -p tcp --dport 47851:47860 -j ACCEPT' >>  $FILEIPTABLES
+	echo '### Regnum Online' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT  -d 91.123.197.131 -p tcp --dport 47300 -j ACCEPT # autentification' >>  $FILEIPTABLES
+	echo '#$IPTABLES -A OUTPUT  -d 91.123.197.142 -p tcp --dport 48000:48002  -j ACCEPT # nemon' >>  $FILEIPTABLES
+    echo '### NeverWinter Nights 1' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT' >>  $FILEIPTABLES
+    echo "#\$IPTABLES -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur " >>  $FILEIPTABLES
+    echo '### LandesEternelles' >>  $FILEIPTABLES
+    echo '$IPTABLES -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT' >>  $FILEIPTABLES
+    echo '### Batel for Wesnoth' >>  $FILEIPTABLES
+    echo '#14998 pour version stable.' >>  $FILEIPTABLES
+    echo '#14999 pour version stable précédente.' >>  $FILEIPTABLES
+    echo '#15000 pour version de dévelopement.' >>  $FILEIPTABLES
+    echo '#15001 télécharger addons' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT' >>  $FILEIPTABLES
+    echo "### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente" >>  $FILEIPTABLES                
+    echo '$IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "' >>  $FILEIPTABLES
+    echo '$IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "' >>  $FILEIPTABLES
+    echo '$IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "' >>  $FILEIPTABLES
+	chown root:root  $FILEIPTABLES
+	chmod 750  $FILEIPTABLES
+}
 
-iptableson () {
+iptablesreload () {
+   
+   $IPTABLES -F
+   $IPTABLES -X
+   $IPTABLES -P INPUT ACCEPT
+   $IPTABLES -P OUTPUT ACCEPT
+   $IPTABLES -P FORWARD ACCEPT
+   $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
+   $IPTABLES -t nat -F ctparental || /bin/true
+   $IPTABLES -t nat -X ctparental || /bin/true
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
 	resolvconffix
-
-   $IPTABLES -t nat -N ctparental
-   $IPTABLES -t nat -A OUTPUT -j ctparental
+	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
+    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
+    $IPTABLES -F
+    $IPTABLES -X
+    $IPTABLES -t nat -N ctparental
+    $IPTABLES -t nat -A OUTPUT -j ctparental
 
    # Force non priviledged users to use dnsmasq
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -886,22 +810,17 @@ iptableson () {
     ipglobal
    fi
 
-cat << EOF > $RSYSLOGCTPARENTAL  
-:msg,contains,"iptables" /var/log/iptables.log
-& ~
-EOF
 
 # Save configuration so that it survives a reboot
    $IPTABLESsave
 }
 iptablesoff () {
-   #if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
+
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
    $IPTABLES -P FORWARD ACCEPT
-   #fi
    $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
    $IPTABLES -t nat -F ctparental || /bin/true
    $IPTABLES -t nat -X ctparental || /bin/true
@@ -1397,6 +1316,43 @@ install () {
       if [ $noinstalldep = "0" ]; then
 	      $CMDINSTALL $DEPENDANCES
       fi
+      # on desactive l'ipv6
+		test=`grep net.ipv6.conf.all.disable_ipv6= /etc/sysctl.conf |wc -l`
+		if [ $test -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=1?g" /etc/sysctl.conf
+		else
+			echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
+		fi
+		unset test
+		test=`grep net.ipv6.conf.default.disable_ipv6= /etc/sysctl.conf |wc -l`
+		if [ $test -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" /etc/sysctl.conf
+		else
+			echo "net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf
+		fi
+		unset test
+				unset test
+		test=`grep net.ipv6.conf.lo.disable_ipv6= /etc/sysctl.conf |wc -l`
+		if [ $test -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" /etc/sysctl.conf
+		else
+			echo "net.ipv6.conf.lo.disable_ipv6=1" >> /etc/sysctl.conf
+		fi
+		unset test
+		sysctl -w
+      ######################
+      # on charge le(s) module(s) indispensable(s) pour iptables.
+		test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
+		if [ $test -ge "1" ] ; then
+			$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
+		else
+			echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
+		fi
+		modprobe ip_conntrack_ftp	
+		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD 
+		echo ':msg,contains,"iptables" /var/log/iptables.log' > $RSYSLOGCTPARENTAL 
+		echo '& ~' >> $RSYSLOGCTPARENTAL 
+	  #######################
       
       if [ ! -f blacklists.tar.gz ]
       then
@@ -1416,22 +1372,10 @@ install () {
       catChoice
       dnsmasqon
       $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=`date +%d-%m-%Y\ %T`?g" $FILE_CONF
-       
-      # on charge le(s) module(s) indispensable(s) pour iptables.
-		test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
-		if [ $test -ge "1" ] ; then
-			$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
-		else
-			echo "#ip_conntrack_ftp" >> $FILEMODULESLOAD
-		fi
-		modprobe ip_conntrack_ftp	
-		$SED "s?.*ip_conntrack_ftp.*?ip_conntrack_ftp?g" $FILEMODULESLOAD 
-	  ###
 	  confdansguardian
 	  confprivoxy
       FoncHTTPDCONF
-      iptablesoff
-      iptableson
+      iptablesreload
       $ENCRON
       $ENLIGHTTPD
       $ENDNSMASQ
@@ -2010,14 +1954,13 @@ case $arg1 in
       exit 0
       ;;
    -i | --install )
-      install
       iptablesoff
-      iptableson
+      install
       exit 0
       ;;
    -u | --uninstall )
+	  iptablesoff
       autoupdateoff 
-      iptablesoff
       dnsmasqoff
       desactivetimelogin
       uninstall
@@ -2049,7 +1992,7 @@ case $arg1 in
       ;;
    -on | --on )
       dnsmasqon
-      iptableson
+      iptablesreload
       exit 0
       ;;
    -off | --off )
@@ -2097,23 +2040,19 @@ case $arg1 in
       ;;
     -gcton )
       activegourpectoff
-	  iptablesoff
-	  iptableson
+	  iptablesreload
       ;;
     -gctoff )
 	  desactivegourpectoff
-	  iptablesoff
-	  iptableson
+	  iptablesreload
       ;;
     -gctulist )
 	  updatelistgctoff
-	  iptablesoff
-	  iptableson
+	  iptablesreload
       ;;
     -gctalist )
 	  applistegctoff
-	  iptablesoff
-	  iptableson
+	  iptablesreload
       ;;
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
