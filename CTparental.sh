@@ -2057,8 +2057,9 @@ case $arg1 in
     -ipton )
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
       iptablesreload
-      echo "pour ajouter des raigles personalisée éditer le fichier $FILEIPTABLES "
-      echo "puis relancer la commande CTparental.sh -ipton"
+      echo -e "$RougeD pour ajouter des raigles personalisée éditer le fichier "
+      echo " $FILEIPTABLES "
+      echo -e " puis relancer la commande CTparental.sh -ipton $Fcolor"
       ;;
     -iptoff )
       $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
