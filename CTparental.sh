@@ -740,7 +740,7 @@ initfileiptables () {
     echo '#$IPTABLES -A OUTPUT  -p udp --dport 5120:5121 -j ACCEPT' >>  $FILEIPTABLES
     echo "#\$IPTABLES -I OUTPUT  -d 204.50.199.9 -j DROP # nwmaster.bioware.com permet d'éviter le temps d'attente avant l'ouverture du multijoueur " >>  $FILEIPTABLES
     echo '### LandesEternelles' >>  $FILEIPTABLES
-    echo '$IPTABLES -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT' >>  $FILEIPTABLES
+    echo '#$IPTABLES -A OUTPUT  -d 62.93.225.45 -p tcp --dport 3000 -j ACCEPT' >>  $FILEIPTABLES
     echo '### Batel for Wesnoth' >>  $FILEIPTABLES
     echo '#14998 pour version stable.' >>  $FILEIPTABLES
     echo '#14999 pour version stable précédente.' >>  $FILEIPTABLES
@@ -1944,6 +1944,8 @@ usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -
 -gctulist => Met a jour le fichier de conf du groupe , $FILE_GCTOFFCONF
 			 en fonction des utilisateurs ajoutés ou supprimés du pc.
 -gctalist => Ajoute/Supprime les utilisateurs dans le group ctoff en fonction du fichier de conf.
+-ipton	  => Active les raigles de par feux personnalisées.
+-iptoff   => Désactive les raigles de par feux personnalisées.
 	 
  "
 case $arg1 in
@@ -2051,6 +2053,16 @@ case $arg1 in
     -gctalist )
 	  applistegctoff
 	  iptablesreload
+      ;;
+    -ipton )
+      $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
+      iptablesreload
+      echo "pour ajouter des raigles personalisée éditer le fichier $FILEIPTABLES "
+      echo "puis relancer la commande CTparental.sh -ipton"
+      ;;
+    -iptoff )
+      $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
+      iptablesreload
       ;;
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
