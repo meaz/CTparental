@@ -742,7 +742,17 @@ ipglobal () {
 }
 initfileiptables () {
     echo >  $FILEIPTABLES
-	echo '' >  $FILEIPTABLES
+	echo '' >>  $FILEIPTABLES
+	echo '## on autorise tous le trafique sortent a destination de notre lan (PC imprimente de la maison)' >>  $FILEIPTABLES
+	echo '$IPTABLES -A OUTPUT -d $reseau_box -j ACCEPT ' >>  $FILEIPTABLES
+	echo '## on acepte tous le trafique entrant en provenence de notre lan (PC imprimente de la maison)' >>  $FILEIPTABLES
+	echo '$IPTABLES -A INPUT -s $reseau_box -j ACCEPT  ' >>  $FILEIPTABLES
+    echo '' >>  $FILEIPTABLES
+    echo '### smtp + pop ssl thunderbird ...  ####' >>  $FILEIPTABLES
+	echo '$IPTABLES -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl' >>  $FILEIPTABLES
+	echo '$IPTABLES -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl' >>  $FILEIPTABLES
+	echo '$IPTABLES -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl' >>  $FILEIPTABLES
+	echo '' >>  $FILEIPTABLES
 	echo '# Ping Externe' >>  $FILEIPTABLES
 	echo '# $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT' >>  $FILEIPTABLES
     echo '# $IPTABLES -A INPUT -i $interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT' >>  $FILEIPTABLES
@@ -756,11 +766,6 @@ initfileiptables () {
     echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT  ' >>  $FILEIPTABLES   
 	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
 	echo '#$IPTABLES -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
-    echo '' >>  $FILEIPTABLES
-    echo '### smtp + pop ssl thunderbird ...  ####' >>  $FILEIPTABLES
-	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl' >>  $FILEIPTABLES
-	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl' >>  $FILEIPTABLES
-	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT      # smtp/ssl' >>  $FILEIPTABLES
 	echo '' >>  $FILEIPTABLES
     echo '###  smtp + pop thunderbird ...  ###' >>  $FILEIPTABLES
     echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 25 -j ACCEPT' >>  $FILEIPTABLES
