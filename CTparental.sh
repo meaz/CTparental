@@ -349,20 +349,14 @@ echo 'http://127.0.0.10/.*' >> $PRIVOXYCTA
 $PRIVOXYrestart
  
 test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
-		if [ $test -ge "0" ] ; then
-		 
+		if [ $test -eq "0" ] ; then	 
 		 $SED  2"i\### CTparental ###" $XSESSIONFILE
 		 $SED  3'i\if  [ \$(groups \$(whoami) | grep -c -E "( ctoff\$)|( ctoff )") -eq 0 ];then' $XSESSIONFILE
 		 $SED  4"i\  export https_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
 		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
 		 $SED  6"i\  export http_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
 		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
-		 $SED  8"i\else" $XSESSIONFILE
-		 $SED  9"i\  unset https_proxy" $XSESSIONFILE
-		 $SED 10"i\  unset HTTPS_PROXY" $XSESSIONFILE
-		 $SED 11"i\  unset http_proxy" $XSESSIONFILE
-		 $SED 12"i\  unset HTTP_PROXY" $XSESSIONFILE
-		 $SED 13"i\fi" $XSESSIONFILE
+		 $SED  8"i\fi" $XSESSIONFILE
 		fi
 unset test
 }
