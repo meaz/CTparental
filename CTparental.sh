@@ -16,7 +16,17 @@ if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec u
 fi
 fi
 fi
-
+if  [ $(groups $(whoami) | grep -c -E "( ctoff$)|( ctoff )") -eq 0 ];then
+  export https_proxy=http://127.0.0.1:8080
+  export HTTPS_PROXY=http://127.0.0.1:8080
+  export http_proxy=http://127.0.0.1:8080
+  export HTTP_PROXY=http://127.0.0.1:8080
+else
+  unset https_proxy
+  unset HTTPS_PROXY
+  unset http_proxy
+  unset HTTP_PROXY
+fi
 
 noinstalldep="0"
 nomanuel="0"
@@ -102,7 +112,7 @@ PROXYport=${PROXYport:="8888"}
 DANSGport=${DANSGport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl "}
+DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl libnss3-tools "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
 
@@ -160,6 +170,9 @@ DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
 PRIVOXYCONF=${PRIVOXYCONF:="/etc/privoxy/config"}
 PRIVOXYUSERA=${PRIVOXYUSERA:="/etc/privoxy/user.action"}
 PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
+CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
+XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
+REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
    CMDINSTALL=${CMDINSTALL:="yum install "}
@@ -304,7 +317,22 @@ $SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $PRIVOXYCONF
 	fi
 	unset test
 
-echo '# BING Add &adlt=strict' > $PRIVOXYCTA
+echo '{{alias}}' > $PRIVOXYCTA
+echo '+crunch-all-cookies = +crunch-incoming-cookies +crunch-outgoing-cookies' >> $PRIVOXYCTA
+echo '-crunch-all-cookies = -crunch-incoming-cookies -crunch-outgoing-cookies' >> $PRIVOXYCTA
+echo ' allow-all-cookies  = -crunch-all-cookies -session-cookies-only -filter{content-cookies}' >> $PRIVOXYCTA
+echo ' allow-popups       = -filter{all-popups} -filter{unsolicited-popups}' >> $PRIVOXYCTA
+echo '+block-as-image     = +block{Blocked image request.} +handle-as-image' >> $PRIVOXYCTA
+echo '-block-as-image     = -block' >> $PRIVOXYCTA
+echo 'fragile     = -block -crunch-all-cookies -filter -fast-redirects -hide-referer -prevent-compression' >> $PRIVOXYCTA
+echo 'shop        = -crunch-all-cookies allow-popups' >> $PRIVOXYCTA
+echo 'myfilters   = +filter{html-annoyances} +filter{js-annoyances} +filter{all-popups}\' >> $PRIVOXYCTA
+echo '              +filter{webbugs} +filter{banners-by-size}' >> $PRIVOXYCTA
+echo 'allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}' >> $PRIVOXYCTA
+echo '{ fragile }' >> $PRIVOXYCTA
+echo 'http://127.0.0.10.*' >> $PRIVOXYCTA
+echo 'http://localhost.*' >> $PRIVOXYCTA
+echo '# BING Add &adlt=strict' >> $PRIVOXYCTA
 echo '{+redirect{s@$@&adlt=strict@}}' >> $PRIVOXYCTA
 echo '.bing./.*[&?]q=' >> $PRIVOXYCTA
 echo '{-redirect}' >> $PRIVOXYCTA
@@ -315,7 +343,28 @@ echo '# remplace http://www.dailymotion.com/family_filter?enable=false....' >> $
 echo '# par http://www.dailymotion.com/family_filter?enable=true...' >> $PRIVOXYCTA
 echo '{+redirect{s@enable=[^&]+@enable=true@}}' >> $PRIVOXYCTA
 echo ' .dailymotion.*/.*enable=(?!true)' >> $PRIVOXYCTA
+echo '{ fragile }' >> $PRIVOXYCTA
+echo 'http://127.0.0.10/.*' >> $PRIVOXYCTA
+
 $PRIVOXYrestart
+ 
+test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
+		if [ $test -ge "0" ] ; then
+		 
+		 $SED  2"i\### CTparental ###" $XSESSIONFILE
+		 $SED  3'i\if  [ \$(groups \$(whoami) | grep -c -E "( ctoff\$)|( ctoff )") -eq 0 ];then' $XSESSIONFILE
+		 $SED  4"i\  export https_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
+		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
+		 $SED  6"i\  export http_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
+		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
+		 $SED  8"i\else" $XSESSIONFILE
+		 $SED  9"i\  unset https_proxy" $XSESSIONFILE
+		 $SED 10"i\  unset HTTPS_PROXY" $XSESSIONFILE
+		 $SED 11"i\  unset http_proxy" $XSESSIONFILE
+		 $SED 12"i\  unset HTTP_PROXY" $XSESSIONFILE
+		 $SED 13"i\fi" $XSESSIONFILE
+		fi
+unset test
 }
 
 addadminhttpd() {
@@ -511,7 +560,9 @@ do
 		done
         fi
 done
-cat $DREAB | sed -e"s/^\.//g" | sed -e"s/^www.//g" > $DANSXSITELIST
+echo "localhost" > $DANSXSITELIST
+echo "127.0.0.1" >> $DANSXSITELIST
+cat $DREAB | sed -e"s/^\.//g" | sed -e"s/^www.//g" >> $DANSXSITELIST
 echo -n "."
 cat $DREAB | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  $DIR_DNS_WHITELIST_ENABLED/whiteliste.ossi.conf
 echo
@@ -521,7 +572,7 @@ date +%H:%M:%S
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=`host -ta forcesafesearch.google.com|cut -d" " -f4`	# retrieve forcesafesearch.google.com ip
 echo "# nosslsearch redirect server for google" > $DIR_DNS_BLACKLIST_ENABLED/googlenosslsearch.conf	
-for subdomaingoogle in `wget https://www.google.com/supported_domains -O - 2> /dev/null `  # pour chaque sous domain de google
+for subdomaingoogle in `wget http://www.google.com/supported_domains -O - 2> /dev/null `  # pour chaque sous domain de google
 do 
 echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf	
 done
@@ -782,7 +833,7 @@ iptablesreload () {
 	  done
 
       for user in `listeusers` ; do
-      if  [ $(groups $user | grep -c " ctoff$") -eq 0 ];then
+      if  [ $(groups $user | grep -c -E "( ctoff$)|( ctoff )" ) -eq 0 ];then
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
          #force passage par dansgourdian si présent
@@ -1224,18 +1275,19 @@ openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.c
 ## instalation de la CA dans les ca de confiance.
 cp $DIR_TMP/cactparental.crt $CADIR/
 cp $DIR_TMP/cactparental.crt $DIRHTML
+cp $DIR_TMP/cactparental.crt $REPCAMOZ
 ## instalation des certificats serveur
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
 #on supprime les certificats dans les navigateurs des utilisateurs pour eviter les erreurs du aux nouveaux certificat.
+#on install le certificat dans tous les prifile firefoxe utilisateur existant 
 for user in `listeusers` ; do
 HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
 		#firefox iceweachel
-	 rm -f $HOMEPCUSER/.mozilla/firefox/$profilefirefox/cert8.db
-	 rm -f $HOMEPCUSER/.mozilla/firefox/$profilefirefox/cert_override.txt
+			certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
 	done
 done
 }
@@ -1243,7 +1295,10 @@ done
 
 install () {
 	groupadd ctoff
-	
+	unset https_proxy
+	unset HTTPS_PROXY
+	unset http_proxy
+	unset HTTP_PROXY
 	if [ $nomanuel -eq 0 ]; then 
 		vim -h 2&> /dev/null
 		if [ $? -eq 0 ] ; then
@@ -1379,7 +1434,6 @@ install () {
       $ENDNSMASQ
       $ENNWMANAGER
       $ENIPTABLESSAVE
-
     
 }
 
@@ -1420,11 +1474,13 @@ activegourpectoff () {
    $ADDUSERTOGROUP root ctoff
    $SED "s?^GCTOFF.*?GCTOFF=ON?g" $FILE_CONF
    applistegctoff
+
 }
 
 desactivegourpectoff () {
    groupdel ctoff
    $SED "s?^GCTOFF.*?GCTOFF=OFF?g" $FILE_CONF
+
 }
 
 uninstall () {

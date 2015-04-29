@@ -1,4 +1,6 @@
-# 28/04/2015
+# 29/04/2015
+# Version 3.92   install du certificat automatique . + parametrage proxy automatique (nécesite un redemarage session en ca d'ajout ou de suppression du groupe ctoff.
+#				 ajout d'une nouvelle dépendance libnss3-tools pour l'utilisation de certutil.
 # Version 3.91   ajout de la gestion de règle personnalisées pour iptables .
 # Version 3.90-8 correction bug port 443 non bloquer pour les usager filtré qui pouvait passer outre le proxy.
 # Version 3.90-7 ajout du + force SafeSearch bing (en http seulement) sont acces étant verouiller en https pour les usagers filtré.
