@@ -347,7 +347,7 @@ echo '{ fragile }' >> $PRIVOXYCTA
 echo 'http://127.0.0.10/.*' >> $PRIVOXYCTA
 
 $PRIVOXYrestart
- 
+if [  -f $XSESSIONFILE ] ; then
 test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
 		if [ $test -eq "0" ] ; then	 
 		 $SED  2"i\### CTparental ###" $XSESSIONFILE
@@ -359,6 +359,7 @@ test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
 		 $SED  8"i\fi" $XSESSIONFILE
 		fi
 unset test
+fi
 }
 
 addadminhttpd() {
@@ -800,6 +801,7 @@ initfileiptables () {
     echo '#$IPTABLES -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT' >>  $FILEIPTABLES
 	chown root:root  $FILEIPTABLES
 	chmod 750  $FILEIPTABLES
+	
 }
 
 iptablesreload () {
@@ -861,6 +863,8 @@ $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
 # Save configuration so that it survives a reboot
    $IPTABLESsave
+   
+updateprofileuser
 }
 iptablesoff () {
 
@@ -1280,15 +1284,9 @@ cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
-#on supprime les certificats dans les navigateurs des utilisateurs pour eviter les erreurs du aux nouveaux certificat.
-#on install le certificat dans tous les prifile firefoxe utilisateur existant 
-for user in `listeusers` ; do
-HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
-		#firefox iceweachel
-			certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"
-	done
-done
+
+
+
 }
 
 
@@ -1466,8 +1464,31 @@ applistegctoff () {
 			$DELUSERTOGROUP $(echo $PCUSER | sed -e "s/#//g" ) ctoff 2> /dev/null
 		fi
 	done 
-}
 
+}
+updateprofileuser (){
+	for user in `listeusers` ; do	
+	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
+	if [  -f $HOMEPCUSER/.profile ] ; then
+	test=$(grep "^### CTparental ###" $$HOMEPCUSER/.profile |wc -l)
+		if [ $test -eq "0" ] ; then	 
+		 $SED  2"i\### CTparental ###" $HOMEPCUSER/.profile
+		 $SED  3'i\if  [ \$(groups \$(whoami) | grep -c -E "( ctoff\$)|( ctoff )") -eq 0 ];then' $HOMEPCUSER/.profile
+		 $SED  4"i\  export https_proxy=http://127.0.0.1:$DANSGport" $HOMEPCUSER/.profile
+		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$DANSGport" $HOMEPCUSER/.profile
+		 $SED  6"i\  export http_proxy=http://127.0.0.1:$DANSGport" $HOMEPCUSER/.profile
+		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$DANSGport" $HOMEPCUSER/.profile
+		 $SED  8"i\fi" $HOMEPCUSER/.profile
+		fi
+	unset test
+	fi
+	#on install le certificat dans tous les prifile firefoxe utilisateur existant 
+	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
+		#firefox iceweachel
+			certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+	done
+done
+}
 activegourpectoff () {
    groupadd ctoff
    $ADDUSERTOGROUP root ctoff
@@ -1853,6 +1874,8 @@ if [ $(echo $LIGNES | cut -d":" -f2) -ge $UIDMINUSER ] ;then
 	echo $LIGNES | cut -d":" -f1
 fi
 done
+
+
 }
 
 
