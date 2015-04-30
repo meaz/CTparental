@@ -1470,7 +1470,7 @@ updateprofileuser (){
 	for user in `listeusers` ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	if [  -f $HOMEPCUSER/.profile ] ; then
-	test=$(grep "^### CTparental ###" $$HOMEPCUSER/.profile |wc -l)
+	test=$(grep "^### CTparental ###" $HOMEPCUSER/.profile |wc -l)
 		if [ $test -eq "0" ] ; then	 
 		 $SED  2"i\### CTparental ###" $HOMEPCUSER/.profile
 		 $SED  3'i\if  [ \$(groups \$(whoami) | grep -c -E "( ctoff\$)|( ctoff )") -eq 0 ];then' $HOMEPCUSER/.profile
@@ -1543,6 +1543,33 @@ uninstall () {
    rm -rf $PEMSRVDIR/localhost.pem
    rm -rf $PEMSRVDIR/duckduckgo.pem
    rm -f $CADIR/cactparental.crt
+   for user in `listeusers` ; do	
+	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
+	if [  -f $HOMEPCUSER/.profile ] ; then
+	test=$(grep "^### CTparental ###" $HOMEPCUSER/.profile |wc -l)
+		if [ $test -eq "1" ] ; then	 
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		 $SED  2d $HOMEPCUSER/.profile
+		fi
+	unset test
+	fi
+   done
+   test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
+		if [ $test -eq "1" ] ; then	 
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		 $SED  2d $XSESSIONFILE
+		fi
+	unset test
 }
 
 choiblenabled () {
