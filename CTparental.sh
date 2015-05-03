@@ -209,30 +209,29 @@ ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f
 DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
 DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
 
-resolvconffix () {
-resolvconf -u 2&> /dev/null
-if [ $? -eq 1 ];then
-	if [ -f /run/resolvconf/interface/original.resolvconf ] ; then
-		cat /run/resolvconf/interface/original.resolvconf >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/original.resolvconf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
-	if [ -f /run/resolvconf/interface/$interface_WAN.dhclient ] ; then
-		cat /run/resolvconf/interface/$interface_WAN.dhclient >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/$interface_WAN.dhclient | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
-	if [ -f /run/resolvconf/interface/NetworkManager ] ; then
-		cat /run/resolvconf/interface/NetworkManager >  /etc/resolvconf/resolv.conf.d/tail
-		resolvconf -u
-		DNS1=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-		DNS2=$(cat /run/resolvconf/interface/NetworkManager | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-	fi
+resolvconffixon () {
+# redemare dnsmasq 
+$DNSMASQstop
+
+resolvconf -u 2&> /dev/null 
+if [ $? -eq 1 ];then # si resolvconf et bien installé
+resolvconf -u
+# on s'assure que les dns du FAI soit bien ajoutés au fichier /etc/resolv.conf malgré l'utilisation de dnsmasq.
+cat cat /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
 fi
+$DNSMASQstart
+
 }
-resolvconffix
+resolvconffixoff () {
+$DNSMASQstop	
+resolvconf -u 2&> /dev/null 
+if [ $? -eq 1 ];then # si resolvconf et bien installé
+echo > /etc/resolvconf/resolv.conf.d/tail
+resolvconf -u
+fi
+
+}
+
 
 PRIVATE_IP="127.0.0.10"
 
@@ -619,7 +618,8 @@ dnsmasqon () {
    server=$DNS2
    
 EOF
-$DNSMASQrestart
+resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
+# $DNSMASQrestart
 $DANSGOUARDIANrestart
 $PRIVOXYrestart
 else
@@ -628,6 +628,7 @@ fi
 }
 dnsmasqoff () {
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
+   resolvconffixoff
    $DANSGOUARDIANrestart
 $PRIVOXYrestart
 }
@@ -817,7 +818,7 @@ iptablesreload () {
 
    # Redirect DNS requests
    # note: http://superuser.com/a/594164
-	resolvconffix
+#resolvconffix
 	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
     ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
     $IPTABLES -t nat -N ctparental
@@ -1356,7 +1357,7 @@ install () {
       mkdir -p $DIR_CONF
       initblenabled
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
-	  resolvconffix
+	  #resolvconffix
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
