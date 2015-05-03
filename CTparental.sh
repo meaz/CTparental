@@ -1248,6 +1248,7 @@ if [ ! $test -eq 0 ];then
 	set -e
 	exit 1
 fi
+updateprofileuser
 }
 CActparental () {
 
@@ -1486,7 +1487,16 @@ updateprofileuser (){
 	#on install le certificat dans tous les prifile firefoxe utilisateur existant 
 	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
 		#firefox iceweachel
-			certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
+			fi
+		done
+		# on ajoute le nouveau certificat
+		certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
 	done
 done
 }
