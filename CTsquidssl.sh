@@ -301,56 +301,89 @@ $DANSGOUARDIANrestart
 confsquid3ssl () {
 
 cat << EOF > $SQUID3SSLCONF  
-visible_hostname proxy
 
-#######Access Controll lists definition ################
-acl localnet src $ipinterface_WAN
+## Port d'ecoute et option ##
+
+http_port 127.0.0.1:$PROXYport intercept
+https_port 127.0.0.1:$PROXYports intercept ssl-bump dynamic_cert_mem_cache_size=4MB cert=$PEMSRVSQUID/squidca.crt key=$PEMSRVSQUID/squidca.key
+
+# Attention si vous modifiez les valeurs de la ligne suivante : lancez squid3 -f $SQUID3SSLCONF  -z pour reconstruire le cache !
+## Mise en cache ##
+#cache_dir ufs /var/spool/squid3.3 1024 256 256
+#cache_dir null /tmp
+
+# Les journaux
+cache_access_log /var/log/squid3/access.log squid
+cache_log /var/log/squid3/cache.log
+cache_store_log /var/log/squid3/store.log
+cache_swap_log /var/log/squid3/cache_swap.log
+
+# Configuration minimum recommandée
+
+acl Safe_ports port 80 # http
+acl Safe_ports port 21 # ftp
+acl Safe_ports port 443 563 # https, snews
+acl Safe_ports port 70 # gopher
+acl Safe_ports port 210 # wais
+acl Safe_ports port 1025-65535 # unregistered ports
+acl Safe_ports port 280 # http-mgmt
+acl Safe_ports port 488 # gss-http
+acl Safe_ports port 591 # filemaker
+acl Safe_ports port 777 # multiling http
 acl CONNECT method CONNECT
-acl purge method PURGE
-acl Safe_ports port 1025-65535	# unregistered ports
-acl Safe_ports port 210		# wais
-acl Safe_ports port 21		# ftp
-acl Safe_ports port 280		# http-mgmt
-acl Safe_ports port 443		# https
-acl Safe_ports port 488		# gss-http
-acl Safe_ports port 591		# filemaker
-acl Safe_ports port 70		# gopher
-acl Safe_ports port 777		# multiling http
-acl Safe_ports port 80		# http
-acl SSL_ports port 443
-##############Authorization list################
+
+# Définition des réseaux
+
+#acl mon_reseaueth src 192.168.182.2
+
+# Les accès ou non
 http_access allow localhost
-http_access allow localnet 
-
-#http_access deny CONNECT !SSL_ports
-#http_access deny manager
-#http_access deny !Safe_ports
-# Only allow cachemgr access from localhost
-
-# Only allow purge requests from localhost
-http_access allow purge localhost
-http_access deny purge
-#Allow ICP queries from local networks only
-icp_access allow localnet
-icp_access deny all
+#http_access allow mon_reseaueth
 http_access deny all
 
+# La redirection sur squidguard pour le contrôle
 
-http_port $PROXYport intercept
+##redirect_program /usr/local/bin/squidGuard -c /etc/squid3/squidGuard.conf
+##redirect_children 100 
 
-sslcrtd_program $SSLCRTCMD  -s $SSLCRTSREP -M 4MB
-sslcrtd_children 2 startup=1 idle=1
-https_port $PROXYports intercept ssl-bump dynamic_cert_mem_cache_size=4MB cert=$PEMSRVSQUID/squidca.crt key=$PEMSRVSQUID/squidca.key
-
-
+# Definition des directive SSL
+always_direct allow all 
+ssl_bump server-first all 
+sslproxy_cert_error allow all
+sslproxy_cert_adapt setCommonName{CN}
 coredump_dir /var/spool/squid3
+
+# Memory Cache Options
+# You may want to increase 64 MB RAM to something higher.
+cache_mem 64 MB
+maximum_object_size_in_memory 512 KB
+memory_replacement_policy heap GDSF
 refresh_pattern .		0	20%	4320
 refresh_pattern ^ftp:		1440	20%	10080
 refresh_pattern ^gopher:	1440	0%	1440
 refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
-dns_nameservers 127.0.0.1
-EOF
 
+
+sslcrtd_program $SSLCRTCMD  -s $SSLCRTSREP -M 4MB
+sslcrtd_children 2
+ 
+# On renseigne le nom de machine qui fait serveur
+
+visible_hostname proxyCT
+append_domain .localdomain
+dns_nameservers 127.0.0.1
+
+##icap_enable on
+##icap_send_client_ip on
+#icap_send_client_username on
+#icap_client_username_header X-Authenticated-User
+##icap_service service_req reqmod_precache bypass=1 icap://127.0.0.1:1344/squidclamav
+##adaptation_access service_req allow all
+##icap_service service_resp respmod_precache bypass=1 icap://127.0.0.1:1344/squidclamav
+##adaptation_access service_resp allow all
+
+EOF
+squid3 -f $SQUID3SSLCONF  -z 
 $SQUIDstart
 }
 
@@ -1530,7 +1563,6 @@ uninstall () {
 	###
    rm -rf $DIR_CONF
    rm -f $PEMSRVDIR/localhost.pem
-   rm -f $PEMSRVDIR/duckduckgo.pem
    rm -f $CADIR/cactparental.crt
 
 
