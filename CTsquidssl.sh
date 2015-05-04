@@ -121,9 +121,13 @@ DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE dnsmasq restart "}
 NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
-IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
+IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 DANSGOUARDIANrestart=${DANSGOUARDIANrestart:="$CMDSERVICE dansguardian restart"}
-PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE squid3 restart"}
+SQUIDrestart=${SQUIDrestart:="$CMDSERVICE squid3 restart"}
+SQUIDstop=${SQUIDstop:="$CMDSERVICE squid3 stop"}
+SQUIDstart=${SQUIDstart:="$CMDSERVICE squid3 start"}
+
+
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
 
@@ -158,12 +162,11 @@ CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
-PRIVOXYCONF=${PRIVOXYCONF:="/etc/privoxy/config"}
-PRIVOXYUSERA=${PRIVOXYUSERA:="/etc/privoxy/user.action"}
-PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
-CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
-XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
+
+SQUID3SSLCONF=${SQUID3SSLCONF:="/etc/squid3/squid.conf"}
+SSLCRTSREP=${SSLCRTSREP:="/var/lib/ssl_db"}
+SSLCRTCMD=${SSLCRTCMD:="/usr/lib/squid3/ssl_crtd"}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
    CMDINSTALL=${CMDINSTALL:="yum install "}
@@ -294,62 +297,62 @@ confdansguardian () {
 $DANSGOUARDIANrestart
   
 }
-confprivoxy () {
-$SED "s?^debug.*?debug = 0?g"  $PRIVOXYCONF  
-$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $PRIVOXYCONF 
+confsquid3ssl () {
+$SQUIDstop
+rm -rf $SSLCRTSREP
+$SSLCRTCMD -c -s  $SSLCRTSREP
+chown -R $PROXYuser:root $SSLCRTSREP
+#chmod -R 644 $SSLCRTSREP
+cat << EOF > $SQUID3SSLCONF  
+visible_hostname proxy
 
-	test=$(grep "actionsfile ctparental.action" $PRIVOXYCONF |wc -l)
-	if [ $test -ge "1" ] ; then
-		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" $PRIVOXYCONF
-	else
-	    nline=$(grep "actionsfile.*user.action" $PRIVOXYCONF -n | cut -d":" -f1)
-		$SED $nline"i\actionsfile ctparental.action      # ctparental customizations" $PRIVOXYCONF
-	fi
-	unset test
+#######Access Controll lists definition ################
+acl localnet src $ipinterface_WAN
+acl CONNECT method CONNECT
+acl purge method PURGE
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 210		# wais
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 443		# https
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 777		# multiling http
+acl Safe_ports port 80		# http
+acl SSL_ports port 443
+##############Authorization list################
+http_access allow localhost
+http_access allow localnet 
 
-echo '{{alias}}' > $PRIVOXYCTA
-echo '+crunch-all-cookies = +crunch-incoming-cookies +crunch-outgoing-cookies' >> $PRIVOXYCTA
-echo '-crunch-all-cookies = -crunch-incoming-cookies -crunch-outgoing-cookies' >> $PRIVOXYCTA
-echo ' allow-all-cookies  = -crunch-all-cookies -session-cookies-only -filter{content-cookies}' >> $PRIVOXYCTA
-echo ' allow-popups       = -filter{all-popups} -filter{unsolicited-popups}' >> $PRIVOXYCTA
-echo '+block-as-image     = +block{Blocked image request.} +handle-as-image' >> $PRIVOXYCTA
-echo '-block-as-image     = -block' >> $PRIVOXYCTA
-echo 'fragile     = -block -crunch-all-cookies -filter -fast-redirects -hide-referer -prevent-compression' >> $PRIVOXYCTA
-echo 'shop        = -crunch-all-cookies allow-popups' >> $PRIVOXYCTA
-echo 'myfilters   = +filter{html-annoyances} +filter{js-annoyances} +filter{all-popups}\' >> $PRIVOXYCTA
-echo '              +filter{webbugs} +filter{banners-by-size}' >> $PRIVOXYCTA
-echo 'allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}' >> $PRIVOXYCTA
-echo '{ fragile }' >> $PRIVOXYCTA
-echo 'http://127.0.0.10.*' >> $PRIVOXYCTA
-echo 'http://localhost.*' >> $PRIVOXYCTA
-echo '# BING Add &adlt=strict' >> $PRIVOXYCTA
-echo '{+redirect{s@$@&adlt=strict@}}' >> $PRIVOXYCTA
-echo '.bing./.*[&?]q=' >> $PRIVOXYCTA
-echo '{-redirect}' >> $PRIVOXYCTA
-echo '.bing./.*&adlt=strict' >> $PRIVOXYCTA
-echo >> $PRIVOXYCTA
-echo '# dailymotion.com ' >> $PRIVOXYCTA
-echo '# remplace http://www.dailymotion.com/family_filter?enable=false....' >> $PRIVOXYCTA
-echo '# par http://www.dailymotion.com/family_filter?enable=true...' >> $PRIVOXYCTA
-echo '{+redirect{s@enable=[^&]+@enable=true@}}' >> $PRIVOXYCTA
-echo ' .dailymotion.*/.*enable=(?!true)' >> $PRIVOXYCTA
-echo '{ fragile }' >> $PRIVOXYCTA
-echo 'http://127.0.0.10/.*' >> $PRIVOXYCTA
+#http_access deny CONNECT !SSL_ports
+#http_access deny manager
+#http_access deny !Safe_ports
+# Only allow cachemgr access from localhost
 
-$PRIVOXYrestart
-if [  -f $XSESSIONFILE ] ; then
-test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
-		if [ $test -eq "0" ] ; then	 
-		 $SED  2"i\### CTparental ###" $XSESSIONFILE
-		 $SED  3'i\if  [ \$(groups \$(whoami) | grep -c -E "( ctoff\$)|( ctoff )") -eq 0 ];then' $XSESSIONFILE
-		 $SED  4"i\  export https_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
-		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
-		 $SED  6"i\  export http_proxy=http://127.0.0.1:$DANSGport" $XSESSIONFILE
-		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$DANSGport" $XSESSIONFILE
-		 $SED  8"i\fi" $XSESSIONFILE
-		fi
-unset test
-fi
+# Only allow purge requests from localhost
+http_access allow purge localhost
+http_access deny purge
+#Allow ICP queries from local networks only
+icp_access allow localnet
+icp_access deny all
+http_access deny all
+
+
+http_port $PROXYport intercept
+https_port $PROXYports intercept ssl-bump dynamic_cert_mem_cache_size=4MB capath=$CADIR cert=$PEMSRVDIR/squid.pem
+sslcrtd_program $SSLCRTCMD  -s $SSLCRTSREP -M 4MB
+sslcrtd_children 2 startup=1 idle=1
+
+coredump_dir /var/spool/squid3
+refresh_pattern .		0	20%	4320
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+dns_nameservers 127.0.0.1
+EOF
+
+$SQUIDstart
 }
 
 addadminhttpd() {
@@ -587,7 +590,7 @@ EOF
 resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
 # $DNSMASQrestart
 $DANSGOUARDIANrestart
-$PRIVOXYrestart
+$SQUIDrestart
 else
   dnsmasqwhitelistonly
 fi
@@ -596,7 +599,7 @@ dnsmasqoff () {
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
    resolvconffixoff
    $DANSGOUARDIANrestart
-$PRIVOXYrestart
+$SQUIDrestart
 }
 ipMaskValide() {
 ip=$(echo $1 | cut -d"/" -f1)
@@ -792,24 +795,18 @@ iptablesreload () {
 
    # Force non priviledged users to use dnsmasq
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	  ipbing=$(cat $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
-	  $IPTABLES -A OUTPUT -d $ipbing -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
-	  
-	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
-	  do 
-		$IPTABLES -A OUTPUT -d $ipdailymotion -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
-	  done
+	 
 
       for user in `listeusers` ; do
       if  [ $(groups $user | grep -c -E "( ctoff$)|( ctoff )" ) -eq 0 ];then
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
          #force passage par dansgourdian si présent
-         $IPTABLES -t nat -A ctparental -d $PRIVATE_IP -p tcp --dport 80 -j DNAT --to $PRIVATE_IP:80
-         $IPTABLES -t nat -A ctparental -d 127.0.0.1 -p tcp --dport 80 -j DNAT --to 127.0.0.1:80
+
+
 	     #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
-		 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$PROXYport
-		 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$PROXYports  # proxy https transparent n'est pas possible avec privoxy
+		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$PROXYport
+		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$PROXYports  # proxy https transparent n'est pas possible avec privoxy
 		#		$IPTABLES -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
 
       fi
@@ -861,7 +858,7 @@ EOF
 
 $DNSMASQrestart
 $DANSGOUARDIANrestart
-$PRIVOXYrestart
+$SQUIDrestart
 }
 
 
@@ -1109,15 +1106,6 @@ fastcgi.server = (
 }
 
 
-\$HTTP["host"] =~ "search.yahoo.com" {
-	\$SERVER["socket"] == ":443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 
-	server.document-root = "$DIRHTML"
-	server.errorfile-prefix = "$DIRHTML/err" 
-#	url.redirect  = (".*" => "http://safe.search.yahoo.com\$0&vm=r " )	
-	}
-}
 
 \$HTTP["host"] =~ "localhost" {
 	\$SERVER["socket"] == ":443" {
@@ -1126,17 +1114,7 @@ fastcgi.server = (
 	#ssl.ca-file = "$CADIR/cactparental.crt"
 	}
 }
-\$HTTP["host"] =~ "duckduckgo.com" {
-	\$SERVER["socket"] == ":443" {
-	ssl.engine = "enable"
-	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
-	#ssl.ca-file = "$CADIR/cactparental.crt"
-	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
-	}
-	\$SERVER["socket"] == "127.0.0.1:80" {
-	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
-	}
-}
+
 
 \$SERVER["socket"] == "$PRIVATE_IP:80" {
 server.document-root = "$DIRHTML"
@@ -1223,11 +1201,18 @@ mkdir $CADIR
 openssl genrsa  2048 > $DIR_TMP/cactparental.key
 openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt
 
-## création de la clef privée serveur localhost
+## création de la clef privée serveur lighttpd
 openssl genrsa 1024 > $DIR_TMP/localhost.key
 ## création certificat localhost et signature par la ca
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=127.0.0.1" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
 openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
+
+
+## création de la clef privée serveur squid
+openssl genrsa 1024 > $DIR_TMP/squid.key
+## création certificat localhost et signature par la ca
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=127.0.0.1" -key $DIR_TMP/squid.key > $DIR_TMP/squid.csr
+openssl x509 -req -in $DIR_TMP/squid.csr -out $DIR_TMP/squid.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
 
 ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
 #openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
@@ -1245,7 +1230,9 @@ cp $DIR_TMP/cactparental.crt $CADIR/
 cp $DIR_TMP/cactparental.crt $DIRHTML
 cp $DIR_TMP/cactparental.crt $REPCAMOZ
 ## instalation des certificats serveur
+cat $DIR_TMP/squid.key $DIR_TMP/squid.crt > $PEMSRVDIR/squid.pem
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
+
 #cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 #cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
@@ -1420,7 +1407,7 @@ install () {
       dnsmasqon
       $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=`date +%d-%m-%Y\ %T`?g" $FILE_CONF
 	  confdansguardian
-	  confprivoxy
+	  confsquid3ssl
       FoncHTTPDCONF
       iptablesreload
       $ENCRON
