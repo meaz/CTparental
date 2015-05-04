@@ -165,6 +165,7 @@ DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
 
 SQUID3SSLCONF=${SQUID3SSLCONF:="/etc/squid3/squid.conf"}
+PEMSRVSQUID=${PEMSRVSQUID:="/etc/squid3/ssl_ca"}
 SSLCRTSREP=${SSLCRTSREP:="/var/lib/ssl_db"}
 SSLCRTCMD=${SSLCRTCMD:="/usr/lib/squid3/ssl_crtd"}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
@@ -298,11 +299,7 @@ $DANSGOUARDIANrestart
   
 }
 confsquid3ssl () {
-$SQUIDstop
-rm -rf $SSLCRTSREP
-$SSLCRTCMD -c -s  $SSLCRTSREP
-chown -R $PROXYuser:root $SSLCRTSREP
-#chmod -R 644 $SSLCRTSREP
+
 cat << EOF > $SQUID3SSLCONF  
 visible_hostname proxy
 
@@ -340,9 +337,11 @@ http_access deny all
 
 
 http_port $PROXYport intercept
-https_port $PROXYports intercept ssl-bump dynamic_cert_mem_cache_size=4MB capath=$CADIR cert=$PEMSRVDIR/squid.pem
+
 sslcrtd_program $SSLCRTCMD  -s $SSLCRTSREP -M 4MB
 sslcrtd_children 2 startup=1 idle=1
+https_port $PROXYports intercept ssl-bump dynamic_cert_mem_cache_size=4MB cert=$PEMSRVSQUID/squidca.crt key=$PEMSRVSQUID/squidca.key
+
 
 coredump_dir /var/spool/squid3
 refresh_pattern .		0	20%	4320
@@ -1201,6 +1200,7 @@ mkdir $CADIR
 openssl genrsa  2048 > $DIR_TMP/cactparental.key
 openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt
 
+
 ## création de la clef privée serveur lighttpd
 openssl genrsa 1024 > $DIR_TMP/localhost.key
 ## création certificat localhost et signature par la ca
@@ -1208,35 +1208,39 @@ openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $D
 openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
 
 
-## création de la clef privée serveur squid
-openssl genrsa 1024 > $DIR_TMP/squid.key
+## création de la clef privée ca intermédière serveur squid
+openssl genrsa 1024 > $DIR_TMP/squidca.key
 ## création certificat localhost et signature par la ca
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=127.0.0.1" -key $DIR_TMP/squid.key > $DIR_TMP/squid.csr
-openssl x509 -req -in $DIR_TMP/squid.csr -out $DIR_TMP/squid.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=127.0.0.1" -key $DIR_TMP/squidca.key > $DIR_TMP/squidca.csr
+openssl x509 -req -in $DIR_TMP/squidca.csr -out $DIR_TMP/squidca.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
 
-## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
-#openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
-#openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr
-#openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
-
-
-## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
-#openssl genrsa 1024 > $DIR_TMP/search.yahoo.com.key
-#openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key $DIR_TMP/search.yahoo.com.key > $DIR_TMP/search.yahoo.com.csr
-#openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
 
 ## instalation de la CA dans les ca de confiance.
+
 cp $DIR_TMP/cactparental.crt $CADIR/
+cp $DIR_TMP/squidca.crt $CADIR/
 cp $DIR_TMP/cactparental.crt $DIRHTML
+cp $DIR_TMP/squidca.crt $REPCAMOZ
 cp $DIR_TMP/cactparental.crt $REPCAMOZ
-## instalation des certificats serveur
-cat $DIR_TMP/squid.key $DIR_TMP/squid.crt > $PEMSRVDIR/squid.pem
+## instalation des certificats serveur squid
+rm -rf $PEMSRVSQUID
+mkdir $PEMSRVSQUID
+cp $DIR_TMP/squidca.key $PEMSRVSQUID/
+cp $DIR_TMP/squidca.crt $PEMSRVSQUID/
+chown -R  root:$PROXYuser $PEMSRVSQUID
+chmod -R 640 $PEMSRVSQUID
+
+
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 
 #cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
 #cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/search.yahoo.com.pem
 rm -rf $DIR_TMP
-
+$SQUIDstop
+rm -rf $SSLCRTSREP
+$SSLCRTCMD -c -s  $SSLCRTSREP
+chown -R $PROXYuser:$PROXYuser $SSLCRTSREP
+$SQUIDstart
 
 
 }
@@ -1463,9 +1467,14 @@ updateprofileuser (){
 			if [ ! $? -eq 0 ];then 
 				break
 			fi
+			certutil -D -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -n"CActparental - squidssl" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
+			fi
 		done
 		# on ajoute le nouveau certificat
-		certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $DIRHTML/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+		certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $CADIR/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"	
+		certutil -A -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -i $CADIR/squidca.crt -n"CActparental - squidssl" -t "CT,c,c"		
 	done
 done
 }
@@ -1509,7 +1518,7 @@ uninstall () {
 	 $CMDREMOVE $PACKAGECT 2> /dev/null
          done
    fi
-   # desactivation du modules ip_conntrack_ftp
+   echo "desactivation du modules ip_conntrack_ftp"
 	test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
 	if [ $test -ge "1" ] ; then
 		$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
@@ -1520,36 +1529,12 @@ uninstall () {
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
 	###
    rm -rf $DIR_CONF
-   rm -rf $PEMSRVDIR/localhost.pem
-   rm -rf $PEMSRVDIR/duckduckgo.pem
+   rm -f $PEMSRVDIR/localhost.pem
+   rm -f $PEMSRVDIR/duckduckgo.pem
    rm -f $CADIR/cactparental.crt
-   for user in `listeusers` ; do	
-	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [  -f $HOMEPCUSER/.profile ] ; then
-	test=$(grep "^### CTparental ###" $HOMEPCUSER/.profile |wc -l)
-		if [ $test -eq "1" ] ; then	 
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		 $SED  2d $HOMEPCUSER/.profile
-		fi
-	unset test
-	fi
-   done
-   test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
-		if [ $test -eq "1" ] ; then	 
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		 $SED  2d $XSESSIONFILE
-		fi
-	unset test
+
+
+   
 }
 
 choiblenabled () {
