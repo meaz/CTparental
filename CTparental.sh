@@ -618,7 +618,6 @@ dnsmasqon () {
    
 EOF
 resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
-# $DNSMASQrestart
 $DANSGOUARDIANrestart
 $PRIVOXYrestart
 else
@@ -1265,9 +1264,9 @@ openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" 
 openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
 
 ## instalation de la CA dans les ca de confiance.
-cp $DIR_TMP/cactparental.crt $CADIR/
-cp $DIR_TMP/cactparental.crt $DIRHTML
-cp $DIR_TMP/cactparental.crt $REPCAMOZ
+cp -f $DIR_TMP/cactparental.crt $CADIR/
+cp -f $DIR_TMP/cactparental.crt $DIRHTML
+cp -f $DIR_TMP/cactparental.crt $REPCAMOZ
 ## instalation des certificats serveur
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
 cat $DIR_TMP/duckduckgo.key $DIR_TMP/duckduckgo.crt > $PEMSRVDIR/duckduckgo.pem
@@ -1535,9 +1534,10 @@ uninstall () {
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
 	###
    rm -rf $DIR_CONF
-   rm -rf $PEMSRVDIR/localhost.pem
-   rm -rf $PEMSRVDIR/duckduckgo.pem
+   rm -f $PEMSRVDIR/localhost.pem
+   rm -f $PEMSRVDIR/duckduckgo.pem
    rm -f $CADIR/cactparental.crt
+   rm -f $REPCAMOZ/cactparental.crt
    for user in `listeusers` ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	if [  -f $HOMEPCUSER/.profile ] ; then
