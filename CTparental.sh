@@ -836,21 +836,14 @@ iptablesreload () {
 
       for user in `listeusers` ; do
       if  [ $(groups $user | grep -c -E "( ctoff$)|( ctoff )" ) -eq 0 ];then
+         #on rediriges les requet DNS des usagers filtrés sur dnsmasq
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
          $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-         #force passage par dansgourdian si présent
-         $IPTABLES -t nat -A ctparental -d $PRIVATE_IP -p tcp --dport 80 -j DNAT --to $PRIVATE_IP:80
-         $IPTABLES -t nat -A ctparental -d 127.0.0.1 -p tcp --dport 80 -j DNAT --to 127.0.0.1:80
-         if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$DANSGport | grep -c  dansguardian) -eq 1 ] ;then # test si dansgouardian écoute bien sur 127.0.0.1:$DANSGport
-			 if [ $(netstat -anlp | grep -w LISTEN | grep 127.0.0.1:$PROXYport | grep -c privoxy) -eq 1 ] ; then # test si privoxy écoute bien sur le port 127.0.0.1:$PROXYport
-				
-			    $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
-				$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
-				#$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
-				$IPTABLES -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
-				
-			 fi
-        fi
+         #force passage par dansgourdian pour les utilisateurs filtrés 
+		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
+		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
+		 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
+		 $IPTABLES -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
       fi
       done
 
