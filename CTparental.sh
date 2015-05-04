@@ -969,12 +969,11 @@ C0zyXE1c3gMeAR5DteXeY23NIJZzU/eVuFXLpgPD/RZUt/3AKtwqW0vyPvXW0vpBLCcyDJiGC+XF
 xZ+Heq2pz0FgNS54K4DVPi7H8iWsIFZy+8dcAEwGxpd9nZpwz9txl16VvtYBr9e7FUQrCjuIAxEZ
 CYzDhXIccDzQjrsyqL3i59LVQnuAnrLv5T9/BWzBhW4Lqna/d4X/A/bydTBs1YRqAAAAAElFTkSu
 QmCC" />
-<br><a href="http://localhost/CTparental/cactparental.crt">Installer le certificat racine de CTparental</a><br>
 </CENTER>
 </BODY>
 </HTML>
 EOF
-
+#<br><a href="http://localhost/CTparental/cactparental.crt">Installer le certificat racine de CTparental</a><br>
 fi
 ## GENERATION
 
@@ -1346,7 +1345,6 @@ install () {
       mkdir -p $DIR_CONF
       initblenabled
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
-	  #resolvconffix
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
