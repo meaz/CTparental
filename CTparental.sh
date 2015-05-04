@@ -342,8 +342,7 @@ echo '# remplace http://www.dailymotion.com/family_filter?enable=false....' >> $
 echo '# par http://www.dailymotion.com/family_filter?enable=true...' >> $PRIVOXYCTA
 echo '{+redirect{s@enable=[^&]+@enable=true@}}' >> $PRIVOXYCTA
 echo ' .dailymotion.*/.*enable=(?!true)' >> $PRIVOXYCTA
-echo '{ fragile }' >> $PRIVOXYCTA
-echo 'http://127.0.0.10/.*' >> $PRIVOXYCTA
+
 
 $PRIVOXYrestart
 if [  -f $XSESSIONFILE ] ; then
@@ -806,7 +805,7 @@ initfileiptables () {
 }
 
 iptablesreload () {
-   
+   ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
@@ -815,17 +814,13 @@ iptablesreload () {
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
    $IPTABLES -P FORWARD ACCEPT
+   $IPTABLES -t nat -N ctparental
+   $IPTABLES -t nat -A OUTPUT -j ctparental
 
-   # Redirect DNS requests
-   # note: http://superuser.com/a/594164
-#resolvconffix
-	## parametrage pour ce protéger contre les attaques par spoofing et par synflood
-    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
-    $IPTABLES -t nat -N ctparental
-    $IPTABLES -t nat -A OUTPUT -j ctparental
-
-   # Force non priviledged users to use dnsmasq
+      # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+	  
+	  # on interdit l'accès a bing en https .
 	  ipbing=$(cat $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
 	  $IPTABLES -A OUTPUT -d $ipbing -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 	  
@@ -843,7 +838,7 @@ iptablesreload () {
 		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:$DANSGport
 		 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport $PROXYport -j DNAT --to 127.0.0.1:$DANSGport
 		 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$DANSGport  # proxy https transparent n'est pas possible avec privoxy
-		 $IPTABLES -A OUTPUT -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
+		 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
       fi
       done
 
@@ -1515,8 +1510,6 @@ uninstall () {
    rm -f /var/www/index.lighttpd.html
    rm -rf $tempDIR
    rm -rf $DIRHTML
-
-
    rm -rf /usr/local/share/CTparental
    rm -rf /usr/share/lighttpd/*
    rm -f $CTPARENTALCONFHTTPD
@@ -1562,6 +1555,18 @@ uninstall () {
 		fi
 	unset test
 	fi
+	#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
+	for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
+		#firefox iceweachel
+		# on supprime tous les anciens certificats
+		while true
+		do
+			certutil -D -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -n"CActparental - ctparental" 2&> /dev/null
+			if [ ! $? -eq 0 ];then 
+				break
+			fi
+		done
+	done
    done
    test=$(grep "^### CTparental ###" $XSESSIONFILE |wc -l)
 		if [ $test -eq "1" ] ; then	 
