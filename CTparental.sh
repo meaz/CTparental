@@ -1581,18 +1581,20 @@ uninstall () {
    rm -f $REPCAMOZ/cactparental.crt
    for user in `listeusers` ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-		#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
-		for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
-			#firefox iceweachel
-			# on supprime tous les anciens certificats
-			while true
-			do
-				certutil -D -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -n"CActparental - ctparental" 2&> /dev/null
-				if [ ! $? -eq 0 ];then 
-					break
-				fi
+		if [ -f $HOMEPCUSER ];then
+			#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
+			for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
+				#firefox iceweachel
+				# on supprime tous les anciens certificats
+				while true
+				do
+					certutil -D -d $HOMEPCUSER/.mozilla/firefox/$profilefirefox/ -n"CActparental - ctparental" 2&> /dev/null
+					if [ ! $? -eq 0 ];then 
+						break
+					fi
+				done
 			done
-		done
+		fi
    done
    unsetproxy
 }
