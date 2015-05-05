@@ -1,5 +1,10 @@
 # 05/05/2015
-# Version 3.93-1 supresion des anciens certificats automatiquement et supressions de ceci a la désinstalation , netoyage du code .
+# Version 3.93-2    correction du bug de paramétrage proxy a la desactivation total du controle parental.
+# Version 3.93-1 	simplification du code
+					ajous de la suprésion des certificats ne servant plus de panière automatique.
+					meilleur intégration de la présence ou non de resolvconf.
+					désinstalation plus propre.
+					désativation de l'ipv6
 # Version 3.93   corectif bug xubuntu parametrage proxy automatique non pris en compte + bug proxy persistant une fois CTparental desinstaller.
 # Version 3.92   install du certificat automatique . + parametrage proxy automatique (nécesite un redemarage session en ca d'ajout ou de suppression du groupe ctoff.
 #				 ajout d'une nouvelle dépendance libnss3-tools pour l'utilisation de certutil.
