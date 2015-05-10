@@ -1143,16 +1143,33 @@ mkdir -p $DIRCONFENABLEDHTTPD
 mkdir -p $DIRadminHTML
 cp -rf CTadmin/* $DIRadminHTML/
 ### configuration du login mot de passe de l'interface d'administration
+PTNlogin='^[a-zA-Z0-9]*$'
 while (true)
 do
-	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration :" 10 60 3>&1 1>&2 2>&3)
-	if [ ! $loginhttp = "" ] ;then
-		password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration 
+- que des lètres ou des chifres .
+- 6 carratères minimum :" 10 60 3>&1 1>&2 2>&3)	
+	if [ $(expr $loginhttp : $PTNlogin) -gt 6  ];then 
+		break
+	fi	
+
+done
+while (true)
+do
+password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
 		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
 		if [ $password = $password2 ] ; then
-			break
+			
+			if [ $(echo $password | grep -E [a-z] | grep -E [0-9] | grep -E [A-Z] | grep -E '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' | wc -c ) -ge 8 ] ; then
+				break
+			else
+				whiptail --title "Mot de passe" --msgbox "Mot de pass n est pas asser complex, il doit comptenir au moins:
+- 8 carataire aux total,1 Majuscule,1 minuscule,1 nombre
+et 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
+			fi
+				
 		fi
-	fi
+
 done
 
 # echo "login:  $loginhttp" > /root/passwordCTadmin
