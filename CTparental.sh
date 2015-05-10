@@ -112,7 +112,7 @@ PROXYport=${PROXYport:="8888"}
 DANSGport=${DANSGport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl libnss3-tools "}
+DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
 
@@ -1142,33 +1142,23 @@ fi
 mkdir -p $DIRCONFENABLEDHTTPD
 mkdir -p $DIRadminHTML
 cp -rf CTadmin/* $DIRadminHTML/
-#if [ $noinstalldep = "1" ]; then
-#	addadminhttpd "admin" "admin"
-#else
-	clear 
-	echo "Entrer le login pour l'interface d'administration :"
-	while (true); do
-		 read loginhttp
-		 case $loginhttp in
-			 * )
-			 echo "login:  $loginhttp" > /root/passwordCTadmin
-			 break
-			 ;;
-		 esac
-	done
-	clear
-	echo "Entrer le mot de passe de $loginhttp :"
-	while (true); do
-		 read password
-		 case $password in
-			 * )
-			 echo "password: $password" >> /root/passwordCTadmin
-		         addadminhttpd "$loginhttp" "$password"
-			 break
-			 ;;
-		 esac
-	done
-#fi
+### configuration du login mot de passe de l'interface d'administration
+while (true)
+do
+	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration :" 10 60 3>&1 1>&2 2>&3)
+	if [ ! $loginhttp = "" ] ;then
+		password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+		if [ $password = $password2 ] ; then
+			break
+		fi
+	fi
+done
+
+# echo "login:  $loginhttp" > /root/passwordCTadmin
+# echo "password: $password" >> /root/passwordCTadmin
+addadminhttpd "$loginhttp" "$password"
+
 chmod 700 /root/passwordCTadmin
 chown root:root /root/passwordCTadmin
 mkdir /run/lighttpd/

@@ -347,10 +347,10 @@ http_access deny all
 ##redirect_children 100 
 
 # Definition des directive SSL
-always_direct allow all 
-ssl_bump server-first all 
+ssl_bump server-first all
 sslproxy_cert_error allow all
-sslproxy_cert_adapt setCommonName{CN}
+sslproxy_cert_adapt setCommonName ssl::certDomainMismatch
+
 coredump_dir /var/spool/squid3
 
 # Memory Cache Options
