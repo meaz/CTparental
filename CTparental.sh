@@ -1639,6 +1639,7 @@ uninstall () {
    if [ $noinstalldep = "0" ]; then
 	 for PACKAGECT in $DEPENDANCES
          do
+			
 			$CMDREMOVE $PACKAGECT 2> /dev/null
          done
    fi
