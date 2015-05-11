@@ -289,6 +289,7 @@ EOF
 
 }
 confdansguardian () {
+echo "confdansguardian"
   $SED "s?^loglevel =.*?loglevel = 0?g" $FILEConfDans   
   $SED "s?^languagedir =.*?languagedir = '/etc/dansguardian/languages'?g" $FILEConfDans  
   $SED "s?^language =.*?language = 'french'?g" $FILEConfDans  
@@ -304,9 +305,10 @@ confdansguardian () {
 
 
 $DANSGOUARDIANrestart
-  
+echo "fin confdansguardian" 
 }
 confprivoxy () {
+echo "confprivoxy"
 $SED "s?^debug.*?debug = 0?g"  $PRIVOXYCONF  
 $SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  $PRIVOXYCONF 
 
@@ -349,6 +351,7 @@ echo ' .dailymotion.*/.*enable=(?!true)' >> $PRIVOXYCTA
 
 $PRIVOXYrestart
 setproxy
+echo "fin confprivoxy"
 }
 unsetproxy () {
 for user in `listeusers` ; do	
@@ -975,6 +978,7 @@ $PRIVOXYrestart
 
 
 FoncHTTPDCONF () {
+echo "FoncHTTPDCONF"
 $LIGHTTPDstop
 rm -rf $DIRHTML/*
 mkdir $DIRHTML 2> /dev/null
@@ -1311,10 +1315,11 @@ if [ ! -f $FILE_HCONF ] ; then
 fi
 chown root:$GROUPHTTPD $FILE_HCONF
 chmod 660 $FILE_HCONF
+if [ -f $FILE_GCTOFFCONF ] ; then 
+	chown root:$GROUPHTTPD $FILE_GCTOFFCONF
+	chmod 660 $FILE_GCTOFFCONF
+fi
 
-chown root:$GROUPHTTPD $FILE_GCTOFFCONF
-chmod 660 $FILE_GCTOFFCONF
-### listeusers > $FILE_GCTOFFCONF
 if [ ! -f $FILE_HCOMPT ] ; then
 	echo "date=$(date +%D)" > $FILE_HCOMPT
 fi
@@ -1331,7 +1336,7 @@ if [ ! $test -eq 0 ];then
 	set -e
 	exit 1
 fi
-
+echo "fin FoncHTTPDCONF"
 }
 configloginpassword () {
 PTNlogin='^[a-zA-Z0-9]*$'
@@ -1555,6 +1560,9 @@ install () {
 
 updatelistgctoff () {
 	result="0"
+	if [ ! -f $FILE_GCTOFFCONF ] ; then 
+		echo -n > $FILE_GCTOFFCONF
+	fi
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in `listeusers`
 	do
@@ -1590,10 +1598,10 @@ applistegctoff () {
 }
 
 activegourpectoff () {
+echo "activegourpectoff"
    groupadd ctoff
-   $ADDUSERTOGROUP root ctoff
    $SED "s?^GCTOFF.*?GCTOFF=ON?g" $FILE_CONF
-   $(updatelistgctoff)
+   updatelistgctoff
    applistegctoff
    USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
    GROUPHTTPD=$(cat /etc/group | grep $USERHTTPD | cut -d":" -f1)
@@ -1602,6 +1610,7 @@ activegourpectoff () {
    echo "PATH=$PATH"  > /etc/cron.d/CTparentalupdateuser
    echo "*/1 * * * * root /usr/local/bin/CTparental.sh -ucto" >> /etc/cron.d/CTparentalupdateuser
    $CRONrestart
+echo "fin activegourpectoff"
 }
 
 desactivegourpectoff () {
@@ -1630,7 +1639,7 @@ uninstall () {
    if [ $noinstalldep = "0" ]; then
 	 for PACKAGECT in $DEPENDANCES
          do
-	 $CMDREMOVE $PACKAGECT 2> /dev/null
+			$CMDREMOVE $PACKAGECT 2> /dev/null
          done
    fi
    # desactivation du modules ip_conntrack_ftp
