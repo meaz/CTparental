@@ -423,12 +423,6 @@ hash=$(echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32)
 ligne=$(echo "$USERADMINHTTPD:$REALMADMINHTTPD:$hash")
 $SED "/^$USERADMINHTTPD:$REALMADMINHTTPD.*/d" $PASSWORDFILEHTTPD
 echo $ligne >> $PASSWORDFILEHTTPD
-echo  "USERADMINHTTPD=$USERADMINHTTPD" > /root/pass.txt
-echo  "REALMADMINHTTPD=$REALMADMINHTTPD" >> /root/pass.txt
-echo  "pass=$pass" >> /root/pass.txt
-echo  "PASSWORDFILEHTTPD=$PASSWORDFILEHTTPD"  >> /root/pass.txt
-echo  "USERHTTPD=$USERHTTPD" >> /root/pass.txt
-echo  "hash=$hash" >> /root/pass.txt
 }
 
 download() {
@@ -1156,10 +1150,8 @@ if [ $nomanuel -eq 0 ]; then
 	configloginpassword
 else
 	mkdir $tempDIR
-
 	ligneandfunc=$(grep -n "^# and func" /usr/local/bin/CTparental.sh | cut -d ":" -f1)
 	sed -n "2,$ligneandfunc p" /usr/local/bin/CTparental.sh > $tempDIR/source
-
 	cat << EOF > $tempDIR/confpass.sh
 #!/bin/bash
 USERHTTPD=$USERHTTPD
@@ -1175,7 +1167,7 @@ EOF
 	chmod 755 $tempDIR/confpass.sh
 	chown root:$USERHTTPD $tempDIR/confpass.sh
 	rm -f $PASSWORDFILEHTTPD
-	while [ ! -f $PASSWORDFILEHTTPD ]
+	while [ ! -f $PASSWORDFILEHTTPD ] 
 	do
 		$XTERMINAL  $tempDIR/confpass.sh &
 		while [ ! -f $tempDIR/startok ]
