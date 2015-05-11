@@ -83,7 +83,7 @@ IPRULES=OFF
 EOF
 
 fi
-
+FILTRAGEISOFF=$(cat $FILE_CONF | grep -c DNSMASQ=OFF)
 
 
 
@@ -211,6 +211,7 @@ DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | 
 DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
 
 resolvconffixon () {
+echo "resolvconffixon"
 # redemare dnsmasq 
 $DNSMASQstop
 
@@ -218,19 +219,20 @@ resolvconf -u 2&> /dev/null
 if [ $? -eq 1 ];then # si resolvconf et bien installé
 resolvconf -u
 # on s'assure que les dns du FAI soit bien ajoutés au fichier /etc/resolv.conf malgré l'utilisation de dnsmasq.
-cat cat /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
+cat /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
 fi
 $DNSMASQstart
-
+echo "fin resolvconffixon"
 }
 resolvconffixoff () {
+echo "resolvconffixoff"
 $DNSMASQstop	
 resolvconf -u 2&> /dev/null 
 if [ $? -eq 1 ];then # si resolvconf et bien installé
 echo > /etc/resolvconf/resolv.conf.d/tail
 resolvconf -u
 fi
-
+echo "fin resolvconffixoff"
 }
 
 
@@ -646,34 +648,36 @@ echo "address=/search.yahoo.com/127.0.0.10" >> $DIR_DNS_BLACKLIST_ENABLED/forces
 }
 
 dnsmasqon () {
-   categorie1=`sed -n "1 p" $CATEGORIES_ENABLED` # on considère que si la 1ère catégorie activée est un blacklist on fonctionne par blacklist.
-   is_blacklist=`grep $categorie1 $BL_CATEGORIES_AVAILABLE |wc -l`
+echo "dnsmasqon"
+   categorie1=$(sed -n "1 p" $CATEGORIES_ENABLED) # on considère que si la 1ère catégorie activée est un blacklist on fonctionne par blacklist.
+   is_blacklist=$(grep $categorie1 $BL_CATEGORIES_AVAILABLE |wc -l)
    if [ $is_blacklist -ge "1" ] ; then
    $SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
-   cat << EOF > $DNSMASQCONF
-         # Configuration file for "dnsmasq with blackhole"
-   # Inclusion de la blacklist <domains> de Toulouse dans la configuration
-   conf-dir=$DIR_DNS_BLACKLIST_ENABLED
-   # conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
-   interface=lo
-   listen-address=127.0.0.1
-   no-dhcp-interface=$interface_WAN
-   bind-interfaces
-   cache-size=1024
-   domain-needed
-   expand-hosts
-   bogus-priv
-   port=54
-   server=$DNS1
-   server=$DNS2
-   
+cat << EOF > $DNSMASQCONF 
+# Configuration file for "dnsmasq with blackhole"
+# Inclusion de la blacklist <domains> de Toulouse dans la configuration
+conf-dir=$DIR_DNS_BLACKLIST_ENABLED
+# conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
+interface=lo
+listen-address=127.0.0.1
+no-dhcp-interface=$interface_WAN
+bind-interfaces
+cache-size=1024
+domain-needed
+expand-hosts
+bogus-priv
+port=54
+server=$DNS1
+server=$DNS2  
 EOF
+
 resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
 $DANSGOUARDIANrestart
 $PRIVOXYrestart
 else
   dnsmasqwhitelistonly
 fi
+echo "fin dnsmasqon"
 }
 dnsmasqoff () {
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
@@ -855,18 +859,20 @@ initfileiptables () {
 }
 
 iptablesreload () {
+	echo "iptablesreload"
    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
    $IPTABLES -F
    $IPTABLES -X
-   $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
-   $IPTABLES -t nat -F ctparental || /bin/true
-   $IPTABLES -t nat -X ctparental || /bin/true
+   $IPTABLES -t nat -D OUTPUT -j ctparental 2> /bin/null
+   $IPTABLES -t nat -F ctparental  2> /bin/null
+   $IPTABLES -t nat -X ctparental  2> /bin/null
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
    $IPTABLES -P FORWARD ACCEPT
-   $IPTABLES -t nat -N ctparental
-   $IPTABLES -t nat -A OUTPUT -j ctparental
-
+   if [ ! $FILTRAGEISOFF -eq 1 ];then
+	 $IPTABLES -t nat -N ctparental
+     $IPTABLES -t nat -A OUTPUT -j ctparental
+      
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  
@@ -891,6 +897,7 @@ iptablesreload () {
 		 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
       fi
       done
+   fi
 
    if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
     ipglobal
@@ -905,9 +912,10 @@ $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
    
 updatecauser
 setproxy
+echo "fin iptablesreload"
 }
 updatecauser () {
-	echo test
+echo "updatecauser"
 for user in `listeusers` ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	if [ -d $HOMEPCUSER ] ;then
@@ -926,6 +934,7 @@ for user in `listeusers` ; do
 		done
 	fi
 done
+echo "fin updatecauser"
 }
 iptablesoff () {
 
@@ -934,9 +943,9 @@ iptablesoff () {
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
    $IPTABLES -P FORWARD ACCEPT
-   $IPTABLES -t nat -D OUTPUT -j ctparental || /bin/true
-   $IPTABLES -t nat -F ctparental || /bin/true
-   $IPTABLES -t nat -X ctparental || /bin/true
+   $IPTABLES -t nat -D OUTPUT -j ctparental  2> /bin/null
+   $IPTABLES -t nat -F ctparental  2> /bin/null
+   $IPTABLES -t nat -X ctparental  2> /bin/null
    $IPTABLESsave
    unsetproxy
 }
@@ -968,7 +977,7 @@ $PRIVOXYrestart
 FoncHTTPDCONF () {
 $LIGHTTPDstop
 rm -rf $DIRHTML/*
-mkdir -v $DIRHTML
+mkdir $DIRHTML 2> /dev/null
 if [ ! -z $DIRhtmlPersonaliser ];then
    cp -r $DIRhtmlPersonaliser/* $DIRHTML
 else
@@ -1189,7 +1198,7 @@ fi
 
 chmod 700 /root/passwordCTadmin
 chown root:root /root/passwordCTadmin
-mkdir /run/lighttpd/
+mkdir /run/lighttpd/ 2> /dev/null
 chmod 770 /run/lighttpd/
 chown root:$GROUPHTTPD /run/lighttpd/
 cat << EOF > $CTPARENTALCONFHTTPD
@@ -1359,31 +1368,30 @@ done
 addadminhttpd "$loginhttp" "$password"
 }
 CActparental () {
-
+echo "CActparental"
 DIR_TMP=${TMPDIR-/tmp}/ctparental-mkcert.$$
 mkdir $DIR_TMP
-mkdir $CADIR
+mkdir $CADIR 2> /dev/null
 
 ## création de la clef priver ca et du certificat ca
-openssl genrsa  1024 > $DIR_TMP/cactparental.key
-openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt
+openssl genrsa  1024 > $DIR_TMP/cactparental.key 2> /dev/null
+openssl req -new -x509 -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=CActparental" -days 10000 -key $DIR_TMP/cactparental.key > $DIR_TMP/cactparental.crt 
 
 ## création de la clef privée serveur localhost
-openssl genrsa 1024 > $DIR_TMP/localhost.key
+openssl genrsa 1024 > $DIR_TMP/localhost.key 2> /dev/null
 ## création certificat localhost et signature par la ca
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr
-openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=localhost" -key $DIR_TMP/localhost.key > $DIR_TMP/localhost.csr 
+openssl x509 -req -in $DIR_TMP/localhost.csr -out $DIR_TMP/localhost.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAcreateserial -CAserial $DIR_TMP/ca.srl  
 
 ## création du certificat duckduckgo pour redirection vers safe.duckduckgo.com
-openssl genrsa 1024 > $DIR_TMP/duckduckgo.key
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr
-openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
-
+openssl genrsa 1024 > $DIR_TMP/duckduckgo.key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=duckduckgo.com" -key $DIR_TMP/duckduckgo.key > $DIR_TMP/duckduckgo.csr 
+openssl x509 -req -in $DIR_TMP/duckduckgo.csr -out $DIR_TMP/duckduckgo.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl 
 
 ## création du certificat search.yahoo.com pour redirection vers pages d'interdiction
-openssl genrsa 1024 > $DIR_TMP/search.yahoo.com.key
-openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key $DIR_TMP/search.yahoo.com.key > $DIR_TMP/search.yahoo.com.csr
-openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl
+openssl genrsa 1024 > $DIR_TMP/search.yahoo.com.key 2> /dev/null
+openssl req -new -subj "/C=FR/ST=FRANCE/L=ici/O=ctparental/CN=search.yahoo.com" -key $DIR_TMP/search.yahoo.com.key > $DIR_TMP/search.yahoo.com.csr 
+openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.com.crt -CA $DIR_TMP/cactparental.crt -CAkey $DIR_TMP/cactparental.key -CAserial $DIR_TMP/ca.srl 
 
 ## instalation de la CA dans les ca de confiance.
 cp -f $DIR_TMP/cactparental.crt $CADIR/
@@ -1396,7 +1404,7 @@ cat $DIR_TMP/search.yahoo.com.key $DIR_TMP/search.yahoo.com.crt > $PEMSRVDIR/sea
 rm -rf $DIR_TMP
 
 updatecauser
-
+echo "fin CActparental"
 }
 
 
@@ -1597,15 +1605,15 @@ activegourpectoff () {
 }
 
 desactivegourpectoff () {
-   groupdel ctoff
+   groupdel ctoff 2> /dev/null
    $SED "s?^GCTOFF.*?GCTOFF=OFF?g" $FILE_CONF
 }
 
 uninstall () {
    desactivegourpectoff
    rm -f /etc/cron.d/CTparental*
-   $DNSMASQrestart
    $LIGHTTPDstop
+   $DNSMASQstop
    rm -f /var/www/index.lighttpd.html
    rm -rf $tempDIR
    rm -rf $DIRHTML
@@ -1958,9 +1966,10 @@ $CRONrestart
 }
 
 desactivetimelogin () {
+echo "desactivetimelogin"
 for FILE in `echo $GESTIONNAIREDESESSIONS`
 do
-   $SED "/account required pam_time.so/d" $DIRPAM$FILE
+   $SED "/account required pam_time.so/d" $DIRPAM$FILE 2> /dev/null
 done
 cat $FILEPAMTIMECONF.old > $FILEPAMTIMECONF
 for NumDAY in 0 1 2 3 4 5 6
@@ -1968,15 +1977,16 @@ do
    rm -f /etc/cron.d/CTparental${DAYS[$NumDAY]}
 done
 rm -f /etc/cron.d/CTparentalmaxtimelogin
-$SED "s?^HOURSCONNECT.*?HOURSCONNECT=OFF?g" $FILE_CONF
+$SED "s?^HOURSCONNECT.*?HOURSCONNECT=OFF?g" $FILE_CONF 
 for PCUSER in `listeusers`
 do
-	passwd -u $PCUSER
+	passwd -u $PCUSER > /dev/null
 done
 # on remet tous les compteurs à zéro.
 echo "date=$(date +%D)" > $FILE_HCOMPT
 echo > $FILE_HCONF
 $CRONrestart
+echo "fin desactivetimelogin"
 }
 
 
@@ -2152,25 +2162,29 @@ case $arg1 in
       exit 0
       ;;
    -u | --uninstall )
-	  iptablesoff
-      autoupdateoff 
+	  autoupdateoff 
       dnsmasqoff
       desactivetimelogin
+      iptablesoff
       uninstall
       exit 0
       ;;
    -dl | --download )
-      download
-      adapt
-      catChoice
-      dnsmasqon
-      $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=`date +%d-%m-%Y\ %T`?g" $FILE_CONF
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  download
+		  adapt
+		  catChoice
+		  dnsmasqon
+		  $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=`date +%d-%m-%Y\ %T`?g" $FILE_CONF
+      fi
       exit 0
       ;;
    -ubl | --updatebl )
-      adapt
-      catChoice
-      dnsmasqon
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  adapt
+		  catChoice
+		  dnsmasqon
+      fi
        
       exit 0
       ;;
@@ -2179,8 +2193,10 @@ case $arg1 in
       exit 0
       ;;
    -rl | --reload )
-      catChoice
-      dnsmasqon
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+         catChoice
+         dnsmasqon
+      fi 
       exit 0
       ;;
    -on | --on )
@@ -2196,62 +2212,90 @@ case $arg1 in
       exit 0
       ;;
    -wlo | --whitelistonly )
-      dnsmasqwhitelistonly
+	  if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  dnsmasqwhitelistonly
+      fi
       exit 0
       ;;
    -cble | --confblenable )
-      choiblenabled
-      catChoice
-      dnsmasqon
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  choiblenabled
+		  catChoice
+		  dnsmasqon
+      fi
       exit 0
       ;;
     -dble | --defaultblenable )
-      initblenabled
-      catChoice
-      dnsmasqon
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  initblenabled
+		  catChoice
+		  dnsmasqon
+      fi
+      exit 0
       ;;
     -tlo | --timeloginon )
       activetimelogin
+      exit 0
       ;;
     -tlu | --timeloginon )
       desactivetimelogin
+      exit 0
       ;;
     -trf | --timeloginon )
       readTimeFILECONF
+      exit 0
       ;;
     -aupon | --autoupdateon )
-      autoupdateon
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		 autoupdateon
+      fi
+      exit 0
       ;;
     -aupoff | --autoupdateoff )
       autoupdateoff
+      exit 0
       ;;
     -aup | --autoupdate )
-      autoupdate
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		 autoupdate
+      fi
+      exit 0
       ;;
     -listusers )
       listeusers
+      exit 0
       ;;
     -gcton )
-      activegourpectoff
-	  iptablesreload
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  activegourpectoff
+		  iptablesreload
+	  fi
+	  exit 0
       ;;
     -gctoff )
 	  desactivegourpectoff
 	  iptablesreload
+	  exit 0
       ;;
     -gctulist )
-	  updatelistgctoff
-	  iptablesreload
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  updatelistgctoff
+		  iptablesreload
+	  fi
+	  exit 0
       ;;
     -gctalist )
-	  test=$(updatelistgctoff)
-	  if [ $test -eq 1 ];then
-		updatecauser
-		setproxy
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		  test=$(updatelistgctoff)
+		  if [ $test -eq 1 ];then
+			updatecauser
+			setproxy
+		  fi
+		  unset test
+		  applistegctoff
+		  iptablesreload
 	  fi
-	  unset test
-	  applistegctoff
-	  iptablesreload
+	  exit 0
       ;;
     -ipton )
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
@@ -2259,25 +2303,31 @@ case $arg1 in
       echo -e "$RougeD pour ajouter des règles personalisée éditer le fichier "
       echo " $FILEIPTABLES "
       echo -e " puis relancer la commande CTparental.sh -ipton $Fcolor"
+      exit 0
       ;;
     -iptoff )
       $SED "s?.*IPRULES=.*?IPRULES=OFF?g" $FILE_CONF
       iptablesreload
+      exit 0
       ;;
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  updatetimelogin
+	  exit 0
       ;;  
     -ucto )
-	 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
-	  test=$(updatelistgctoff)
-	  if [ $test -eq 1 ];then
-		applistegctoff
-		updatecauser
-		setproxy
-		iptablesreload
+      if [ ! $FILTRAGEISOFF -eq 1 ];then
+		 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
+		  test=$(updatelistgctoff)
+		  if [ $test -eq 1 ];then
+			applistegctoff
+			updatecauser
+			setproxy
+			iptablesreload
+		  fi
+		  unset test
 	  fi
-	  unset test
+	  exit 0
       ;;       
       
    *)
