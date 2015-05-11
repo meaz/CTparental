@@ -907,12 +907,12 @@ updatecauser
 setproxy
 }
 updatecauser () {
+	echo test
 for user in `listeusers` ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [ -f $HOMEPCUSER ];then
-		#on install le certificat dans tous les prifile firefoxe utilisateur existant 
+	if [ -d $HOMEPCUSER ] ;then
+			#on install le certificat dans tous les prifile firefoxe utilisateur existant 
 		for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
-			#firefox iceweachel
 			# on supprime tous les anciens certificats
 			while true
 			do
@@ -1066,13 +1066,13 @@ server.modules = (
 "mod_auth",	#pour interface admin
 "mod_fastcgi",  #pour interface admin (activation du php)
 )
-auth.debug                 = 2
+auth.debug                 = 0
 auth.backend               = "htdigest" 
 auth.backend.htdigest.userfile = "$PASSWORDFILEHTTPD" 
 
 server.document-root = "/var/www"
 server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
-server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
+#server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
 server.pid-file = "$LIGHTTPpidfile"
 server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
@@ -1230,7 +1230,6 @@ fastcgi.server = (
 	ssl.pemfile = "$PEMSRVDIR/search.yahoo.com.pem" 
 	server.document-root = "$DIRHTML"
 	server.errorfile-prefix = "$DIRHTML/err" 
-#	url.redirect  = (".*" => "http://safe.search.yahoo.com\$0&vm=r " )	
 	}
 }
 
@@ -1238,14 +1237,12 @@ fastcgi.server = (
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/localhost.pem" 	
-	#ssl.ca-file = "$CADIR/cactparental.crt"
 	}
 }
 \$HTTP["host"] =~ "duckduckgo.com" {
 	\$SERVER["socket"] == ":443" {
 	ssl.engine = "enable"
 	ssl.pemfile = "$PEMSRVDIR/duckduckgo.pem" 
-	#ssl.ca-file = "$CADIR/cactparental.crt"
 	url.redirect  = (".*" => "https://safe.duckduckgo.com\$0" )
 	}
 	\$SERVER["socket"] == "127.0.0.1:80" {
@@ -1305,9 +1302,10 @@ if [ ! -f $FILE_HCONF ] ; then
 fi
 chown root:$GROUPHTTPD $FILE_HCONF
 chmod 660 $FILE_HCONF
-listeusers > $FILE_GCTOFFCONF
+
 chown root:$GROUPHTTPD $FILE_GCTOFFCONF
 chmod 660 $FILE_GCTOFFCONF
+### listeusers > $FILE_GCTOFFCONF
 if [ ! -f $FILE_HCOMPT ] ; then
 	echo "date=$(date +%D)" > $FILE_HCOMPT
 fi
@@ -1536,6 +1534,7 @@ install () {
 	  confdansguardian
 	  confprivoxy
       FoncHTTPDCONF
+      activegourpectoff
       iptablesreload
       $ENCRON
       $ENLIGHTTPD
@@ -1547,34 +1546,38 @@ install () {
 
 
 updatelistgctoff () {
+	result="0"
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in `listeusers`
 	do
 		if [ $(cat $FILE_GCTOFFCONF | sed -e "s/#//g" | grep -c -E "^$PCUSER$") -eq 0 ];then
-			echo $PCUSER >> $FILE_GCTOFFCONF
+			result="1"
+			echo "#$PCUSER" >> $FILE_GCTOFFCONF
 		fi
 	done
 	## on supprime tout ceux qui n'existent plus sur le pc.
 	for PCUSER in $(cat $FILE_GCTOFFCONF | sed -e "s/#//g" )
 	do
 		if [ $( listeusers | grep -c -E "^$PCUSER$") -eq 0 ];then
+			result="1"
 			$SED "/^$PCUSER$/d" $FILE_GCTOFFCONF
 			$SED "/^#$PCUSER$/d" $FILE_GCTOFFCONF
 		fi
 	done
+	echo $result
+	
 }
 applistegctoff () {
-	updatelistgctoff
-
-	$ADDUSERTOGROUP root ctoff 2> /dev/null
-	for PCUSER in $(cat $FILE_GCTOFFCONF )
-	do
-		if [ $(echo $PCUSER | grep -c -v "#") -eq 1 ];then
-			$ADDUSERTOGROUP $PCUSER ctoff 2> /dev/null
-		else
-			$DELUSERTOGROUP $(echo $PCUSER | sed -e "s/#//g" ) ctoff 2> /dev/null
-		fi
-	done 
+		$ADDUSERTOGROUP root ctoff 2> /dev/null
+		for PCUSER in $(cat $FILE_GCTOFFCONF )
+		do
+			if [ $(echo $PCUSER | grep -c -v "#") -eq 1 ];then
+				$ADDUSERTOGROUP $PCUSER ctoff 2> /dev/null
+			else
+				$DELUSERTOGROUP $(echo $PCUSER | sed -e "s/#//g" ) ctoff 2> /dev/null
+			fi
+		done 
+	
 
 }
 
@@ -1582,14 +1585,20 @@ activegourpectoff () {
    groupadd ctoff
    $ADDUSERTOGROUP root ctoff
    $SED "s?^GCTOFF.*?GCTOFF=ON?g" $FILE_CONF
+   $(updatelistgctoff)
    applistegctoff
-
+   USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
+   GROUPHTTPD=$(cat /etc/group | grep $USERHTTPD | cut -d":" -f1)
+   chown root:$GROUPHTTPD $FILE_GCTOFFCONF
+   chmod 660 $FILE_GCTOFFCONF
+   echo "PATH=$PATH"  > /etc/cron.d/CTparentalupdateuser
+   echo "*/1 * * * * root /usr/local/bin/CTparental.sh -ucto" >> /etc/cron.d/CTparentalupdateuser
+   $CRONrestart
 }
 
 desactivegourpectoff () {
    groupdel ctoff
    $SED "s?^GCTOFF.*?GCTOFF=OFF?g" $FILE_CONF
-
 }
 
 uninstall () {
@@ -1633,7 +1642,7 @@ uninstall () {
    rm -f $REPCAMOZ/cactparental.crt
    for user in `listeusers` ; do	
 		HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-		if [ -f $HOMEPCUSER ];then
+		if [ -d $HOMEPCUSER ];then
 			#on desinstall le certificat dans tous les prifiles firefoxe utilisateur existant 
 			for profilefirefox in $(cat $HOMEPCUSER/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2) ; do
 				#firefox iceweachel
@@ -2235,6 +2244,12 @@ case $arg1 in
 	  iptablesreload
       ;;
     -gctalist )
+	  test=$(updatelistgctoff)
+	  if [ $test -eq 1 ];then
+		updatecauser
+		setproxy
+	  fi
+	  unset test
 	  applistegctoff
 	  iptablesreload
       ;;
@@ -2252,7 +2267,18 @@ case $arg1 in
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  updatetimelogin
-      ;;      
+      ;;  
+    -ucto )
+	 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
+	  test=$(updatelistgctoff)
+	  if [ $test -eq 1 ];then
+		applistegctoff
+		updatecauser
+		setproxy
+		iptablesreload
+	  fi
+	  unset test
+      ;;       
       
    *)
       echo "Argument inconnu :$1";
