@@ -173,6 +173,7 @@ PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
 CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
+XTERMINAL=${XTERMINAL:="x-terminal-emulator --hide-menubar  --hide-toolbar -e "}
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
    CMDINSTALL=${CMDINSTALL:="yum install "}
@@ -413,14 +414,21 @@ addadminhttpd() {
 if [ ! -f $PASSWORDFILEHTTPD ] ; then
     echo -n > $PASSWORDFILEHTTPD   
 fi
+
 chown root:$USERHTTPD $PASSWORDFILEHTTPD
 chmod 640 $PASSWORDFILEHTTPD
 USERADMINHTTPD=${1}
 pass=${2}
-hash=`echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32`
+hash=$(echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32)
 ligne=$(echo "$USERADMINHTTPD:$REALMADMINHTTPD:$hash")
 $SED "/^$USERADMINHTTPD:$REALMADMINHTTPD.*/d" $PASSWORDFILEHTTPD
 echo $ligne >> $PASSWORDFILEHTTPD
+echo  "USERADMINHTTPD=$USERADMINHTTPD" > /root/pass.txt
+echo  "REALMADMINHTTPD=$REALMADMINHTTPD" >> /root/pass.txt
+echo  "pass=$pass" >> /root/pass.txt
+echo  "PASSWORDFILEHTTPD=$PASSWORDFILEHTTPD"  >> /root/pass.txt
+echo  "USERHTTPD=$USERHTTPD" >> /root/pass.txt
+echo  "hash=$hash" >> /root/pass.txt
 }
 
 download() {
@@ -1064,13 +1072,13 @@ server.modules = (
 "mod_auth",	#pour interface admin
 "mod_fastcgi",  #pour interface admin (activation du php)
 )
-auth.debug                 = 0
+auth.debug                 = 2
 auth.backend               = "htdigest" 
 auth.backend.htdigest.userfile = "$PASSWORDFILEHTTPD" 
 
 server.document-root = "/var/www"
 server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
-#server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
+server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
 server.pid-file = "$LIGHTTPpidfile"
 server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
@@ -1142,39 +1150,50 @@ fi
 mkdir -p $DIRCONFENABLEDHTTPD
 mkdir -p $DIRadminHTML
 cp -rf CTadmin/* $DIRadminHTML/
+
 ### configuration du login mot de passe de l'interface d'administration
-PTNlogin='^[a-zA-Z0-9]*$'
-while (true)
-do
-	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration 
-- que des lètres ou des chifres .
-- 6 carratères minimum :" 10 60 3>&1 1>&2 2>&3)	
-	if [ $(expr $loginhttp : $PTNlogin) -gt 6  ];then 
-		break
-	fi	
+if [ $nomanuel -eq 0 ]; then 
+	configloginpassword
+else
+	mkdir $tempDIR
 
-done
-while (true)
-do
-password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
-		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
-		if [ $password = $password2 ] ; then
-			
-			if [ $(echo $password | grep -E [a-z] | grep -E [0-9] | grep -E [A-Z] | grep -E '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' | wc -c ) -ge 8 ] ; then
-				break
-			else
-				whiptail --title "Mot de passe" --msgbox "Mot de pass n est pas asser complex, il doit comptenir au moins:
-- 8 carataire aux total,1 Majuscule,1 minuscule,1 nombre
-et 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
-			fi
-				
-		fi
+	ligneandfunc=$(grep -n "^# and func" /usr/local/bin/CTparental.sh | cut -d ":" -f1)
+	sed -n "2,$ligneandfunc p" /usr/local/bin/CTparental.sh > $tempDIR/source
 
-done
+	cat << EOF > $tempDIR/confpass.sh
+#!/bin/bash
+USERHTTPD=$USERHTTPD
+GROUPHTTPD=$GROUPHTTPD
+PIDSCRIPT=\$\$
+echo -n "\$PIDSCRIPT" > $tempDIR/confpass.pid
+echo -n > $tempDIR/startok
+source $tempDIR/source
+configloginpassword
+	
+EOF
 
-# echo "login:  $loginhttp" > /root/passwordCTadmin
-# echo "password: $password" >> /root/passwordCTadmin
-addadminhttpd "$loginhttp" "$password"
+	chmod 755 $tempDIR/confpass.sh
+	chown root:$USERHTTPD $tempDIR/confpass.sh
+	rm -f $PASSWORDFILEHTTPD
+	while [ ! -f $PASSWORDFILEHTTPD ]
+	do
+		$XTERMINAL  $tempDIR/confpass.sh &
+		while [ ! -f $tempDIR/startok ]
+		do
+			sleep 0.2
+		done
+		rm -f $tempDIR/startok
+		PID=$(cat $tempDIR/confpass.pid)
+		while [ $( ps -A | grep -c "$PID")   -ge 1 ] 
+		do
+		sleep 0.5
+		done
+	done
+	USERADMINHTTPD=$(cat $PASSWORDFILEHTTPD | cut -d":" -f1)
+	rm -rf $tempDIR
+fi
+
+
 
 chmod 700 /root/passwordCTadmin
 chown root:root /root/passwordCTadmin
@@ -1314,6 +1333,40 @@ if [ ! $test -eq 0 ];then
 	exit 1
 fi
 
+}
+configloginpassword () {
+PTNlogin='^[a-zA-Z0-9]*$'
+while (true)
+do
+     
+	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration 
+- que des lètres ou des chifres .
+- 6 carratères minimum :" 10 60 3>&1 1>&2 2>&3)			
+	if [ $(expr $loginhttp : $PTNlogin) -gt 6  ];then 
+		break
+	fi	
+
+done
+while (true)
+do
+password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+		if [ $password = $password2 ] ; then
+			
+			if [ $(echo $password | grep -E [a-z] | grep -E [0-9] | grep -E [A-Z] | grep -E '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' | wc -c ) -ge 8 ] ; then
+				break
+			else
+				whiptail --title "Mot de passe" --msgbox "Mot de pass n'est pas asser complex, il doit comptenir au moins:
+- 8 carataire aux total,1 Majuscule,1 minuscule,1 nombre
+et 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
+			fi
+		else
+		    whiptail --title "Mot de passe" --msgbox "Le mot de pass rentré n'est pas identique au premier." 14 60 
+				
+		fi
+
+done
+addadminhttpd "$loginhttp" "$password"
 }
 CActparental () {
 
@@ -2036,7 +2089,7 @@ $CRONrestart
 }
 
 
-
+# and func # ne pas effacer cette ligne !!
 
 usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
                                |{ -tlo }|{ -tlu }|{ -uhtml }|{ -aupon }|{ -aupoff }|{ -aup } 
