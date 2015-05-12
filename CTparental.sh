@@ -1159,43 +1159,13 @@ mkdir -p $DIRadminHTML
 cp -rf CTadmin/* $DIRadminHTML/
 
 ### configuration du login mot de passe de l'interface d'administration
-if [ $nomanuel -eq 0 ]; then 
+if [ $nomanuel -eq 0 ]; then  
 	configloginpassword
 else
-	mkdir $tempDIR
-	ligneandfunc=$(grep -n "^# and func" /usr/local/bin/CTparental.sh | cut -d ":" -f1)
-	sed -n "2,$ligneandfunc p" /usr/local/bin/CTparental.sh > $tempDIR/source
-	cat << EOF > $tempDIR/confpass.sh
-#!/bin/bash
-USERHTTPD=$USERHTTPD
-GROUPHTTPD=$GROUPHTTPD
-PIDSCRIPT=\$\$
-echo -n "\$PIDSCRIPT" > $tempDIR/confpass.pid
-echo -n > $tempDIR/startok
-source $tempDIR/source
-configloginpassword
-	
-EOF
-
-	chmod 755 $tempDIR/confpass.sh
-	chown root:$USERHTTPD $tempDIR/confpass.sh
-	rm -f $PASSWORDFILEHTTPD
-	while [ ! -f $PASSWORDFILEHTTPD ] 
-	do
-		$XTERMINAL  $tempDIR/confpass.sh &
-		while [ ! -f $tempDIR/startok ]
-		do
-			sleep 0.2
-		done
-		rm -f $tempDIR/startok
-		PID=$(cat $tempDIR/confpass.pid)
-		while [ $( ps -A | grep -c "$PID")   -ge 1 ] 
-		do
-		sleep 0.5
-		done
-	done
-	USERADMINHTTPD=$(cat $PASSWORDFILEHTTPD | cut -d":" -f1)
-	rm -rf $tempDIR
+	## variable récupérer par éritage du script DEBIAN/postinst
+	addadminhttpd "$debconfloginhttp" "$debconfpassword"
+	unset debconfpassword
+	unset debconfloginhttp
 fi
 
 
