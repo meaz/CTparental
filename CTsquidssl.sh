@@ -1378,7 +1378,6 @@ install () {
       initblenabled
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
       if [ $noinstalldep = "0" ]; then
-      ln -s /usr/local/bin/CTsquidssl.sh /usr/local/bin/CTparental.sh 
 	  for PACKAGECT in $CONFLICTS
          do
 			$CMDREMOVE $PACKAGECT 2> /dev/null

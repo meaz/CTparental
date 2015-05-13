@@ -19,7 +19,7 @@ if ($HOURSCONNECT == "ON")
 
 	### on lit est on interprète le fichier CTparental.conf
 	echo "<TABLE width='100%' border=0 cellspacing=0 cellpadding=0>";
-	exec ("/usr/local/bin/CTparental.sh -listusers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
+	exec ("/usr/local/bin/CTsquidssl.sh -listusers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
 		echo "<select name=\"selectuser\">";
 		if (isset($selectuser)){echo "<option value=\"$selectuser\">$selectuser\n"; }

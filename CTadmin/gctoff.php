@@ -20,7 +20,7 @@ if ($GCTOFF == "ON")
 	echo "<table cellspacing=2 cellpadding=2 border=1>";
 	echo "<tr><th>$l_gctoff_username<th></tr>";
 	// Read the "CTOFF.conf" file
-	exec ("sudo /usr/local/bin/CTparental.sh -gctulist");
+	exec ("sudo /usr/local/bin/CTsquidssl.sh -gctulist");
 	$tab=file($conf_ctoff_file);
 	if ($tab)  # the file isn't empty
 		{

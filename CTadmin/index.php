@@ -161,10 +161,10 @@ if (isset($_POST['choix'])){ $choix=$_POST['choix']; } else { $choix=""; }
 switch ($choix)
 {
 case 'gct_Off' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -gctoff");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -gctoff");
 	break;
 case 'gct_On' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -gcton");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -gcton");
 	break;
 case 'LogOFF' :
 	header('HTTP/1.0 401 Unauthorized');
@@ -172,28 +172,28 @@ case 'LogOFF' :
 	exit;
 	break;
 case 'BL_On' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -on");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -on");
 	break;
 case 'BL_Off' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -off");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -off");
 	break;
 case 'H_On' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -trf");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -trf");
 	break;
 case 'H_Off' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -tlu");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -tlu");
 	break;
 case 'AUP_On' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -aupon");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -aupon");
 	break;
 case 'AUP_Off' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -aupoff");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -aupoff");
 	break;
 case 'INIT_BL' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -dble");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -dble");
 	break;
 case 'Download_bl' :
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -dl");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -dl");
 	break;
 case 'MAJ_cat' :
 	$tab=file($bl_categories_enabled);	
@@ -219,7 +219,7 @@ case 'MAJ_cat' :
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_wl_domains']);
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -ubl");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -ubl");
 	break;
 case 'MAJ_H' :
 	$formatheuresok=1;
@@ -319,7 +319,7 @@ case 'MAJ_H' :
 	}
 	
 	fclose($pointeur);
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -trf");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -trf");
 	break;
 	
 case 'change_user' :
@@ -351,7 +351,7 @@ $tab=file($conf_ctoff_file);
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/local/bin/CTparental.sh -gctalist");
+	exec ("sudo -u root /usr/local/bin/CTsquidssl.sh -gctalist");
 	break;
 
 }
