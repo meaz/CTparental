@@ -426,7 +426,8 @@ USERADMINHTTPD=${1}
 pass=${2}
 hash=$(echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32)
 ligne=$(echo "$USERADMINHTTPD:$REALMADMINHTTPD:$hash")
-$SED "/^$USERADMINHTTPD:$REALMADMINHTTPD.*/d" $PASSWORDFILEHTTPD
+echo $ligne
+$SED "/.*:$REALMADMINHTTPD.*/d" $PASSWORDFILEHTTPD 
 echo $ligne >> $PASSWORDFILEHTTPD
 }
 
@@ -1590,16 +1591,25 @@ desactivegourpectoff () {
 
 uninstall () {
    desactivegourpectoff
-   rm -f /etc/cron.d/CTparental*
    $LIGHTTPDstop
    $DNSMASQstop
-   rm -f /var/www/index.lighttpd.html
+   if [ $nomanuel -eq 1 ]; then 
+	   # en install par le deb on n'efface pas les fichiers installer par celuis si
+       rm -f /etc/cron.d/CTparental*
+       rm -rf $DIRHTML
+       rm -rf /usr/local/share/CTparental
+       rm -f $(ls $DIR_CONF | grep -v dist.conf)
+   else 
+       rm -f /etc/cron.d/CTparental*
+       rm -rf $DIRadminHTML
+       rm -rf $DIRHTML
+       rm -rf /usr/local/share/CTparental
+       rm -rf $DIR_CONF
+   fi
+   
    rm -rf $tempDIR
-   rm -rf $DIRHTML
-   rm -rf /usr/local/share/CTparental
    rm -rf /usr/share/lighttpd/*
    rm -f $CTPARENTALCONFHTTPD
-   rm -rf $DIRadminHTML
    if [ -f /etc/NetworkManager/NetworkManager.conf ];then
 	$SED "s/^#dns=dnsmasq/dns=dnsmasq/g" /etc/NetworkManager/NetworkManager.conf
 	$NWMANAGERrestart
@@ -1623,7 +1633,7 @@ uninstall () {
 	modprobe -r ip_conntrack_ftp	
 	$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" $FILEMODULESLOAD
 	###
-   rm -rf $DIR_CONF
+
    rm -f $PEMSRVDIR/localhost.pem
    rm -f $PEMSRVDIR/duckduckgo.pem
    rm -f $CADIR/cactparental.crt
