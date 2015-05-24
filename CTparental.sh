@@ -793,6 +793,10 @@ ipglobal () {
     else
 	    initfileiptables
     fi
+### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
+$IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
+$IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
+$IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
 
 }
@@ -903,10 +907,6 @@ iptablesreload () {
    if [ $(cat $FILE_CONF | grep -c IPRULES=ON ) -eq 1 ];then
     ipglobal
    fi
-### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
-$IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
-$IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
-$IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 
 # Save configuration so that it survives a reboot
    $IPTABLESsave

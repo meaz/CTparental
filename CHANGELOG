@@ -1,4 +1,5 @@
 # 15/05/2015
+# Version 3.94-2   debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
 # Version 3.94-1   CTparental.sh -u propose la des-installation par dpkg --purge ctparental en cas de présence de l'install deb.
 					correctif du bug de non suppression de /usr/local/CTparental/ lors d'une dés-installation par dpkg.
 # Version 3.94-0  utilisation de debconf pour l'install par le deb et de whiptail en install manuel ,
