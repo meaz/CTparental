@@ -298,7 +298,7 @@ echo "confdansguardian"
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
-  echo "#le filtrage de domaines est géré par dnsmasq, ne pa toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
+  echo "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
 
 
 $DANSGOUARDIANrestart
@@ -432,7 +432,7 @@ download() {
    rm -rf $tempDIR
    mkdir $tempDIR
    # on attend que la connection remonte suite au redemarage de networkmanager
-   echo "attente de connection au serveur de toulouse:"
+   echo "attente de connexion au serveur de toulouse:"
    i=1
    while [ $(ping -c 1 $BL_SERVER 2> /dev/null | grep -c "1 received"  ) -eq 0 ]
    do
@@ -440,13 +440,13 @@ download() {
    sleep 1
    i=$(($i + 1 ))
    if [ $i -ge 40 ];then # si au bout de 40 secondes on a toujours pas de connection on considaire qu'il y a une erreur
-		echo "connection a $BL_SERVER impossible."
+		echo "connexion a $BL_SERVER impossible."
 		set -e
 		exit 1
    fi
    done
    echo
-   echo "connection établit:"
+   echo "connexion établie:"
    
    wget -P $tempDIR http://$BL_SERVER/blacklists/download/blacklists.tar.gz 2>&1 | cat
    if [ ! $? -eq 0 ]; then
@@ -803,9 +803,9 @@ $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 initfileiptables () {
     echo >  $FILEIPTABLES
 	echo '' >>  $FILEIPTABLES
-	echo '## on autorise tous le trafique sortent a destination de notre lan (PC imprimente de la maison)' >>  $FILEIPTABLES
+	echo '## on autorise tous le trafic sortant à destination de notre lan (PC imprimante de la maison)' >>  $FILEIPTABLES
 	echo '$IPTABLES -A OUTPUT -d $reseau_box -j ACCEPT ' >>  $FILEIPTABLES
-	echo '## on acepte tous le trafique entrant en provenence de notre lan (PC imprimente de la maison)' >>  $FILEIPTABLES
+	echo '## on acepte tous le trafic entrant en provenence de notre lan (PC imprimante de la maison)' >>  $FILEIPTABLES
 	echo '$IPTABLES -A INPUT -s $reseau_box -j ACCEPT  ' >>  $FILEIPTABLES
     echo '' >>  $FILEIPTABLES
     echo '### smtp + pop ssl thunderbird ...  ####' >>  $FILEIPTABLES
@@ -822,7 +822,7 @@ initfileiptables () {
 	echo '#$IPTABLES -A INPUT -s $reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT' >>  $FILEIPTABLES
 	echo '#$IPTABLES -I INPUT -s $ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle' >>  $FILEIPTABLES
     echo '' >>  $FILEIPTABLES
-    echo '### emesene,pindgin,amsn...  ####' >>  $FILEIPTABLES
+    echo '### emesene,pidgin,amsn...  ####' >>  $FILEIPTABLES
     echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT  ' >>  $FILEIPTABLES   
 	echo '#$IPTABLES -A OUTPUT -p tcp -m tcp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
 	echo '#$IPTABLES -A OUTPUT -p udp -m udp --dport 6891:6900 -j ACCEPT # pour transfert de fichiers , webcam' >>  $FILEIPTABLES
@@ -854,7 +854,7 @@ initfileiptables () {
     echo '### Batel for Wesnoth' >>  $FILEIPTABLES
     echo '#14998 pour version stable.' >>  $FILEIPTABLES
     echo '#14999 pour version stable précédente.' >>  $FILEIPTABLES
-    echo '#15000 pour version de dévelopement.' >>  $FILEIPTABLES
+    echo '#15000 pour version de développement.' >>  $FILEIPTABLES
     echo '#15001 télécharger addons' >>  $FILEIPTABLES
     echo '#$IPTABLES -A OUTPUT  -d 65.18.193.12 -p tcp --sport 1023:65535 --dport 14998:15001 -j ACCEPT' >>  $FILEIPTABLES
     echo '#$IPTABLES -A INPUT   -p tcp --sport 1023:65535 --dport 15000 -j ACCEPT' >>  $FILEIPTABLES
@@ -1312,8 +1312,8 @@ while (true)
 do
      
 	loginhttp=$(whiptail --title "Login" --nocancel --inputbox "Entrer le login pour l'interface d'administration 
-- que des lètres ou des chifres .
-- 6 carratères minimum :" 10 60 3>&1 1>&2 2>&3)			
+- que des lettres ou des chiffres .
+- 6 caractères minimum :" 10 60 3>&1 1>&2 2>&3)			
 	if [ $(expr $loginhttp : $PTNlogin) -gt 6  ];then 
 		break
 	fi	
@@ -1321,19 +1321,19 @@ do
 done
 while (true)
 do
-password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrer votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
-		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et valider par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+password=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Entrez votre mot de passe pour $loginhttp et validez par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
+		password2=$(whiptail --title "Mot de passe" --nocancel --passwordbox "Confirmez votre mot de passe pour $loginhttp et validez par Ok pour continuer." 10 60 3>&1 1>&2 2>&3)
 		if [ $password = $password2 ] ; then
 			
 			if [ $(echo $password | grep -E [a-z] | grep -E [0-9] | grep -E [A-Z] | grep -E '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' | wc -c ) -ge 8 ] ; then
 				break
 			else
-				whiptail --title "Mot de passe" --msgbox "Mot de pass n'est pas asser complex, il doit comptenir au moins:
-- 8 carataire aux total,1 Majuscule,1 minuscule,1 nombre
-et 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
+				whiptail --title "Mot de passe" --msgbox "Mot de passe n'est pas assez complexe, il doit contenir au moins:
+- 8 caractères au total,1 Majuscule,1 minuscule,1 nombre
+et 1 caractère spécial parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£% " 14 60 
 			fi
 		else
-		    whiptail --title "Mot de passe" --msgbox "Le mot de pass rentré n'est pas identique au premier." 14 60 
+		    whiptail --title "Mot de passe" --msgbox "Le mot de passe rentré n'est pas identique au premier." 14 60 
 				
 		fi
 
@@ -1419,9 +1419,9 @@ install () {
 		$EDIT $DIR_CONF/dist.conf
 		clear
 		cat  $DIR_CONF/dist.conf | grep -v -E ^# | grep -v ^$
-		echo "Entrer : S pour continuer avec ces parramêtres ."
+		echo "Entrer : S pour continuer avec ces paramètres ."
 		echo "Entrer : Q pour Quiter l'installation."
-		echo "Entrer tous autre choix pour modifier les parramêtres."
+		echo "Entrez tout autre choix pour modifier les paramètres."
 		 read choi
 		case $choi in
 			 S | s )
@@ -1590,7 +1590,7 @@ desactivegourpectoff () {
 uninstall () {
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
-	   muninstall="Une install par paquet a était détecter veuiller utiliser cette commande pour désinstaller ctparental."
+	   muninstall="Une install par paquet a été détectée veuillez utiliser cette commande pour désinstaller ctparental."
 	   if [ $(dpkg -l ctparental | grep -c ^i) -eq 1 ] ;then
 			echo "$muninstall"
 			echo "$CMDREMOVE ctparental"
@@ -1737,7 +1737,7 @@ done
 
 errortime1 () {
 clear
-echo -e "L'heure de début doit être strictement inférieure  à l'heure de fin: $RougeD$input$Fcolor "
+echo -e "L'heure de début doit être strictement inférieure à l'heure de fin: $RougeD$input$Fcolor "
 echo "exemple: 08h00 à 23h59 ou 08h00 à 12h00 et 14h00 à 23h59"
 echo -e -n "$RougeD$PCUSER$Fcolor est autorisé à se connecter le $BleuD${DAYS[$NumDAY]}$Fcolor de :"
 }
@@ -1750,7 +1750,7 @@ echo -e -n "$RougeD$PCUSER$Fcolor est autorisé à se connecter le $BleuD${DAYS[
 
 
 timecronalert () {
-MinAlert=${1} # temp en minute entre l'alerte et l'action
+MinAlert=${1} # temps en minute entre l'alerte et l'action
 H=$((10#${2}))
 M=$((10#${3}))
 D=$((10#${4}))
@@ -1771,7 +1771,7 @@ echo "$MAlert $Halert * * ${DAYSCRON[$D]}"
 updatetimelogin () {
 	USERSCONECT=$(who | awk '//{print $1}' | sort -u)
    	if [ $(cat $FILE_HCOMPT | grep -c $(date +%D)) -eq 1 ] ; then
-			# on incrément le conteur de temps de connection. pour chaque utilisateur connecter
+			# on incrémente le compteur de temps de connection. pour chaque utilisateur connecté
 		for PCUSER in $USERSCONECT
 		do
 		
@@ -1783,12 +1783,12 @@ updatetimelogin () {
 					$SED "s?^$PCUSER=.*?$PCUSER=$count?g" $FILE_HCOMPT
 					temprest=$(($(cat $FILE_HCONF | grep ^$PCUSER=user= | cut -d "=" -f3 ) - $count ))
 					echo $temprest
-					# si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on deconnecte l'utilisateur.
+					# si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on déconnecte l'utilisateur.
 					if [ $temprest -le 0 ];then
 						/usr/bin/skill -KILL -u$PCUSER
 						passwd -l $PCUSER
 					else
-						# On allerte l'usager que sont quota temps arrive a expiration 5-4-3-2-1 minutes avant.
+						# On alerte l'usager que son quota temps arrive à expiration 5-4-3-2-1 minutes avant.
 						if [ $temprest -le 10 ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
 						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connexion restant est de $temprest minutes "
@@ -1797,18 +1797,18 @@ updatetimelogin () {
 			   fi
 			   
 			else
-			# on efface les ligne relative a cette utilisateur
+			# on efface les lignes relatives à cet utilisateur
 			$SED "/^$PCUSER=/d" $FILE_HCOMPT
 			fi
 
 		done	
 	else
-		# on réactivent tous les comptes
+		# on réactive tous les comptes
 		for PCUSER in `listeusers`
 		do
 			passwd -u $PCUSER
 		done
-		# on remait tous les compteurs a zero.
+		# on remet tous les compteurs à zéro.
 		echo "date=$(date +%D)" > $FILE_HCOMPT
 		
 	fi
@@ -1844,7 +1844,7 @@ activetimelogin () {
    do
    HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
    $SED "/^$PCUSER=/d" $FILE_HCONF
-   echo -e -n "$PCUSER est autorisé a se connecter 7j/7 24h/24 O/N?" 
+   echo -e -n "$PCUSER est autorisé à se connecter 7j/7 24h/24 O/N?" 
    choi=""
    while (true); do
    read choi
@@ -2148,7 +2148,7 @@ usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -
 		     CTparental.sh -u -nodep 
 -nomanuel =>  utilisé uniquement pour le script de postinst et prerm  
             du deb.
--gcton	  => créé un groupe de privilégiés ne subissant pas le filtrage.
+-gcton	  => crée un groupe de privilégiés ne subissant pas le filtrage.
 			 exemple:CTparental.sh -gctulist
 			 editer $FILE_GCTOFFCONF et y commenter tous les utilisateurs que l'on veut filtrer.
 			 CTparental.sh -gctalist
@@ -2157,8 +2157,8 @@ usage="Usage: CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -
 -gctulist => Met a jour le fichier de conf du groupe , $FILE_GCTOFFCONF
 			 en fonction des utilisateurs ajoutés ou supprimés du pc.
 -gctalist => Ajoute/Supprime les utilisateurs dans le group ctoff en fonction du fichier de conf.
--ipton	  => Active les règles de par feux personnalisées.
--iptoff   => Désactive les règles de par feux personnalisées.
+-ipton	  => Active les règles de pare-feu personnalisées.
+-iptoff   => Désactive les règles de pare-feu personnalisées.
 	 
  "
 case $arg1 in
@@ -2305,9 +2305,9 @@ case $arg1 in
     -ipton )
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
       iptablesreload
-      echo -e "$RougeD pour ajouter des règles personalisée éditer le fichier "
+      echo -e "$RougeD pour ajouter des règles personalisées éditez le fichier "
       echo " $FILEIPTABLES "
-      echo -e " puis relancer la commande CTparental.sh -ipton $Fcolor"
+      echo -e " puis relancez la commande CTparental.sh -ipton $Fcolor"
       exit 0
       ;;
     -iptoff )
