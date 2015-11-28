@@ -1,3 +1,12 @@
+ctparental (3.94-3) unstable; urgency=medium
+  
+  *  Ajout de la procedure pour création des deb ubuntu et debian dans le fichier make-deb.txt
+  *  léger nettoyage du code de desactivation de l'ipv6
+  *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
+  
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 22:51:15 CET
+ 
+
 ctparental (3.94-2) unstable; urgency=medium
 
   *  debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
