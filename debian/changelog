@@ -4,7 +4,7 @@ ctparental (3.94-3) unstable; urgency=medium
   *  léger nettoyage du code de desactivation de l'ipv6
   *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 22:51:15 CET
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam., 28 nov. 2015 22:51:15 CET
  
 
 ctparental (3.94-2) unstable; urgency=medium
