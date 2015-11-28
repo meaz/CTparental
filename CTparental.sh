@@ -150,7 +150,7 @@ ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=1000}
 
-
+FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 FILEConfDans=${FILEConfDans:="/etc/dansguardian/dansguardian.conf"}
 FILEConfDansf1=${FILEConfDansf1:="/etc/dansguardian/dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -1458,29 +1458,28 @@ install () {
 	      $CMDINSTALL $DEPENDANCES
       fi
       # on desactive l'ipv6
-		test=`grep net.ipv6.conf.all.disable_ipv6= /etc/sysctl.conf |wc -l`
+		test=`grep net.ipv6.conf.all.disable_ipv6= $FILESYSCTL |wc -l`
 		if [ $test -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=1?g" /etc/sysctl.conf
+			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=1?g" $FILESYSCTL
 		else
-			echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
+			echo "net.ipv6.conf.all.disable_ipv6=1" >> $FILESYSCTL
 		fi
 		unset test
-		test=`grep net.ipv6.conf.default.disable_ipv6= /etc/sysctl.conf |wc -l`
+		test=`grep net.ipv6.conf.default.disable_ipv6= $FILESYSCTL |wc -l`
 		if [ $test -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" /etc/sysctl.conf
+			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" $FILESYSCTL
 		else
-			echo "net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf
+			echo "net.ipv6.conf.default.disable_ipv6=1" >> $FILESYSCTL
 		fi
 		unset test
-				unset test
-		test=`grep net.ipv6.conf.lo.disable_ipv6= /etc/sysctl.conf |wc -l`
+		test=`grep net.ipv6.conf.lo.disable_ipv6= $FILESYSCTL |wc -l`
 		if [ $test -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" /etc/sysctl.conf
+			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" $FILESYSCTL
 		else
-			echo "net.ipv6.conf.lo.disable_ipv6=1" >> /etc/sysctl.conf
+			echo "net.ipv6.conf.lo.disable_ipv6=1" >> $FILESYSCTL
 		fi
 		unset test
-		sysctl -w
+		sysctl -p $FILESYSCTL
       ######################
       # on charge le(s) module(s) indispensable(s) pour iptables.
 		test=`grep ip_conntrack_ftp $FILEMODULESLOAD |wc -l`
