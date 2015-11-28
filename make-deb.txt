@@ -1,0 +1,16 @@
+
+On debian
+apt-get install git git-buildpackage
+git clone https://github.com/marsat/CTparental.git
+cd CTparental/
+gbp buildpackage
+
+
+On ubuntu.
+apt-get install git git-buildpackage
+git clone https://github.com/marsat/CTparental.git
+cd CTparental/
+cp ubuntu/dist.conf debian/dist.conf 
+git commit -a 
+# décomenter le fichier debian/dist.conf et sauvegarder
+gbp buildpackage
