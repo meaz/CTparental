@@ -1814,28 +1814,37 @@ updatetimelogin () {
 	fi
 	
 }
-activetimelogin () {
-   TESTGESTIONNAIRE=""
-   for FILE in `echo $GESTIONNAIREDESESSIONS`
-   do
-      if [ -f $DIRPAM$FILE ];then
-         if [ $(cat $DIRPAM$FILE | grep -c "account required pam_time.so") -eq 0  ] ; then
-            $SED "1i account required pam_time.so"  $DIRPAM$FILE
-         fi
-         TESTGESTIONNAIRE=$TESTGESTIONNAIRE\ $FILE
-      fi
-   done
-   if [ $( echo $TESTGESTIONNAIRE | wc -m ) -eq 1 ] ; then
-      echo "Aucun gestionnaire de session connu n'a été détecté."
-      echo " il est donc impossible d'activer le contrôle horaire des connexions"
-      desactivetimelogin
-      exit 1
-   fi
+requiredpamtime (){
+	TESTGESTIONNAIRE=""
+   if [ ! -f $DIRPAM$COMMONFILEGS ] ; then 
+	   for FILE in `echo $GESTIONNAIREDESESSIONS`
+	   do
+		  if [ -f $DIRPAM$FILE ];then
+			 if [ $(cat $DIRPAM$FILE | grep -c "^account required pam_time.so") -eq 0  ] ; then
+				$SED "1i account required pam_time.so"  $DIRPAM$FILE
+			 fi
+			 TESTGESTIONNAIRE=$TESTGESTIONNAIRE\ $FILE
+		  fi
+	   done
+	   if [ $( echo $TESTGESTIONNAIRE | wc -m ) -eq 1 ] ; then
+		  echo "Aucun gestionnaire de session connu n'a été détecté."
+		  echo " il est donc impossible d'activer le contrôle horaire des connexions"
+		  desactivetimelogin
+		  exit 1
+	   fi
+	else
+		if [ $(cat $DIRPAM$COMMONFILEGS | grep -c "^account required pam_time.so") -eq 0  ] ; then
+				$SED "1i account required pam_time.so"  $DIRPAM$COMMONFILEGS 
+		fi
+	fi
    
    if [ ! -f $FILEPAMTIMECONF.old ] ; then
    cp $FILEPAMTIMECONF $FILEPAMTIMECONF.old
    fi
    echo "*;*;root;Al0000-2400" > $FILEPAMTIMECONF
+}
+activetimelogin () {
+requiredpamtime
    for NumDAY in 0 1 2 3 4 5 6
    do
    echo "PATH=$PATH"  > /etc/cron.d/CTparental${DAYS[$NumDAY]}
@@ -1981,6 +1990,8 @@ for FILE in `echo $GESTIONNAIREDESESSIONS`
 do
    $SED "/account required pam_time.so/d" $DIRPAM$FILE 2> /dev/null
 done
+$SED "/account required pam_time.so/d" $DIRPAM$COMMONFILEGS 2> /dev/null
+
 cat $FILEPAMTIMECONF.old > $FILEPAMTIMECONF
 for NumDAY in 0 1 2 3 4 5 6
 do
@@ -2015,33 +2026,7 @@ done
 
 
 readTimeFILECONF () {
-   TESTGESTIONNAIRE=""
-   if [ ! -f $COMMONFILEGS ] ; then 
-	   for FILE in `echo $GESTIONNAIREDESESSIONS`
-	   do
-		  if [ -f $DIRPAM$FILE ];then
-			 if [ $(cat $DIRPAM$FILE | grep -c "account required pam_time.so") -eq 0  ] ; then
-				$SED "1i account required pam_time.so"  $DIRPAM$FILE
-			 fi
-			 TESTGESTIONNAIRE=$TESTGESTIONNAIRE\ $FILE
-		  fi
-	   done
-	   if [ $( echo $TESTGESTIONNAIRE | wc -m ) -eq 1 ] ; then
-		  echo "Aucun gestionnaire de session connu n'a été détecté."
-		  echo " il est donc impossible d'activer le contrôle horaire des connexions"
-		  desactivetimelogin
-		  exit 1
-	   fi
-	else
-		if [ $(cat $DIRPAM$COMMONFILEGS | grep -c "account required pam_time.so") -eq 0  ] ; then
-				$SED "1i account required pam_time.so"  $DIRPAM$COMMONFILEGS 
-		fi
-	fi
-   
-   if [ ! -f $FILEPAMTIMECONF.old ] ; then
-   cp $FILEPAMTIMECONF $FILEPAMTIMECONF.old
-   fi
-   echo "*;*;root;Al0000-2400" > $FILEPAMTIMECONF
+   requiredpamtime
    for NumDAY in 0 1 2 3 4 5 6
    do
    echo "PATH=$PATH" > /etc/cron.d/CTparental${DAYS[$NumDAY]}
