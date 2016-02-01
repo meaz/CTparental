@@ -101,6 +101,7 @@ RougeD="\033[1;31m"
 BleuD="\033[1;36m"
 VertD="\033[1;32m"
 Fcolor="\033[0m"
+COMMONFILEGS="common-auth"
 GESTIONNAIREDESESSIONS=" login gdm lightdm slim kdm xdm lxdm gdm3 "
 FILEPAMTIMECONF="/etc/security/time.conf"
 DIRPAM="/etc/pam.d/"
@@ -2015,21 +2016,27 @@ done
 
 readTimeFILECONF () {
    TESTGESTIONNAIRE=""
-   for FILE in `echo $GESTIONNAIREDESESSIONS`
-   do
-      if [ -f $DIRPAM$FILE ];then
-         if [ $(cat $DIRPAM$FILE | grep -c "account required pam_time.so") -eq 0  ] ; then
-            $SED "1i account required pam_time.so"  $DIRPAM$FILE
-         fi
-         TESTGESTIONNAIRE=$TESTGESTIONNAIRE\ $FILE
-      fi
-   done
-   if [ $( echo $TESTGESTIONNAIRE | wc -m ) -eq 1 ] ; then
-      echo "Aucun gestionnaire de session connu n'a été détecté."
-      echo " il est donc impossible d'activer le contrôle horaire des connexions"
-      desactivetimelogin
-      exit 1
-   fi
+   if [ ! -f $COMMONFILEGS ] ; then 
+	   for FILE in `echo $GESTIONNAIREDESESSIONS`
+	   do
+		  if [ -f $DIRPAM$FILE ];then
+			 if [ $(cat $DIRPAM$FILE | grep -c "account required pam_time.so") -eq 0  ] ; then
+				$SED "1i account required pam_time.so"  $DIRPAM$FILE
+			 fi
+			 TESTGESTIONNAIRE=$TESTGESTIONNAIRE\ $FILE
+		  fi
+	   done
+	   if [ $( echo $TESTGESTIONNAIRE | wc -m ) -eq 1 ] ; then
+		  echo "Aucun gestionnaire de session connu n'a été détecté."
+		  echo " il est donc impossible d'activer le contrôle horaire des connexions"
+		  desactivetimelogin
+		  exit 1
+	   fi
+	else
+		if [ $(cat $DIRPAM$COMMONFILEGS | grep -c "account required pam_time.so") -eq 0  ] ; then
+				$SED "1i account required pam_time.so"  $DIRPAM$COMMONFILEGS 
+		fi
+	fi
    
    if [ ! -f $FILEPAMTIMECONF.old ] ; then
    cp $FILEPAMTIMECONF $FILEPAMTIMECONF.old
