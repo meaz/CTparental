@@ -1,8 +1,8 @@
-ctparental (3.94-4) unstable; urgency=medium
+ctparental (3.94-5) unstable; urgency=medium
   
   *  corrige un bug de configuration pam_time apparue sous jessie .
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 23:13:43 CET
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  lun. 01 févr. 2016 19:50:16 CET
  
 ctparental (3.94-3) unstable; urgency=medium
   
