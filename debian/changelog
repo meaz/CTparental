@@ -1,3 +1,9 @@
+ctparental (3.94-4) unstable; urgency=medium
+  
+  *  corrige un bug de configuration pam_time apparue sous jessie .
+    
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 23:13:43 CET
+ 
 ctparental (3.94-3) unstable; urgency=medium
   
   *  Ajout de la procedure pour création des deb ubuntu et debian dans le fichier make-deb.txt
