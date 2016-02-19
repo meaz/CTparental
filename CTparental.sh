@@ -1058,7 +1058,7 @@ QmCC" />
 </BODY>
 </HTML>
 EOF
-#<br><a href="http://localhost/CTparental/cactparental.crt">Installer le certificat racine de CTparental</a><br>
+
 fi
 ## GENERATION
 
