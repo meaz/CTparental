@@ -3,7 +3,7 @@
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <TITLE>CTparental DNS filtering</TITLE>
-<link rel="stylesheet" href="/CTadmin/css/style.css" type="text/css">
+<link rel="stylesheet" href="css/style.css" type="text/css">
 </HEAD>
 <body>
 <?php

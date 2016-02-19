@@ -287,7 +287,10 @@ EOF
 
 }
 confdansguardian () {
-echo "confdansguardian"
+  # replace the default deny HTML page
+  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /usr/share/dansguardian/languages/ukenglish/
+  cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /usr/share/dansguardian/languages/french/template.html
+  echo "confdansguardian"
   $SED "s?^loglevel =.*?loglevel = 0?g" $FILEConfDans   
   $SED "s?^languagedir =.*?languagedir = '/etc/dansguardian/languages'?g" $FILEConfDans  
   $SED "s?^language =.*?language = 'french'?g" $FILEConfDans  
@@ -297,7 +300,6 @@ echo "confdansguardian"
   $SED "s?^filterport =.*?filterport = $DANSGport?g" $FILEConfDans 
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
- # $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
   echo "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
 
@@ -610,6 +612,7 @@ do
 done
 echo "localhost" > $DANSXSITELIST
 echo "127.0.0.1" >> $DANSXSITELIST
+echo $BL_SERVER >> $DANSXSITELIST
 cat $DREAB | sed -e"s/^\.//g" | sed -e"s/^www.//g" >> $DANSXSITELIST
 echo -n "."
 cat $DREAB | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  $DIR_DNS_WHITELIST_ENABLED/whiteliste.ossi.conf
@@ -984,88 +987,11 @@ mkdir $DIRHTML 2> /dev/null
 if [ ! -z $DIRhtmlPersonaliser ];then
    cp -r $DIRhtmlPersonaliser/* $DIRHTML
 else
-s="span"
-st="style"
-c="$c"
-cab=";\">"
-
-cat << EOF > $DIRHTML/index.html
- <HTML>
-<HEAD>
-   <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-   <TITLE>danger</TITLE>
-</HEAD>
-<BODY LANG="fr-FR" DIR="LTR">
-<CENTER>
-<img alt="Site dangereux pour des mineurs boquer par dnsmasq"
-  HEIGHT="600"   
-  src="data:image/png;base64,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
-QmCC" />
-</CENTER>
-</BODY>
-</HTML>
-EOF
-
+ cp -r usr/local/share/CTparental/www/CTparental/* $DIRHTML
 fi
 ## GENERATION
 
-#cat $DIRHTML/index.html > /etc/dansguardian/languages/french/template.html
-#$SED "s/dnsmasq/dansguardian/g"  /etc/dansguardian/languages/french/template.html  
-
-ln -s  $DIRHTML/index.html $DIRHTML/err404.html
+#ln -s  $DIRHTML/index.html $DIRHTML/err404.html
 USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
 GROUPHTTPD=$(cat /etc/group | grep $USERHTTPD | cut -d":" -f1)
 chmod 644 $FILE_CONF

@@ -127,7 +127,7 @@ else
 	$nb_urls=$l_error_openfile." ".$bl_categorie_url_file;
 echo "<TITLE>$l_title</TITLE>";
 ?>
-<link rel="stylesheet" href="/CTadmin/css/style.css" type="text/css">
+<link rel="stylesheet" href="/CTparental/css/style.css" type="text/css">
 </HEAD>
 <body>
 <TABLE width="100%" border="0" cellspacing="0" cellpadding="0">
