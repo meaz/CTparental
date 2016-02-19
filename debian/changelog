@@ -1,8 +1,15 @@
+ctparental (3.94-6) unstable; urgency=medium
+  
+  *  probleme dansguardian + blackliste de toulouse.
+  *  page d'interseption dansguardian ou dnsmasq plus parlante.
+    
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 19 Feb 2016 14:29:24 +0100
+
 ctparental (3.94-5) unstable; urgency=medium
   
   *  corrige un bug de configuration pam_time apparue sous jessie.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 25 Oct 2015 10:47:32 +0200
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 01 Feb 2016 10:47:32 +0100
 
 ctparental (3.94-3) unstable; urgency=medium
   
@@ -10,20 +17,20 @@ ctparental (3.94-3) unstable; urgency=medium
   *  léger nettoyage du code de desactivation de l'ipv6
   *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 24 Oct 2015 10:47:32 +0200
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 24 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-2) unstable; urgency=medium
 
   *  debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 23 Oct 2015 10:47:32 +0200
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 23 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-1) unstable; urgency=medium
 
   * CTparental.sh -u propose la des-installation par dpkg --purge ctparental en cas de présence de l'install deb.
   * correctif du bug de non suppression de /usr/local/CTparental/ lors d'une dés-installation par dpkg.
  
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 22 Oct 2015 10:47:32 +0200
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 22 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-0) unstable; urgency=medium
 
