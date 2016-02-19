@@ -1062,8 +1062,8 @@ EOF
 fi
 ## GENERATION
 
-cat $DIRHTML/index.html > /etc/dansguardian/languages/french/template.html
-$SED "s/dnsmasq/dansguardian/g"  /etc/dansguardian/languages/french/template.html  
+#cat $DIRHTML/index.html > /etc/dansguardian/languages/french/template.html
+#$SED "s/dnsmasq/dansguardian/g"  /etc/dansguardian/languages/french/template.html  
 
 ln -s  $DIRHTML/index.html $DIRHTML/err404.html
 USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
