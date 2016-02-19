@@ -1094,10 +1094,6 @@ else
 	unset debconfloginhttp
 fi
 
-
-
-chmod 700 /root/passwordCTadmin
-chown root:root /root/passwordCTadmin
 mkdir /run/lighttpd/ 2> /dev/null
 chmod 770 /run/lighttpd/
 chown root:$GROUPHTTPD /run/lighttpd/
