@@ -987,7 +987,7 @@ mkdir $DIRHTML 2> /dev/null
 if [ ! -z $DIRhtmlPersonaliser ];then
    cp -r $DIRhtmlPersonaliser/* $DIRHTML
 else
- cp -r usr/local/share/CTparental/www/CTparental/* $DIRHTML
+ cp -r /usr/local/share/CTparental/www/CTparental/* $DIRHTML
 fi
 ## GENERATION
 
