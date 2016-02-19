@@ -1,36 +1,35 @@
 ctparental (3.94-5) unstable; urgency=medium
   
-  *  corrige un bug de configuration pam_time apparue sous jessie .
+  *  corrige un bug de configuration pam_time apparue sous jessie.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  lun. 01 févr. 2016 19:50:16 CET
- 
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  lun. 01 févr. 2016 19:50:16 CEST
+
 ctparental (3.94-3) unstable; urgency=medium
   
   *  Ajout de la procedure pour création des deb ubuntu et debian dans le fichier make-deb.txt
   *  léger nettoyage du code de desactivation de l'ipv6
   *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 23:13:43 CET
- 
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam. 28 nov. 2015 23:13:43 CEST
+
 ctparental (3.94-2) unstable; urgency=medium
 
   *  debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
   
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  jeu., 22 oct. 2015 10:55:12 CEST
- 
+
 ctparental (3.94-1) unstable; urgency=medium
 
   * CTparental.sh -u propose la des-installation par dpkg --purge ctparental en cas de présence de l'install deb.
   * correctif du bug de non suppression de /usr/local/CTparental/ lors d'une dés-installation par dpkg.
  
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 22 Oct 2015 10:47:32 +0200
- 
+
 ctparental (3.94-0) unstable; urgency=medium
 
   * Upstream fix .
  
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 09 Jan 2014 21:09:00 +0100
-
 
 ctparental (3.84.1-1) unstable; urgency=medium
 
