@@ -288,8 +288,8 @@ EOF
 }
 confdansguardian () {
   # replace the default deny HTML page
-  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /usr/share/dansguardian/languages/ukenglish/
-  cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /usr/share/dansguardian/languages/french/template.html
+  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
+  cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /etc/dansguardian/languages/french/template.html
   echo "confdansguardian"
   $SED "s?^loglevel =.*?loglevel = 0?g" $FILEConfDans   
   $SED "s?^languagedir =.*?languagedir = '/etc/dansguardian/languages'?g" $FILEConfDans  
