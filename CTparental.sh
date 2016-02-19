@@ -1155,7 +1155,7 @@ fastcgi.server = (
 	}
 }
 
-\$SERVER["socket"] == "$PRIVATE_IP" {
+\$SERVER["socket"] == "$PRIVATE_IP:80" {
 server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
 }
@@ -1292,6 +1292,7 @@ openssl x509 -req -in $DIR_TMP/search.yahoo.com.csr -out $DIR_TMP/search.yahoo.c
 
 ## instalation de la CA dans les ca de confiance.
 cp -f $DIR_TMP/cactparental.crt $CADIR/
+cp -f $DIR_TMP/cactparental.crt $DIRHTML
 cp -f $DIR_TMP/cactparental.crt $REPCAMOZ
 ## instalation des certificats serveur
 cat $DIR_TMP/localhost.key $DIR_TMP/localhost.crt > $PEMSRVDIR/localhost.pem
