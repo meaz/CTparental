@@ -989,10 +989,9 @@ if [ ! -z $DIRhtmlPersonaliser ];then
    cp -r $DIRhtmlPersonaliser/* $DIRHTML
 else
  cp -r /usr/local/share/CTparental/www/CTparental/* $DIRHTML
+ 
 fi
-## GENERATION
 
-#ln -s  $DIRHTML/index.html $DIRHTML/err404.html
 USERHTTPD=$(cat /etc/passwd | grep /var/www | cut -d":" -f1)
 GROUPHTTPD=$(cat /etc/group | grep $USERHTTPD | cut -d":" -f1)
 chmod 644 $FILE_CONF
@@ -1161,7 +1160,14 @@ server.error-handler-404 ="err404.php"
 }
 
 EOF
-
+if [ -e $DIRHTML/index.php ] ;  then
+ln -s $DIRHTML/index.php $DIRHTML/err404.php
+else
+	if [ -e $DIRHTML/index.html] ;  then
+	ln -s  $DIRHTML/index.html $DIRHTML/err404.html
+	fi
+	$SED "s?^server.error-handler-404 =.*?server.error-handler-404 =\"err404.html\"?g" $CTPARENTALCONFHTTPD
+fi
 
 
 chown root:$GROUPHTTPD $DREAB
