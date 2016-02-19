@@ -297,7 +297,7 @@ echo "confdansguardian"
   $SED "s?^filterport =.*?filterport = $DANSGport?g" $FILEConfDans 
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
-  $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
+ # $SED "s?^accessdeniedaddress =.*?accessdeniedaddress = 'http://127.0.0.10/index.php'?g" $FILEConfDans
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
   echo "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
 
