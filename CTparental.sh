@@ -1155,9 +1155,9 @@ fastcgi.server = (
 	}
 }
 
-\$SERVER["socket"] == "$PRIVATE_IP:80" {
+\$SERVER["socket"] == "$PRIVATE_IP" {
 server.document-root = "$DIRHTML"
-server.errorfile-prefix = "$DIRHTML/err" 
+server.error-handler-404 ="err404.php"
 }
 
 EOF
