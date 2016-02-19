@@ -288,8 +288,7 @@ EOF
 }
 confdansguardian () {
   # replace the default deny HTML page
-  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
-  cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /etc/dansguardian/languages/french/template.html
+ 
   echo "confdansguardian"
   $SED "s?^loglevel =.*?loglevel = 0?g" $FILEConfDans   
   $SED "s?^languagedir =.*?languagedir = '/etc/dansguardian/languages'?g" $FILEConfDans  
@@ -303,8 +302,10 @@ confdansguardian () {
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
   echo "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier!!" > /etc/dansguardian/lists/bannedsitelist
 
-
 $DANSGOUARDIANrestart
+ cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
+ cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /etc/dansguardian/languages/french/template.html
+ $DANSGOUARDIANrestart
 echo "fin confdansguardian" 
 }
 confprivoxy () {
