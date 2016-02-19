@@ -2,7 +2,7 @@ ctparental (3.94-5) unstable; urgency=medium
   
   *  corrige un bug de configuration pam_time apparue sous jessie.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  lun., 01 févr. 2016 19:50:16 CEST
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 25 Oct 2015 10:47:32 +0200
 
 ctparental (3.94-3) unstable; urgency=medium
   
@@ -10,13 +10,13 @@ ctparental (3.94-3) unstable; urgency=medium
   *  léger nettoyage du code de desactivation de l'ipv6
   *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  sam., 28 nov. 2015 23:13:43 CEST
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 24 Oct 2015 10:47:32 +0200
 
 ctparental (3.94-2) unstable; urgency=medium
 
   *  debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  jeu., 22 oct. 2015 10:55:12 CEST
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 23 Oct 2015 10:47:32 +0200
 
 ctparental (3.94-1) unstable; urgency=medium
 
