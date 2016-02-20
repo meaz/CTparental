@@ -5,8 +5,8 @@ if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
   $Language = strtolower(substr(chop($Langue[0]),0,2)); }
 if($Language == 'fr'){
 $text0="ACC&Egrave;S REFUS&Eacute;"	;
-$text1="L'acc&egrave;s &agrave; la page :";
-$text2="... a &eacute;t&eacute; refus&eacute; pour la raison suivante :";
+$text1="L'acc&egrave;s &agrave; au domaine :";
+$text2="... a &eacute;t&eacute; refus&eacute; pour la(les) raison(s) suivante(s) :";
 $text3="Vous tentez d'acc&eacute;der &agrave; une ressource dont le contenu est r&eacute;put&eacute;
 	contenir des informations inappropri&eacute;es.";
 $text4="Contactez votre responsable informatique (RSSI/OSSI), si vous pensez que ce filtrage est abusif.";
