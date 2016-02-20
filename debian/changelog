@@ -1,6 +1,6 @@
 ctparental (3.95-1) unstable; urgency=medium
   
-  *  Corection de bug sur la page de redirection.
+  *  Corection de bugs sur la page de redirection dnsmasq et dansguardian.
     
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 20 Feb 2016 08:50:31 +0100
 
