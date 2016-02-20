@@ -305,7 +305,6 @@ confdansguardian () {
 $DANSGOUARDIANrestart
  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
  cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /etc/dansguardian/languages/french/template.html
- # corection des accents dant les messages de Dansguardian.
  sed -i "s/\&ecute;/\&eacute;/g" /etc/dansguardian/languages/french/messages
  $DANSGOUARDIANrestart
 echo "fin confdansguardian" 
