@@ -1,3 +1,9 @@
+ctparental (3.95-1) unstable; urgency=medium
+  
+  *  Corection de bug sur la page de redirection.
+    
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 20 Feb 2016 08:50:31 +0100
+
 ctparental (3.95-0) unstable; urgency=medium
   
   *  probleme dansguardian + blackliste de toulouse.
