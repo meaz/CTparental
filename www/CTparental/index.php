@@ -66,12 +66,15 @@ $text5="Filtered by ";
 	<?php
 
 exec ("/usr/local/bin/CTparental-bl-infos.sh ".$_SERVER["HTTP_HOST"],$blinfosliste);
-
-foreach ($blinfosliste as $categorie )
+$var1=$blinfosliste[0];
+$tab1=explode(" ",$var1);
+foreach ($tab1 as $categorie )
 			{
 				echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a><br>";
 			}
-?></b>
+
+?>
+</b>
 	<font color=black>
 	<br><br><br><br>
 	<?php echo ($text3);?>
