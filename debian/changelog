@@ -1,3 +1,9 @@
+ctparental (3.95-2) unstable; urgency=medium
+  
+  *  [PATCH] Ajout de la variable d'environement PATH dans /etc/cron.d/CTparental-autoupdate
+    
+ -- DEMAREST Maxime <demar.max@openmailbox.org>  Thu, 25 Feb 2016 13:42:31 +0100
+ 
 ctparental (3.95-1) unstable; urgency=medium
   
   *  Corection de bugs sur la page de redirection dnsmasq et dansguardian.

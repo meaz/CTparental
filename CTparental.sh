@@ -484,7 +484,8 @@ autoupdate() {
 }
 autoupdateon() {
 $SED "s?^AUTOUPDATE.*?AUTOUPDATE=ON?g" $FILE_CONF
-echo "*/10 * * * * root $CHEMINCTPARENTLE -aup" > /etc/cron.d/CTparental-autoupdate
+echo "PATH=$PATH"  > /etc/cron.d/CTparental-autoupdate
+echo "*/10 * * * * root $CHEMINCTPARENTLE -aup" >> /etc/cron.d/CTparental-autoupdate
 $CRONrestart
 }
 
