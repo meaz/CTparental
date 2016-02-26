@@ -174,6 +174,7 @@ PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
 CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
+DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g")}
 
 if [ $(yum help 2> /dev/null | wc -l ) -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
@@ -609,13 +610,20 @@ do
 		do
 		    cp -f $DIR_DNS_BLACKLIST_ENABLED/$CATEGORIE.conf $FILE_tmp
 		    $SED "/$DOMAINE/d" $FILE_tmp
-                    cp -f $FILE_tmp $DIR_DNS_BLACKLIST_ENABLED/$CATEGORIE.conf
+            cp -f $FILE_tmp $DIR_DNS_BLACKLIST_ENABLED/$CATEGORIE.conf
 		done
-        fi
+		for DOMAINE in $DOMAINEDEPOTS
+		do
+		    cp -f $DIR_DNS_BLACKLIST_ENABLED/$CATEGORIE.conf $FILE_tmp
+		    $SED "/$DOMAINE/d" $FILE_tmp
+            cp -f $FILE_tmp $DIR_DNS_BLACKLIST_ENABLED/$CATEGORIE.conf
+		done
+    fi
 done
 echo "localhost" > $DANSXSITELIST
 echo "127.0.0.1" >> $DANSXSITELIST
 echo $BL_SERVER >> $DANSXSITELIST
+echo $DOMAINEDEPOTS | sed -e "s/ /\n/g" >> $DANSXSITELIST
 cat $DREAB | sed -e"s/^\.//g" | sed -e"s/^www.//g" >> $DANSXSITELIST
 echo -n "."
 cat $DREAB | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  $DIR_DNS_WHITELIST_ENABLED/whiteliste.ossi.conf
