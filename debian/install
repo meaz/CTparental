@@ -5,4 +5,4 @@ www/CTadmin										var/www
 www/locale/fr_FR/LC_MESSAGES/fr.mo				var/www/CTadmin/locale/fr_FR/LC_MESSAGES
 www/CTparental       							usr/local/share/CTparental/www
 www/locale/fr_FR/LC_MESSAGES/fr.mo				usr/local/share/CTparental/www/CTparental/locale/fr_FR/LC_MESSAGES
-e2guardian_conf									usr/local/share/CTparental
+confDansgouardian									usr/local/share/CTparental
