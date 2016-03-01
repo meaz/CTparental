@@ -1,3 +1,9 @@
+ctparental (4.01-0) unstable; urgency=medium
+  
+  *  internationalisation de l'interface web.
+    
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 26 Feb 2016 16:38:40 +0100
+ 
 ctparental (3.95-3) unstable; urgency=medium
   
   *  ajout des depots apt dans les domaines en exeption de manière transparente.
