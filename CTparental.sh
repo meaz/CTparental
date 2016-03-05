@@ -1838,12 +1838,16 @@ requiredpamtime
 	 fi
 	 
          clear
-         echo "exemple: 00h00 à 23h59 ou 08h00 à 12h00 et 14h00 à 16h50"
+         at=$(getttext "at")
+         and=$(getttext "and")
+         h=$(getttext ":")
+         or=$(getttext "or")
+         echo "exemple: 00$h00 $at 23$h59 $or 08$h00 $at 12$h00 $and 14$h00 $at 16$h50"
          echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
          while (true); do
             read choi
             input=$choi
-            choi=$(echo $choi | sed -e "s/h//g" | sed -e "s/ //g" | sed -e "s/a/-/g" | sed -e "s/et/:/g" ) # mise en forme de la variable choi pour pam   
+            choi=$(echo $choi | sed -e "s/$h//g" | sed -e "s/ //g" | sed -e "s/$at/-/g" | sed -e "s/$and/:/g" ) # mise en forme de la variable choi pour pam   
                if [ $( echo $choi | grep -E -c "^([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]$|^([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]:([0-1][0-9]|2[0-3])[0-5][0-9]-([0-1][0-9]|2[0-3])[0-5][0-9]$" ) -eq 1 ];then
                   int1=$(echo $choi | cut -d ":" -f1 | cut -d "-" -f1)
                   int2=$(echo $choi | cut -d ":" -f1 | cut -d "-" -f2)

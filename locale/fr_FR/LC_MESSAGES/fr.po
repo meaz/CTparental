@@ -280,3 +280,15 @@ msgstr "puis relancez la commande"
 
 msgid "unknown argument"
 msgstr "Argument inconnu"
+
+msgid "at"
+msgstr "à"
+
+msgid "and"
+msgstr "et"
+
+msgid ":"
+msgstr "h"
+
+msgid "or"
+msgstr "ou"
