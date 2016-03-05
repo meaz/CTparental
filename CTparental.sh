@@ -1692,7 +1692,7 @@ and=$(gettext "and")
 h=$(gettext ":")
 or=$(gettext "or")
 echo -e "$(gettext "The start time must be strictly less than the end time:")$RougeD$input$Fcolor "
-echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
+echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
 echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
 }
 errortime2 () {
@@ -1702,7 +1702,7 @@ and=$(gettext "and")
 h=$(gettext ":")
 or=$(gettext "or")
 echo -e "$(gettext "Bad syntax:")$RougeD$input$Fcolor "
-echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
+echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
 echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
 }
 
@@ -1852,7 +1852,7 @@ requiredpamtime
          and=$(gettext "and")
          h=$(gettext ":")
          or=$(gettext "or")
-         echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
+         echo "exemple: 00${h}00 $at 23${h}59 $or 08${h}00 $at 12${h}00 $and 14${h}00 $at 16${h}50"
          echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
          while (true); do
             read choi
