@@ -19,12 +19,12 @@ export TEXTDOMAIN=${LANG:0:2}
 
 arg1=${1}
 if [ $# -ge 1 ];then
-if [ $arg1 != "-listusers" ] ; then
-if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
-   echo $(gettext "It root of the need to run this script.")
-   exit 1
-fi
-fi
+	if [ $arg1 != "-listusers" ] ; then
+		if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
+		   echo $(gettext "It root of the need to run this script.")
+		   exit 1
+		fi
+	fi
 fi
 if  [ $(groups $(whoami) | grep -c -E "( ctoff$)|( ctoff )") -eq 0 ];then
   export https_proxy=http://127.0.0.1:8080
@@ -208,16 +208,16 @@ if [ $( echo $CMDINSTALL | wc -m ) -eq 1 ] ; then
    set -e
    exit 1
 fi
+if [ $UID -le 499 ]; then
+	interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) 
+	ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   # suppose que la passerelle est la route par défaut
+	ipinterface_WAN=$(ifconfig $interface_WAN | awk '/adr:/{print $2}' | cut -d":" -f2)
+	reseau_box=$(ip route | grep / | grep "$interface_WAN" | cut -d" " -f1 )
+	ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f2)
 
-interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) 
-ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   # suppose que la passerelle est la route par défaut
-ipinterface_WAN=$(ifconfig $interface_WAN | awk '/adr:/{print $2}' | cut -d":" -f2)
-reseau_box=$(ip route | grep / | grep "$interface_WAN" | cut -d" " -f1 )
-ip_broadcast=$(ifconfig $interface_WAN | awk '/Bcast:/{print $3}' | cut -d":" -f2)
-
-DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
-
+	DNS1=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
+	DNS2=$(cat /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+fi
 resolvconffixon () {
 echo "<resolvconffixon>"
 # redemare dnsmasq 
