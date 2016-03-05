@@ -1,3 +1,9 @@
+ctparental (4.02-0) unstable; urgency=medium
+  
+  *  internationalisation de CTparental.sh.
+    
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 05 Mar 2016 19:45:06 +0100
+ 
 ctparental (4.01-0) unstable; urgency=medium
   
   *  internationalisation de l'interface web.
