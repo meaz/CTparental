@@ -1838,10 +1838,10 @@ requiredpamtime
 	 fi
 	 
          clear
-         at=$(getttext "at")
-         and=$(getttext "and")
-         h=$(getttext ":")
-         or=$(getttext "or")
+         at=$(gettext "at")
+         and=$(gettext "and")
+         h=$(gettext ":")
+         or=$(gettext "or")
          echo "exemple: 00$h00 $at 23$h59 $or 08$h00 $at 12$h00 $and 14$h00 $at 16$h50"
          echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
          while (true); do
