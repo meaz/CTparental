@@ -591,7 +591,7 @@ catChoice() {
      	 fi     
       done
       cp $DIR_DNS_FILTER_AVAILABLE/ossi.conf $DIR_DNS_BLACKLIST_ENABLED/
-      echo "</fincatChoice>"
+      echo "</catChoice>"
       reabdomaine
 }
 
@@ -705,10 +705,12 @@ fi
 echo "</dnsmasqon>"
 }
 dnsmasqoff () {
+   echo "<dnsmasqoff>"
    $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
    resolvconffixoff
    $DANSGOUARDIANrestart
-$PRIVOXYrestart
+   $PRIVOXYrestart
+   echo "</dnsmasqoff>"
 }
 ipMaskValide() {
 ip=$(echo $1 | cut -d"/" -f1)
@@ -1685,14 +1687,22 @@ done
 
 errortime1 () {
 clear
+at=$(gettext "at")
+and=$(gettext "and")
+h=$(gettext ":")
+or=$(gettext "or")
 echo -e "$(gettext "The start time must be strictly less than the end time:")$RougeD$input$Fcolor "
-echo "exemple: 08h00 à 23h59 ou 08h00 à 12h00 et 14h00 à 23h59"
+echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
 echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
 }
 errortime2 () {
 clear
+at=$(gettext "at")
+and=$(gettext "and")
+h=$(gettext ":")
+or=$(gettext "or")
 echo -e "$(gettext "Bad syntax:")$RougeD$input$Fcolor "
-echo "exemple: 08h00 à 23h59 ou 08h00 à 12h00 et 14h00 à 23h59"
+echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
 echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
 }
 
@@ -1842,7 +1852,7 @@ requiredpamtime
          and=$(gettext "and")
          h=$(gettext ":")
          or=$(gettext "or")
-         echo "exemple: 00$h00 $at 23$h59 $or 08$h00 $at 12$h00 $and 14$h00 $at 16$h50"
+         echo "exemple: 00$h\00 $at 23$h\59 $or 08$h\00 $at 12$h\00 $and 14$h\00 $at 16$h\50"
          echo -e -n "$RougeD$PCUSER$Fcolor $(gettext "is allowed to connect the") $BleuD${DAYS[$NumDAY]}$Fcolor $(gettext "at :")"
          while (true); do
             read choi
