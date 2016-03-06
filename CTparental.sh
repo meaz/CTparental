@@ -601,8 +601,6 @@ date +%H:%M:%S
 $MFILEtmp
 if [ ! -f $DREAB ] ; then
 cat << EOF > $DREAB
-www.google.com
-www.google.fr
 EOF
 fi
 if [ ! -f $DIR_DNS_BLACKLIST_ENABLED/ossi.conf ] ; then
@@ -1486,8 +1484,14 @@ updatelistgctoff () {
 	for PCUSER in `listeusers`
 	do
 		if [ $(cat $FILE_GCTOFFCONF | sed -e "s/#//g" | grep -c -E "^$PCUSER$") -eq 0 ];then
-			result="1"
-			echo "#$PCUSER" >> $FILE_GCTOFFCONF
+			result="1"	
+			if [ $(groups $PCUSER | grep -c -E "( sudo )|( sudo$)") -eq 1 ];then
+				#si l'utilisateur fait parti du group sudo on l'ajoute sans filtrage par default.
+				echo "$PCUSER" >> $FILE_GCTOFFCONF
+			else
+				#si l'utilisateur ne fait pas parti du group sudo on l'ajoute avec filtrage  par default.
+				echo "#$PCUSER" >> $FILE_GCTOFFCONF
+			fi
 		fi
 	done
 	## on supprime tout ceux qui n'existent plus sur le pc.
