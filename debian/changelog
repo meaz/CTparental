@@ -2,7 +2,7 @@ ctparental (4.03-0) unstable; urgency=medium
   
   *  correction du bug sur le filtrage par liste blanche qui verrouillait tout.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 05 Mar 2016 19:45:06 +0100
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Mon, 07 Mar 2016 18:06:31 +0100
  
 ctparental (4.02-0) unstable; urgency=medium
   
