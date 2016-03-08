@@ -310,7 +310,31 @@ confdansguardian () {
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" $FILEConfDans 
   $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfDans
-  echo $(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !!") > /etc/dansguardian/lists/bannedsitelist
+cat << EOF > /etc/dansguardian/lists/bannedsitelist
+#Blanket Block.  To block all sites except those in the
+#exceptionsitelist and greysitelist files, remove
+#the # from the next line to leave only a '**':
+#**
+
+#Blanket SSL/CONNECT Block.  To block all SSL
+#and CONNECT tunnels except to addresses in the
+#exceptionsitelist and greysitelist files, remove
+#the # from the next line to leave only a '**s':
+#**s
+
+#Blanket IP Block.  To block all sites specified only as an IP,
+#remove the # from the next line to leave only a '*ip':
+#*ip
+
+#Blanket SSL/CONNECT IP Block.  To block all SSL and CONNECT
+#tunnels to sites specified only as an IP,
+#remove the # from the next line to leave only a '**ips':
+#**ips
+
+$(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !!")
+
+EOF
+
 
 $DANSGOUARDIANrestart
  cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
@@ -1199,6 +1223,12 @@ chmod 660 $DNS_FILTER_OSSI
 chown root:$GROUPHTTPD $CATEGORIES_ENABLED
 chmod 660 $CATEGORIES_ENABLED
 chmod 660 /etc/sudoers
+chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedextensionlist
+chmod 664 /etc/dansguardian/lists/bannedextensionlist
+chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedmimetypelist
+chmod 664 /etc/dansguardian/lists/bannedmimetypelist
+chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedsitelist
+chmod 664 /etc/dansguardian/lists/bannedsitelist
 
 sudotest=`grep Defaults:$USERHTTPD /etc/sudoers |wc -l`
 if [ $sudotest -ge "1" ] ; then
@@ -1209,9 +1239,9 @@ fi
 
 sudotest=`grep "$USERHTTPD ALL=" /etc/sudoers |wc -l`
 if [ $sudotest -ge "1" ] ; then
-    $SED "s?^$USERHTTPD.*?$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff?g" /etc/sudoers
+    $SED "s?^$USERHTTPD.*?$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -dgreload,/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff?g" /etc/sudoers
 else
-    echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff" >> /etc/sudoers
+    echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -dgreload,/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff" >> /etc/sudoers
 fi
 	
 
@@ -2309,7 +2339,11 @@ case $arg1 in
 		  unset test
 	  fi
 	  exit 0
-      ;;       
+      ;;  
+     -dgreload)
+      $DANSGOUARDIANrestart     
+      exit 0
+      ;;  
       
    *)
       echo "$(gettext "unknown argument"):$1";
