@@ -45,103 +45,8 @@ $hconf_file="/usr/local/etc/CTparental/CThours.conf";
 $wl_domains="/usr/local/etc/CTparental/domaine-rehabiliter";
 $bl_domains="/usr/local/etc/CTparental/blacklist-local";
 
-echo "<TABLE width='100%' border=0 cellspacing=0 cellpadding=0>";
-echo "<tr><th>".gettext('web filtering')."</th></tr>";
-echo "<tr bgcolor='#FFCC66'><td><img src='/images/pix.gif' width='1' height='2'></td></tr>";
-echo "</table>";
-echo "<table width='100%' border=1 cellspacing=0 cellpadding=1>";
-echo "<TABLE width='100%' border=1 cellspacing=0 cellpadding=0>";
-echo "<tr><td valign='middle' align='left'>";
-echo "<CENTER>";
-echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
-echo "<input type=hidden name='choix' value=\"LogOFF\">";
-echo "<input type=submit value=".gettext('Logout').">";
-echo "</FORM>";
-echo "</CENTER>";
-	if (is_file ($conf_file))
-	{
-	$tab=file($conf_file);
-	if ($tab)
-		{
-		foreach ($tab as $line)
-			{
-			$field=explode("=", $line);
-			if ($field[0] == "DNSMASQ")		{$DNSMASQ=trim($field[1]);}   
-			}
-		}
-	}
-else { echo gettext('Error opening the file')." ".$conf_file;}
 
-		if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
-		else {
-				if ($DNSMASQ <> "OFF"){$dg_confswitch='Blacklist filtering';}
-				else {$dg_confswitch='Hours of allowed connections';}
-			
-			}
 	
-	switch ($dg_confswitch)
-{
-	case 'extensions has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
-		break;
-	case 'mimetype has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
-		break;
-	case '*ip **ips ...' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
-		break;
-	case 'WhiteList Filtering' :
-		$bl_categories="/usr/local/etc/CTparental/wl-categories-available";
-		break;
-	case 'Blacklist filtering' :
-		$bl_categories="/usr/local/etc/CTparental/bl-categories-available";
-		break;
-
-		
-
-}
-	//$dg_confswitch = urlencode($dg_confswitch);
-	echo "<table width='100%' border=1 cellspacing=0 cellpadding=1>";
-//	echo "<table border=0 width=800 cellpadding=0 cellspacing=2>";
-	echo "<tr valign=top>";
-
-if ($DNSMASQ <> "OFF")
-	{
-	echo "<CENTER><H3> ".gettext('Actually, the Domain name filter is on')." </H3><BR>";
- 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
-	echo "<input type=hidden name='choix' value=\"BL_Off\">";
-	echo "<input type=submit value=".gettext('Switch the Filter off').">";
-	echo "</FORM></CENTER>";
-		
-	echo "<td align=center"; if ( $dg_confswitch == 'Blacklist filtering' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=Blacklist filtering\" title=\"\"><font color=\"black\"><b>".gettext('Blacklist filtering')."</b></font></a></td>";
-	echo "<td align=center"; if ( $dg_confswitch == 'WhiteList Filtering' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=WhiteList Filtering\" title=\"\"><font color=\"black\"><b>".gettext('WhiteList Filtering')."</b></font></a></td>";
-	echo "<td align=center"; if ( 'extensions has filtered' == $dg_confswitch ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=extensions has filtered\" title=\"\"><font color=\"black\"><b>".gettext('extensions has filtered')."</b></font></a></td>";
-	echo "<td align=center"; if ( 'mimetype has filtered' == $dg_confswitch   ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=mimetype has filtered\" title=\"\"><font color=\"black\"><b>".gettext('mimetype has filtered')."</b></font></a></td>";
-	echo "<td align=center"; if ( '*ip **ips ...' == $dg_confswitch ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=*ip **ips ...\" title=\"\"><font color=\"black\"><b>".gettext('*ip **ips ...')."</b></font></a></td>";
-	echo "<td align=center"; if ( $dg_confswitch == 'privileged group' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=privileged group\" title=\"\"><font color=\"black\"><b>".gettext('privileged group')."</b></font></a></td>";
-	
-	}
-else
-	{
-	echo "<CENTER><H3>".gettext('Actually, the Domain name filter is off')."</H3><BR>";
- 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
-	echo "<input type=hidden name='choix' value=\"BL_On\">";
-	echo "<input type=submit value=".gettext('Switch the Filter on').">";
-	echo "</FORM></CENTER>";
-	}
-	echo "<td align=center"; if ( $dg_confswitch == 'Hours of allowed connections' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
-	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=Hours of allowed connections\" title=\"\"><font color=\"black\"><b>".gettext('Hours of allowed connections')."</b></font></a></td>";
-
-	echo "</tr>";
-	echo" </table>";
-	echo "</td></tr>";
-
 
 # traitement du formulaire
 if (isset($_POST['choix'])){ $choix=$_POST['choix']; } else { $choix=""; }
@@ -374,7 +279,8 @@ $tab=file($conf_ctoff_file);
 	exec ("sudo -u root /usr/local/bin/CTparental.sh -gctalist");
 	break;
 }
-	if (is_file ($conf_file))
+
+if (is_file ($conf_file))
 	{
 	$tab=file($conf_file);
 	if ($tab)
@@ -391,6 +297,89 @@ $tab=file($conf_ctoff_file);
 		}
 	}
 else { echo gettext('Error opening the file')." ".$conf_file;}
+
+
+if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
+		else {
+				if ($DNSMASQ <> "OFF"){$dg_confswitch='Blacklist filtering';}
+				else {$dg_confswitch='Hours of allowed connections';}
+			
+			}
+	
+	switch ($dg_confswitch)
+{
+	case 'extensions has filtered' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
+		break;
+	case 'mimetype has filtered' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
+		break;
+	case '*ip **ips ...' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
+		break;
+	case 'WhiteList Filtering' :
+		$bl_categories="/usr/local/etc/CTparental/wl-categories-available";
+		break;
+	case 'Blacklist filtering' :
+		$bl_categories="/usr/local/etc/CTparental/bl-categories-available";
+		break;
+
+		
+
+}
+echo "<TABLE width='100%' border=0 cellspacing=0 cellpadding=0>";
+echo "<tr><th>".gettext('web filtering')."</th></tr>";
+echo "<tr bgcolor='#FFCC66'><td><img src='/images/pix.gif' width='1' height='2'></td></tr>";
+echo "</table>";
+echo "<table width='100%' border=1 cellspacing=0 cellpadding=1>";
+echo "<tr><td valign='middle' align='left'>";
+echo "<div align='right'>";
+echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
+echo "<input type=hidden name='choix' value=\"LogOFF\">";
+echo "<input type=submit value=".gettext('Logout').">";
+echo "</FORM>";
+echo "</div> ";
+
+echo "<table width='100%' border=1 cellspacing=0 cellpadding=1>";
+
+echo "<tr valign=top>";
+
+if ($DNSMASQ <> "OFF")
+	{
+	echo "<CENTER><H3> ".gettext('Actually, the Domain name filter is on')." </H3>";
+ 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
+	echo "<input type=hidden name='choix' value=\"BL_Off\">";
+	echo "<input type=submit value=".gettext('Switch the Filter off').">";
+	echo "</FORM></CENTER><br>";	
+	echo "<td align=center"; if ( $dg_confswitch == 'Blacklist filtering' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=Blacklist filtering\" title=\"\"><font color=\"black\"><b>".gettext('Blacklist filtering')."</b></font></a></td>";
+	echo "<td align=center"; if ( $dg_confswitch == 'WhiteList Filtering' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=WhiteList Filtering\" title=\"\"><font color=\"black\"><b>".gettext('WhiteList Filtering')."</b></font></a></td>";
+	echo "<td align=center"; if ( 'extensions has filtered' == $dg_confswitch ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=extensions has filtered\" title=\"\"><font color=\"black\"><b>".gettext('extensions has filtered')."</b></font></a></td>";
+	echo "<td align=center"; if ( 'mimetype has filtered' == $dg_confswitch   ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=mimetype has filtered\" title=\"\"><font color=\"black\"><b>".gettext('mimetype has filtered')."</b></font></a></td>";
+	echo "<td align=center"; if ( '*ip **ips ...' == $dg_confswitch ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=*ip **ips ...\" title=\"\"><font color=\"black\"><b>".gettext('*ip **ips ...')."</b></font></a></td>";
+	echo "<td align=center"; if ( $dg_confswitch == 'privileged group' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=privileged group\" title=\"\"><font color=\"black\"><b>".gettext('privileged group')."</b></font></a></td>";
+	
+	}
+else
+	{
+	echo "<CENTER><H3>".gettext('Actually, the Domain name filter is off')."</H3>";
+ 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
+	echo "<input type=hidden name='choix' value=\"BL_On\">";
+	echo "<input type=submit value=".gettext('Switch the Filter on').">";
+	echo "</FORM></CENTER><br>";
+	}
+	echo "<td align=center"; if ( $dg_confswitch == 'Hours of allowed connections' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=Hours of allowed connections\" title=\"\"><font color=\"black\"><b>".gettext('Hours of allowed connections')."</b></font></a></td>";
+
+	echo "</tr>";
+	echo" </table>";
+	echo "</td></tr>";
+
 
 # Lecture du formulaire
 switch ($dg_confswitch)
