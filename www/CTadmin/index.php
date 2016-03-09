@@ -46,12 +46,40 @@ $wl_domains="/usr/local/etc/CTparental/domaine-rehabiliter";
 $bl_domains="/usr/local/etc/CTparental/blacklist-local";
 
 
+if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
+		else {
+				if ($DNSMASQ <> "OFF"){$dg_confswitch='Blacklist filtering';}
+				else {$dg_confswitch='Hours of allowed connections';}
+			
+			}
 	
+	switch ($dg_confswitch)
+{
+	case 'extensions has filtered' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
+		break;
+	case 'mimetype has filtered' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
+		break;
+	case '*ip **ips ...' :
+		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
+		break;
+	case 'WhiteList Filtering' :
+		$bl_categories="/usr/local/etc/CTparental/wl-categories-available";
+		break;
+	case 'Blacklist filtering' :
+		$bl_categories="/usr/local/etc/CTparental/bl-categories-available";
+		break;
+
+		
+
+}	
 
 # traitement du formulaire
 if (isset($_POST['choix'])){ $choix=$_POST['choix']; } else { $choix=""; }
 switch ($choix)
 {
+	
 case 'change_file1' :
 	$tab=file($dg_file_edit);
 	if ($tab)
@@ -299,34 +327,7 @@ if (is_file ($conf_file))
 else { echo gettext('Error opening the file')." ".$conf_file;}
 
 
-if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
-		else {
-				if ($DNSMASQ <> "OFF"){$dg_confswitch='Blacklist filtering';}
-				else {$dg_confswitch='Hours of allowed connections';}
-			
-			}
-	
-	switch ($dg_confswitch)
-{
-	case 'extensions has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
-		break;
-	case 'mimetype has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
-		break;
-	case '*ip **ips ...' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
-		break;
-	case 'WhiteList Filtering' :
-		$bl_categories="/usr/local/etc/CTparental/wl-categories-available";
-		break;
-	case 'Blacklist filtering' :
-		$bl_categories="/usr/local/etc/CTparental/bl-categories-available";
-		break;
 
-		
-
-}
 echo "<TABLE width='100%' border=0 cellspacing=0 cellpadding=0>";
 echo "<tr><th>".gettext('web filtering')."</th></tr>";
 echo "<tr bgcolor='#FFCC66'><td><img src='/images/pix.gif' width='1' height='2'></td></tr>";
@@ -347,7 +348,7 @@ echo "<tr valign=top>";
 if ($DNSMASQ <> "OFF")
 	{
 	echo "<CENTER><H3> ".gettext('Actually, the Domain name filter is on')." </H3>";
- 	echo "<FORM action='$_SERVER[PHP_SELF]' method=POST>";
+ 	echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Hours of allowed connections' method=POST>";
 	echo "<input type=hidden name='choix' value=\"BL_Off\">";
 	echo "<input type=submit value=".gettext('Switch the Filter off').">";
 	echo "</FORM></CENTER><br>";	
