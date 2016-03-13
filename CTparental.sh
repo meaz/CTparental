@@ -124,7 +124,7 @@ PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
 DEPENDANCES=${DEPENDANCES:=" dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog dansguardian privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
-CONFLICTS=${CONFLICTS:=" mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
 
 #### COMMANDES de services par DEFAULT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -161,8 +161,9 @@ ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 UIDMINUSER=${UIDMINUSER:=1000}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
-FILEConfDans=${FILEConfDans:="/etc/dansguardian/dansguardian.conf"}
-FILEConfDansf1=${FILEConfDansf1:="/etc/dansguardian/dansguardianf1.conf"}
+DIRDAN=${DIRDAN:="/etc/dansguardian/"}
+FILEConfDans=${FILEConfDans:=$DIRDAN"dansguardian.conf"}
+FILEConfDansf1=${FILEConfDansf1:=$DIRDAN"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -462,7 +463,7 @@ USERADMINHTTPD=${1}
 pass=${2}
 hash=$(echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32)
 ligne=$(echo "$USERADMINHTTPD:$REALMADMINHTTPD:$hash")
-echo $ligne
+#echo $ligne
 $SED "/.*:$REALMADMINHTTPD.*/d" $PASSWORDFILEHTTPD 
 echo $ligne >> $PASSWORDFILEHTTPD
 }
@@ -727,12 +728,12 @@ fi
 echo "</dnsmasqon>"
 }
 dnsmasqoff () {
-   echo "<dnsmasqoff>"
-   $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
-   resolvconffixoff
-   $DANSGOUARDIANrestart
-   $PRIVOXYrestart
-   echo "</dnsmasqoff>"
+echo "<dnsmasqoff>"
+$SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
+resolvconffixoff
+$DANSGOUARDIANrestart
+$PRIVOXYrestart
+echo "</dnsmasqoff>"
 }
 ipMaskValide() {
 ip=$(echo $1 | cut -d"/" -f1)
@@ -1015,7 +1016,7 @@ expand-hosts
 bogus-priv
 port=54
 server=$DNS1
-server=$DNS2  
+server=$DNS2 
 address=/localhost/127.0.0.1
 address=/#/$PRIVATE_IP #redirige vers $PRIVATE_IP pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
@@ -1027,7 +1028,7 @@ $PRIVOXYrestart
 
 
 FoncHTTPDCONF () {
-echo "FoncHTTPDCONF"
+echo "<FoncHTTPDCONF>"
 $LIGHTTPDstop
 rm -rf $DIRHTML/*
 mkdir $DIRHTML 2> /dev/null
@@ -1223,12 +1224,12 @@ chmod 660 $DNS_FILTER_OSSI
 chown root:$GROUPHTTPD $CATEGORIES_ENABLED
 chmod 660 $CATEGORIES_ENABLED
 chmod 660 /etc/sudoers
-chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedextensionlist
-chmod 664 /etc/dansguardian/lists/bannedextensionlist
-chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedmimetypelist
-chmod 664 /etc/dansguardian/lists/bannedmimetypelist
-chown root:$GROUPHTTPD /etc/dansguardian/lists/bannedsitelist
-chmod 664 /etc/dansguardian/lists/bannedsitelist
+chown root:$GROUPHTTPD $DIRDAN"lists/bannedextensionlist"
+chmod 664 $DIRDAN"lists/bannedextensionlist"
+chown root:$GROUPHTTPD $DIRDAN"lists/bannedmimetypelist"
+chmod 664 $DIRDAN"lists/bannedmimetypelist"
+chown root:$GROUPHTTPD $DIRDAN"lists/bannedsitelist"
+chmod 664 $DIRDAN"lists/bannedsitelist"
 
 sudotest=`grep Defaults:$USERHTTPD /etc/sudoers |wc -l`
 if [ $sudotest -ge "1" ] ; then
@@ -1292,14 +1293,12 @@ configloginpassword () {
 PTNlogin='^[a-zA-Z0-9]*$'
 while (true)
 do
-     
-	loginhttp=$(whiptail --title "$(gettext "Login")" --nocancel --inputbox "$(gettext "Enter login to the administration interface") 
+loginhttp=$(whiptail --title "$(gettext "Login")" --nocancel --inputbox "$(gettext "Enter login to the administration interface") 
 $(gettext "- Only letters or numbers.")
 $(gettext "- 6 characters minimum:")" 10 60 3>&1 1>&2 2>&3)			
 	if [ $(expr $loginhttp : $PTNlogin) -gt 6  ];then 
 		break
 	fi	
-
 done
 while (true)
 do
@@ -2340,7 +2339,7 @@ case $arg1 in
 	  fi
 	  exit 0
       ;;  
-     -dgreload)
+    -dgreload)
       $DANSGOUARDIANrestart     
       exit 0
       ;;  
