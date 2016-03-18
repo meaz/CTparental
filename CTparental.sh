@@ -162,6 +162,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
+DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -306,15 +307,15 @@ confe2guardian () {
  
   echo "<confdansguardian>"
   $SED "s?^loglevel =.*?loglevel = 0?g" "$FILEConfe2gu"
-  $SED "s?^languagedir =.*?languagedir = '/usr/share/dansguardian/languages'?g" "$FILEConfe2gu"
+  $SED "s?^languagedir =.*?languagedir = $DIRE2GLANG?g" "$FILEConfe2gu"
   $SED "s?^language =.*?language = 'french'?g" "$FILEConfe2gu"
   $SED "s?^logexceptionhits =.*?logexceptionhits = 0?g" "$FILEConfe2gu"
   $SED "s?^filterip =.*?filterip = 127.0.0.1?g" "$FILEConfe2gu"
   $SED "s?^proxyip =.*?proxyip = 127.0.0.1?g" "$FILEConfe2gu"
   $SED "s?^filterports =.*?filterports = $E2GUport?g" "$FILEConfe2gu"
   $SED "s?^proxyport =.*?proxyport = $PROXYport?g" "$FILEConfe2gu"
-  #$SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" $FILEConfe2gu
-cat << EOF > /etc/dansguardian/lists/bannedsitelist
+  $SED "s?.*UNCONFIGURED.*?#UNCONFIGURED?g" "$FILEConfe2gu"
+cat << EOF > "$DIRE2G"lists/bannedsitelist
 #Blanket Block.  To block all sites except those in the
 #exceptionsitelist and greysitelist files, remove
 #the # from the next line to leave only a '**':
@@ -340,9 +341,9 @@ $(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !
 EOF
 
 $E2GUARDIANrestart
-cp -f /usr/local/share/CTparental/confDansgouardian/template.html /etc/dansguardian/languages/ukenglish/
-cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html /etc/dansguardian/languages/french/template.html
-sed -i "s/\&ecute;/\&eacute;/g" /etc/dansguardian/languages/french/messages
+cp -f /usr/local/share/CTparental/confDansgouardian/template.html "$DIRE2GLANG"ukenglish/
+cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html "$DIRE2GLANG"french/template.html
+sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
 echo "</confdansguardian>"
 }
