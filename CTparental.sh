@@ -41,22 +41,22 @@ fi
 
 noinstalldep="0"
 nomanuel="0"
-for arg in "$*" ; do
-       case $arg in
-	  -nodep )
-	     noinstalldep="1"
-	  ;;
-	  -nomanuel )
-	     nomanuel="1"
-	  ;;
-	  -dirhtml )
-	     narg=$(( "$narg" +1 ))
-	     DIRhtmlPersonaliser=${ARGS[$narg]}
-	     if [ ! -d "$DIRhtmlPersonaliser" ];then
-		gettext 'Invalid directory path!'
-		exit 0
-	     fi
-	  ;;
+for arg in $* ; do
+	case $arg in
+		-nodep )
+			noinstalldep="1"
+		;;
+		-nomanuel )
+			nomanuel="1"
+		;;
+		-dirhtml )
+			narg=$(( "$narg" +1 ))
+			DIRhtmlPersonaliser=${ARGS[$narg]}
+			if [ ! -d "$DIRhtmlPersonaliser" ];then
+				gettext 'Invalid directory path!'
+				exit 0
+			fi	
+		;;
 	esac
 done
 pause () {   # fonction pause pour debugage
