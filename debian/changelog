@@ -1,3 +1,9 @@
+ctparental (4.06-0) unstable; urgency=medium
+
+  * passage du script Ctparental.sh a shellcheck et corection du code en conséquance.
+
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 18 Mar 2016 23:33:34 +0100
+ 
 ctparental (4.05-0) unstable; urgency=medium
   
   *  possibilité d'activer le superuser sur grub2 avec la commande CTparental.sh -grubPon
