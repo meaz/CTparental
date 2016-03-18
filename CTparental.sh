@@ -41,7 +41,7 @@ fi
 
 noinstalldep="0"
 nomanuel="0"
-for arg in $* ; do
+for arg in "$@" ; do
 	case $arg in
 		-nodep )
 			noinstalldep="1"
@@ -459,19 +459,15 @@ done
 }
 
 addadminhttpd() {
-if [ ! -f "$PASSWORDFILEHTTPD" ] ; then
-    echo -n > "$PASSWORDFILEHTTPD"  
-fi
 
-chown root:"$USERHTTPD" "$PASSWORDFILEHTTPD"
-chmod 640 "$PASSWORDFILEHTTPD"
 USERADMINHTTPD=${1}
 pass=${2}
-hash=$(echo -n "$USERADMINHTTPD":"$REALMADMINHTTPD":"$pass" | md5sum | cut -b -32)
-ligne=$("$USERADMINHTTPD":"$REALMADMINHTTPD":"$hash")
+hash="$(echo -n "$USERADMINHTTPD"":""$REALMADMINHTTPD"":""$pass" | md5sum | cut -b -32)"
+ligne="$USERADMINHTTPD"":""$REALMADMINHTTPD"":""$hash"
 #echo $ligne
-$SED "/.*:$REALMADMINHTTPD.*/d" "$PASSWORDFILEHTTPD" 
-echo "$ligne" >> "$PASSWORDFILEHTTPD"
+echo "$ligne" > "$PASSWORDFILEHTTPD"
+chown root:"$USERHTTPD" "$PASSWORDFILEHTTPD"
+chmod 640 "$PASSWORDFILEHTTPD"
 }
 
 download() {
@@ -599,7 +595,7 @@ else
 fi     
 echo
 $UMFILEtmp
-cd "$(dirname $(readlink -f $0))"
+cd "$(dirname "$(readlink -f "$0")")"
 rm -rf $tempDIR
 date +%H:%M:%S
 }
@@ -1322,7 +1318,8 @@ do
 password=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Enter your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
 		password2=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Confirm your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
 		if [ "$password" = "$password2" ] ; then
-			if [ "$(echo "$password" | grep -E "[a-z]" | grep -E "[0-9]" | grep -E "[A-Z]" | grep -c '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' )" -ge 8 ] ; then
+			test="$(echo "$password" | grep -E "[a-z]" | grep -E "[0-9]" | grep -E "[A-Z]" | grep '[&éè~#{}()ç_@à?.;:/!,$<>=£%]')"
+			if [ "${#test}" -ge 8 ] ; then
 				break
 			else
 				whiptail --title "$(gettext "Password")" --msgbox "$(gettext "Password is not complex enough, it must contain at least:")
