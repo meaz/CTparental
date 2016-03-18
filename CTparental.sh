@@ -41,9 +41,8 @@ fi
 
 noinstalldep="0"
 nomanuel="0"
-ARGS=("$*")
-for (( narg=1; narg<=$#; narg++ )) ; do
-        case "${ARGS[$narg]}" in
+for arg in "$*" ; do
+       case $arg in
 	  -nodep )
 	     noinstalldep="1"
 	  ;;
@@ -2024,8 +2023,8 @@ echo "</desactivetimelogin>"
 
 
 listeusers () {
-TABUSER=$( " $(getent passwd | cut -d":" -f1,3) " )
-for LIGNES in $TABUSER
+
+for LIGNES in $(getent passwd | cut -d":" -f1,3)
 do
 #echo $(echo $LIGNES | cut -d":" -f2)
 if [ "$(echo "$LIGNES" | cut -d":" -f2)" -ge "$UIDMINUSER" ] ;then
