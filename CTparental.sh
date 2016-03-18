@@ -569,16 +569,16 @@ if [ -d $tempDIR  ] ; then
 					if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
 						echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
 						$SED "s?.*?server=/&/#?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes blanches
-						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$DOMAINE".conf
+						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
 						$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
-						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$DOMAINE".conf  	
+						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
 					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
 					$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
-					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$DOMAINE".conf  	
+					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 				fi
 			fi
 		fi
