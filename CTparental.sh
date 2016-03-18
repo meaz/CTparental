@@ -467,8 +467,8 @@ chown root:"$USERHTTPD" "$PASSWORDFILEHTTPD"
 chmod 640 "$PASSWORDFILEHTTPD"
 USERADMINHTTPD=${1}
 pass=${2}
-hash=$(echo -n "$USERADMINHTTPD:$REALMADMINHTTPD:$pass" | md5sum | cut -b -32)
-ligne=$("$USERADMINHTTPD:$REALMADMINHTTPD:$hash")
+hash=$(echo -n "$USERADMINHTTPD":"$REALMADMINHTTPD":"$pass" | md5sum | cut -b -32)
+ligne=$("$USERADMINHTTPD":"$REALMADMINHTTPD":"$hash")
 #echo $ligne
 $SED "/.*:$REALMADMINHTTPD.*/d" "$PASSWORDFILEHTTPD" 
 echo "$ligne" >> "$PASSWORDFILEHTTPD"
@@ -1045,12 +1045,16 @@ echo "<FoncHTTPDCONF>"
 $LIGHTTPDstop
 rm -rf "${DIRHTML:?}"/*
 mkdir "$DIRHTML" 2> /dev/null
+mkdir -p "$DIRadminHTML"
+mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
-   cp -r "$DIRhtmlPersonaliser"/* "$DIRHTML"
+   cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
- cp -r /usr/local/share/CTparental/www/CTparental/* "$DIRHTML"
- 
+cp -rf /usr/local/share/CTparental/www/local "$DIRHTML"
+cp -rf /usr/local/share/CTparental/www/CTparental/* "$DIRHTML"
 fi
+cp -rf /usr/local/share/CTparental/www/local "$DIRadminHTML"
+cp -rf /usr/local/share/CTparental/www/CTadmin/* "$DIRadminHTML"
 
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
 GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
@@ -1140,13 +1144,12 @@ chmod +x /usr/share/lighttpd/include-conf-enabled.pl
 fi
 
 mkdir -p "$DIRCONFENABLEDHTTPD"
-mkdir -p "$DIRadminHTML"
-cp -rf CTadmin/* "$DIRadminHTML"/
 
-### configuration du login mot de passe de l'interface d'administration
+
 if [ $nomanuel -eq 0 ]; then  
 	configloginpassword
 else
+
 	## variable récupérer par éritage du script DEBIAN/postinst
 	debconfloginhttp=${debconfloginhttp:="admin"}
 	debconfpassword=${debconfpassword:="admin"}
@@ -1374,6 +1377,11 @@ echo "</CActparental>"
 
 
 install () {
+	if [ $nomanuel -eq 0 ]; then  
+		cp -rf www /usr/local/share/CTparental
+		cp -rf confDansgouardian /usr/local/share/CTparental
+		cp -rf locale /usr/local/etc/CTparental
+	fi
 	iptablesoff
 	groupadd ctoff
 	unset https_proxy
