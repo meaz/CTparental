@@ -273,7 +273,7 @@ DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
 DNS_FILTER_OSSI="$DIR_CONF/blacklist-local"
 DREAB="$DIR_CONF/domaine-rehabiliter" 
 E2GUXSITELIST="/etc/dansguardian/lists/exceptionsitelist"
-THISDAYS=$(( $(date +%Y) * 365 + $(date +%j) ))
+THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
@@ -583,6 +583,7 @@ if [ -d $tempDIR  ] ; then
 			fi
 		fi
 	done
+
 else
 	mkdir   $tempDIR
 	echo -n "."
@@ -598,6 +599,7 @@ else
 fi     
 echo
 $UMFILEtmp
+cd "$(dirname $(readlink -f $0))"
 rm -rf $tempDIR
 date +%H:%M:%S
 }
@@ -1050,10 +1052,10 @@ mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
    cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
-cp -rf /usr/local/share/CTparental/www/local "$DIRHTML"
+cp -rf /usr/local/share/CTparental/www/locale "$DIRHTML"
 cp -rf /usr/local/share/CTparental/www/CTparental/* "$DIRHTML"
 fi
-cp -rf /usr/local/share/CTparental/www/local "$DIRadminHTML"
+cp -rf /usr/local/share/CTparental/www/locale "$DIRadminHTML"
 cp -rf /usr/local/share/CTparental/www/CTadmin/* "$DIRadminHTML"
 
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
