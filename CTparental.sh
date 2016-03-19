@@ -182,6 +182,7 @@ CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
 DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g")}
+TIMERALERT=${TIMERALERT:=10}
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
@@ -1941,7 +1942,7 @@ requiredpamtime
                         h2=${int2:0:2}
 						echo "$PCUSER=$NumDAY=$h1${h}h$m1:$h2${h}h$m2" >> "$FILE_HCONF"   
                         echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-			for count in 1 2 3 4 5
+			for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			do
                         echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			done
@@ -1967,7 +1968,7 @@ requiredpamtime
 							  echo "$PCUSER=$NumDAY=$h1${h}h$m1:$h2${h}h$m2:$h3${h}h$m3:$h4${h}h$m4" >> "$FILE_HCONF"
                               echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			      echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-			      for count in 1 2 3 4 5
+			      for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			      do
                               echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
                               echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
@@ -2088,7 +2089,7 @@ readTimeFILECONF () {
 		                      	fi
 					echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-					for count in 1 2 3 4 5 6 7 8 9 10
+					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
 					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
@@ -2101,7 +2102,7 @@ readTimeFILECONF () {
 				        else
 				           HORAIRESPAM="$HORAIRESPAM${DAYSPAM[$NumDAY]}$h1$m1-$h2$m2|"
 				        fi
-					for count in 1 2 3 4 5 6 7 8 9 10
+					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
 					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					done
