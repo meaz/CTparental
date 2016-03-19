@@ -1,11 +1,11 @@
-#!/bin/bash 
+#!/bin/bash
 # CTparental.sh
 #
 # par Guillaume MARSAT
 # Corrections orthographiques par Pierre-Edouard TESSIER
 # une partie du code est tirée du script alcasar-bl.sh créé par Franck BOUIJOUX et Richard REY
 # présente dans le code du projet alcasar en version 2.6.1 ; web page http://www.alcasar.net/
- 
+
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/usr/local/etc/CTparental"
 #chargement des locales.
@@ -92,20 +92,16 @@ IPRULES=OFF
 EOF
 
 fi
-FILTRAGEISOFF=$(cat < $FILE_CONF | grep -c DNSMASQ=OFF)
+FILTRAGEISOFF="$(cat $FILE_CONF | grep -c DNSMASQ=OFF)"
 
 
 
 ## imports du plugin de la distributions si il existe
-if [ -f $DIR_CONF/dist.conf ];then
-	source  $DIR_CONF/dist.conf 
-fi
+if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
 
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
-if [ ! -d $tempDIRRamfs ] ; then
-mkdir $tempDIRRamfs
-fi
+if [ ! -d $tempDIRRamfs ]; then mkdir "${tempDIRRamfs}"; fi
 RougeD="\033[1;31m"
 BleuD="\033[1;36m"
 #VertD="\033[1;32m"
@@ -211,18 +207,28 @@ if [ -z "$CMDINSTALL" ] ; then
    exit 1
 fi
 if [ $UID -le 499 ]; then
-interface_WAN=$(ip route | awk '/^default via/{print $5}' | sort -u ) 
+ip_route="$(ip route)"
+interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
+ipbox="$(awk '{print $3}' <<< ${ip_route})"   
+if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
+	ipinterface_WAN="$(ifconfig $interface_WAN | awk '/adr:/{print substr($2,5)}')"
+	reseau_box="$(awk '/'${ipinterface_WAN}'/ { print $8}' <<< ${ip_route})"
+	ip_broadcast="$(ifconfig $interface_WAN | awk '/Bcast:/ { print substr($3,7) }')"	
+else
+	ipinterface_WAN="$(ifconfig $interface_WAN | awk '/inet /{print substr($2,1)}')"
+	reseau_box="$(awk '/'${ipinterface_WAN}'/ { print $10}' <<< ${ip_route})"
+	ip_broadcast="$(ifconfig $interface_WAN | awk '/broadcast / { print substr($6,1) }')"
+fi
 export interface_WAN
-ipbox=$(ip route | awk '/^default via/{print $3}' | sort -u )   
 export ipbox
-ipinterface_WAN=$(ifconfig "$interface_WAN" | awk '/adr:/{print $2}' | cut -d":" -f2)
 export ipinterface_WAN
-reseau_box=$(ip route | grep / | grep "$interface_WAN" | cut -d" " -f1 )
 export reseau_box
-ip_broadcast=$(ifconfig "$interface_WAN" | awk '/Bcast:/{print $3}' | cut -d":" -f2)
 export ip_broadcast
-DNS1=$(cat < /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f1)
-DNS2=$(cat < /etc/resolv.conf | grep ^nameserver | cut -d " " -f2 | tr "\n" " " | cut -d " " -f2)
+unset ip_route
+nameserver="$(cat /etc/resolv.conf | awk '/nameserver/ { print $2 }')"
+DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
+DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
+#echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
 fi
 resolvconffixon () {
 echo "<resolvconffixon>"
@@ -460,13 +466,14 @@ done
 }
 
 addadminhttpd() {
-
+if [ ! -f "$PASSWORDFILEHTTPD" ]; then touch "$PASSWORDFILEHTTPD"; fi
 USERADMINHTTPD=${1}
 pass=${2}
 hash="$(echo -n "$USERADMINHTTPD"":""$REALMADMINHTTPD"":""$pass" | md5sum | cut -b -32)"
 ligne="$USERADMINHTTPD"":""$REALMADMINHTTPD"":""$hash"
 #echo $ligne
-echo "$ligne" > "$PASSWORDFILEHTTPD"
+$SED "/.*:$REALMADMINHTTPD.*/d" "$PASSWORDFILEHTTPD"
+echo "$ligne" >> "$PASSWORDFILEHTTPD"
 chown root:"$USERHTTPD" "$PASSWORDFILEHTTPD"
 chmod 640 "$PASSWORDFILEHTTPD"
 }
