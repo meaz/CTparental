@@ -92,7 +92,7 @@ IPRULES=OFF
 EOF
 
 fi
-FILTRAGEISOFF="$(cat $FILE_CONF | grep -c DNSMASQ=OFF)"
+FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
 
 
 
@@ -211,13 +211,13 @@ ip_route="$(ip route)"
 interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
 ipbox="$(awk '{print $3}' <<< ${ip_route})"   
 if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
-	ipinterface_WAN="$(ifconfig $interface_WAN | awk '/adr:/{print substr($2,5)}')"
-	reseau_box="$(awk '/'${ipinterface_WAN}'/ { print $8}' <<< ${ip_route})"
-	ip_broadcast="$(ifconfig $interface_WAN | awk '/Bcast:/ { print substr($3,7) }')"	
+	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/adr:/{print substr($2,5)}')"
+	reseau_box="$(awk '/'"${ipinterface_WAN}"'/ { print $8}' <<< ${ip_route})"
+	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/ { print substr($3,7) }')"	
 else
-	ipinterface_WAN="$(ifconfig $interface_WAN | awk '/inet /{print substr($2,1)}')"
-	reseau_box="$(awk '/'${ipinterface_WAN}'/ { print $10}' <<< ${ip_route})"
-	ip_broadcast="$(ifconfig $interface_WAN | awk '/broadcast / { print substr($6,1) }')"
+	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/inet /{print substr($2,1)}')"
+	reseau_box="$(awk '/'"${ipinterface_WAN}"'/ { print $10}' <<< ${ip_route})"
+	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast / { print substr($6,1) }')"
 fi
 export interface_WAN
 export ipbox
@@ -225,7 +225,7 @@ export ipinterface_WAN
 export reseau_box
 export ip_broadcast
 unset ip_route
-nameserver="$(cat /etc/resolv.conf | awk '/nameserver/ { print $2 }')"
+nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }')"
 DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
