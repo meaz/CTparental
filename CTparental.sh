@@ -211,14 +211,15 @@ ip_route="$(ip route)"
 interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
 ipbox="$(awk '{print $3}' <<< ${ip_route})"   
 if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
+	## jessie et infèrieur
 	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/adr:/{print substr($2,5)}')"
-	reseau_box="$(awk '/'"${ipinterface_WAN}"'/ { print $8}' <<< ${ip_route})"
-	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/ { print substr($3,7) }')"	
+	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/{ print substr($3,7)}')"	
 else
+	## testing/sid
 	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/inet /{print substr($2,1)}')"
-	reseau_box="$(awk '/'"${ipinterface_WAN}"'/ { print $10}' <<< ${ip_route})"
-	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast / { print substr($6,1) }')"
+	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
 fi
+reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
 export interface_WAN
 export ipbox
 export ipinterface_WAN
