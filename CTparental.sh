@@ -2142,8 +2142,8 @@ readTimeFILECONF () {
 					echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
-					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-					echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					userisconfigured="1"
 					done
 
@@ -2155,7 +2155,7 @@ readTimeFILECONF () {
 				        fi
 					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
-					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					done
 					echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					
