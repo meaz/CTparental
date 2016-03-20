@@ -273,6 +273,7 @@ fi
 BL_SERVER="dsi.ut-capitole.fr"
 FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
 FILEIPTABLES="$DIR_CONF/iptables"
+FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
 CATEGORIES_ENABLED="$DIR_CONF/categories-enabled"
 BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
 WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
@@ -860,6 +861,7 @@ ipglobal () {
 		source "$FILEIPTABLES"
     else
 	    initfileiptables
+	    source "$FILEIPTABLES"
     fi
 ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
 $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
@@ -972,7 +974,10 @@ iptablesreload () {
       fi
       done
    fi
-
+   if [ -e "$FILEIPTIMEWEB" ] ;  then
+		source "$FILEIPTIMEWEB"
+   fi
+	
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
@@ -1801,21 +1806,37 @@ updatetimelogin () {
 		
 			if [ "$(cat < $FILE_HCONF | grep -c "^$PCUSER=user=" )" -eq 1 ] ;then
 			   if [ "$(cat < $FILE_HCOMPT | grep -c "^$PCUSER=" )" -eq 0 ] ;then
-					echo "$PCUSER=1" >> $FILE_HCOMPT
+					echo "$PCUSER=1=1" >> $FILE_HCOMPT
 			   else
 					count=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
-					$SED "s?^$PCUSER=.*?$PCUSER=$count?g" $FILE_HCOMPT
+					if [ "$(netstat -e | grep "$PCUSER" | grep -c ESTABLISHED)" -ge 1 ];then
+						countweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
+					else
+						countweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) 
+					fi
+					$SED "s?^$PCUSER=.*?$PCUSER=$count=$countweb?g" $FILE_HCOMPT
 					temprest=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f3 ) - count ))
+					temprestweb=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f4 ) - countweb ))
 					echo $temprest
 					# si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on déconnecte l'utilisateur.
 					if [ $temprest -le 0 ];then
 						/usr/bin/skill -KILL -u"$PCUSER"
 						passwd -l "$PCUSER"
 					else
-						# On alerte l'usager que son quota temps arrive à expiration 5-4-3-2-1 minutes avant.
-						if [ $temprest -le 10 ];then
+						# On alerte l'usager que son quota temps session arrive à expiration 5-4-3-2-1 minutes avant.
+						if [ $temprest -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
 						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connexion restant est de $temprest minutes "
+						fi
+					fi
+					if [ $temprestweb -le 0 ];then
+						echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT # on interdit l'acces web pour l'usager ." >> "$FILEIPTIMEWEB"
+						iptablesreload
+					else
+						# On alerte l'usager que son quota temps web arrive à expiration 5-4-3-2-1 minutes avant.
+						if [ $temprestweb -le "$TIMERALERT" ];then
+						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de navigation restant est de $temprestweb minutes "
 						fi
 					fi
 			   fi
@@ -1834,6 +1855,8 @@ updatetimelogin () {
 		done
 		# on remet tous les compteurs à zéro.
 		echo "date=$(date +%D)" > $FILE_HCOMPT
+		echo > $FILEIPTIMEWEB 
+		iptablesreload
 		
 	fi
 	
@@ -1896,12 +1919,26 @@ requiredpamtime
          read choi
          if [ "$choi" -ge 1 ];then
 			if [ "$choi" -le 1440 ];then
+				timesession=$choi
 				break
 			fi
 		 fi	
-         echo " $(gettext "X must take a value between 1 and 1440")"
+         echo " $(gettext "X must take a value between 1 and") $timesession "
          done
-         echo "$PCUSER=user=$choi" >> $FILE_HCONF
+         clear
+         echo -e "$PCUSER $(gettext "is allowed to surf the Internet X minutes per day")" 
+         echo -e -n "X (1 a ""$timesession"") = " 
+         while (true); do
+         read choi
+         if [ "$choi" -ge 1 ];then
+			if [ "$choi" -le "$timesession" ];then
+				timeweb=$choi
+				break
+			fi
+		 fi	
+         echo " $(gettext "X must take a value between 1 and") $timesession "
+         done
+         echo "$PCUSER=user=$timesession=$timeweb" >> $FILE_HCONF
 		 break
          ;;	
    esac
@@ -2035,6 +2072,8 @@ done
 echo "date=$(date +%D)" > $FILE_HCOMPT
 echo > $FILE_HCONF
 $CRONrestart
+echo > $FILEIPTIMEWEB 
+iptablesreload
 echo "</desactivetimelogin>"
 }
 

@@ -1,5 +1,11 @@
 ctparental (4.07-0) unstable; urgency=medium
 
+  * Ajout de la jestion du temps max de navigation web / jour. activable seullement par Ctparental.sh -tlo
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
+ 
+ctparental (4.07-0) unstable; urgency=medium
+
   * correction du bug détection ipinterface_wan ... apparus sur debian sid car la réponce ifconfig a changer de structure. .
 	Ajout d'un varriable TIMERALERT réglé par defaut a 10 permétent de prévenir l'utilisateur X minutes avans sa deconection.
 	pour ce faire ajouter la ligne suivante au fichier /usr/local/etc/CTparental/dist.conf 
