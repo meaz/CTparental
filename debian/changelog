@@ -1,4 +1,4 @@
-ctparental (4.07-0) unstable; urgency=medium
+ctparental (4.08-0) unstable; urgency=medium
 
   * corection de bug sur la gestion du temps max de navigation web + modif interface web pour sa prise en compte.
 	
