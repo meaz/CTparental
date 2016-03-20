@@ -149,15 +149,6 @@ msgstr "Aucun gestionnaire de session connu n'a été détecté."
 msgid "so it is impossible to activate the time control connections"
 msgstr "il est donc impossible d'activer le contrôle horaire des connexions"
 
-msgid "is allowed to connect 7/7 24/24"
-msgstr "est autorisé à se connecter 7j/7 24h/24"
-
-msgid "is allowed to connect X minutes per day"
-msgstr "est autorisé à se connecter X minutes par jours"
-
-msgid "X must take a value between 1 and 1440"
-msgstr "X doit prendre un valeur entre 1 et 1440"
-
 msgid "Use"
 msgstr "Usage"
 
@@ -292,3 +283,27 @@ msgstr "h"
 
 msgid "or"
 msgstr "ou"
+
+msgid "Internet surfing cut in"
+msgstr "Cupure d'internet dans"
+
+msgid "Logout in"
+msgstr "Fermeture session dans"
+
+msgid "minutes"
+msgstr "minutes"
+
+msgid "Your surf time as expird!"
+msgstr "Votre temps de surf a expiré!"
+
+msgid "is allowed to connect 7/7 24/24"
+msgstr "est autorisé à se connecter 7j/7 24h/24"
+
+msgid "is allowed to connect X minutes per day"
+msgstr "est autorisé à se connecter X minutes par jours"
+
+msgid "X must take a value between 1 and"
+msgstr "X doit prendre un valeur entre 1 et"
+
+msgid "is allowed to surf the Internet X minutes per day"
+msgstr "est autorisé à surfer X minutes par jours"

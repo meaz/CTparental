@@ -59,8 +59,14 @@ msgstr "samedi"
 msgid "sunday"
 msgstr "dimanche"
 
-msgid "Minutes max / 24 hours"
-msgstr "Minutes max /24 heurs"
+msgid "time max pc connection"
+msgstr "Temp de connection maximum au pc"
+
+msgid "time max for web surfing"
+msgstr "temps max pour surfer sur le web"
+
+msgid "( minutes for 24 hours )"
+msgstr "( minutes par 24 heures )"
 
 msgid "Logout"
 msgstr "Déconnexion"
@@ -73,6 +79,9 @@ msgstr "incohérence horaire : "
 
 msgid "You must enter a value between 1 and 1440 minutes."
 msgstr "Vous devez rentrer une valeur entre 1 et 1440 minutes."
+
+msgid "Time surf between 1 to"
+msgstr "Le temp de surf doit ètre entre 1 et"
 
 msgid "Connection schedules are currently enabled"
 msgstr "Les horaires de connexion sont actuellement activés"

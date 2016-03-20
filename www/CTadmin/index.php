@@ -205,7 +205,7 @@ case 'MAJ_H' :
 				else
 				{
 					fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."=".$_POST["tmax"]."\n");
-					echo "<H3>".gettext('Time surf between 1 to time session.')."</H3>";
+					echo "<H3>".gettext('Time surf between 1 to')." ".$_POST["tmax"]."</H3>";
 					
 				}
 			}

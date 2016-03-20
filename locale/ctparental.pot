@@ -135,15 +135,6 @@ msgstr ""
 msgid "so it is impossible to activate the time control connections"
 msgstr ""
 
-msgid "is allowed to connect 7/7 24/24"
-msgstr ""
-
-msgid "is allowed to connect X minutes per day"
-msgstr ""
-
-msgid "X must take a value between 1 and 1440"
-msgstr ""
-
 msgid "Use"
 msgstr ""
 
@@ -256,4 +247,28 @@ msgid ":"
 msgstr ""
 
 msgid "or"
+msgstr ""
+
+msgid "Internet surfing cut in"
+msgstr ""
+
+msgid "Logout in"
+msgstr ""
+
+msgid "minutes"
+msgstr ""
+
+msgid "Your surf time as expird!"
+msgstr ""
+
+msgid "is allowed to connect 7/7 24/24"
+msgstr ""
+
+msgid "is allowed to connect X minutes per day"
+msgstr ""
+
+msgid "X must take a value between 1 and"
+msgstr ""
+
+msgid "is allowed to surf the Internet X minutes per day"
 msgstr ""

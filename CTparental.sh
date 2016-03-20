@@ -1826,15 +1826,15 @@ updatetimelogin () {
 						# On alerte l'usager que son quota temps session arrive à expiration 5-4-3-2-1 minutes avant.
 						if [ $temprest -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connexion restant est de $temprest minutes "
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Logout in') $temprest $(gettext 'minutes') $LANG "
 						fi
 					fi
 					if [ "$temprestweb" -le 0 ];then
 						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -eq 0 ];then
-							echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT # on interdit l'acces web pour l'usager ." >> "$FILEIPTIMEWEB"
+							echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT" >> "$FILEIPTIMEWEB"
 							iptablesreload
 							HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-							export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de navigation est écoulé! "
+							export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Your surf time as expird!')"
 						fi
 					else
 						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
@@ -1844,7 +1844,7 @@ updatetimelogin () {
 						# On alerte l'usager que son quota temps web arrive à expiration 5-4-3-2-1 minutes avant.
 						if [ $temprestweb -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de navigation restant est de $temprestweb minutes "
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Internet surfing cut in') $temprestweb $(gettext 'minutes') "
 						fi
 					fi
 			   fi   
@@ -1906,7 +1906,7 @@ activetimelogin () {
 requiredpamtime
    for NumDAY in 0 1 2 3 4 5 6
    do
-   echo "PATH=$PATH"  > /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+   { echo "PATH=$PATH" ; echo "LANG=$LANG" ; } > /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
    done
    for PCUSER in $(listeusers)
    do
@@ -1925,7 +1925,7 @@ requiredpamtime
 	 N| n )
          alltime="N"
          clear
-         echo -e "$PCUSER $(gettext "is allowed to connect X minutes per day")" 
+         echo -e "$PCUSER $(gettext 'is allowed to connect X minutes per day')" 
          echo -e -n "X (1 a 1440) = " 
          while (true); do
          read choi
@@ -1935,10 +1935,10 @@ requiredpamtime
 				break
 			fi
 		 fi	
-         echo " $(gettext "X must take a value between 1 and") $timesession "
+         echo " $(gettext 'X must take a value between 1 and') 1440 "
          done
          clear
-         echo -e "$PCUSER $(gettext "is allowed to surf the Internet X minutes per day")" 
+         echo -e "$PCUSER $(gettext 'is allowed to surf the Internet X minutes per day')" 
          echo -e -n "X (1 a ""$timesession"") = " 
          while (true); do
          read choi
@@ -1948,7 +1948,7 @@ requiredpamtime
 				break
 			fi
 		 fi	
-         echo " $(gettext "X must take a value between 1 and") $timesession "
+         echo " $(gettext 'X must take a value between 1 and') $timesession "
          done
          echo "$PCUSER=user=$timesession=$timeweb" >> $FILE_HCONF
 		 break
@@ -1993,7 +1993,7 @@ requiredpamtime
                         echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			do
-                        echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                        echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			done
                         break
    
@@ -2019,8 +2019,8 @@ requiredpamtime
 			      echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			      for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			      do
-                              echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes \" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-                              echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"Alerte CTparental\" \"fermeture de session dans $count minutes\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                              echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                              echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			      done
                              
                               break   
@@ -2055,7 +2055,7 @@ requiredpamtime
       echo >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
    done
    echo >> $FILE_HCONF
-echo "PATH=$PATH"  > /etc/cron.d/CTparentalmaxtimelogin
+{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }   > /etc/cron.d/CTparentalmaxtimelogin
 echo "*/1 * * * * root /usr/local/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
@@ -2108,7 +2108,7 @@ readTimeFILECONF () {
    requiredpamtime
    for NumDAY in 0 1 2 3 4 5 6
    do
-   echo "PATH=$PATH" > /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+   { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
    done
    
    for PCUSER in $(listeusers)
@@ -2173,7 +2173,7 @@ readTimeFILECONF () {
 		passwd -u "$PCUSER"
 	fi
    done
-echo "PATH=$PATH"  > /etc/cron.d/CTparentalmaxtimelogin  
+{ echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalmaxtimelogin  
 echo "*/1 * * * * root /usr/local/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart

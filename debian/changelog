@@ -1,3 +1,9 @@
+ctparental (4.09-0) unstable; urgency=medium
+
+  * corection de bug de non traduction des message d'alerte.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 18:09:13 +0100
+ 
 ctparental (4.08-0) unstable; urgency=medium
 
   * corection de bug sur la gestion du temps max de navigation web + modif interface web pour sa prise en compte.
