@@ -1546,7 +1546,9 @@ if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
  "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
  "$interface_WAN" != "$(cat < $FILE_CONF | grep I_WAN | cut -d"=" -f2)"  -o \
  "$ipbox" != "$(cat < $FILE_CONF | grep IP_BOX | cut -d"=" -f2)"  -o \
- "$ipinterface_WAN" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" ];then
+ "$ipinterface_WAN" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" \
+ -a "$interface_WAN" != "" -a "$ipbox" != "" -a "$ipinterface_WAN" != "" \
+ -a "$DNS1" != "" ];then
 # on sauvegarde ces chnagement dans le fichier de conf CTparental.
 $SED "/^I_WAN=/d" "$FILE_CONF"
 $SED "/^IP_BOX=/d" "$FILE_CONF"
@@ -1561,6 +1563,7 @@ $SED "/^DNS2=/d" "$FILE_CONF"
 } >> $FILE_CONF
 # on modifi la conf dnsmasq
 dnsmasqon
+# on reconfigure les règle du parfeux.
 iptablesreload
 fi
 
