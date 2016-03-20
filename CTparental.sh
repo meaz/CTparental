@@ -227,7 +227,7 @@ export ipinterface_WAN
 export reseau_box
 export ip_broadcast
 unset ip_route
-nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }')"
+nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
 DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
@@ -719,8 +719,10 @@ echo "</reabdomaine>"
 
 dnsmasqon () {
 echo "<dnsmasqon>"
-   if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
-   $SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
+	
+if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
+$SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
+
 cat << EOF > $DNSMASQCONF 
 # Configuration file for "dnsmasq with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
@@ -1532,9 +1534,37 @@ install () {
       $ENDNSMASQ
       $ENNWMANAGER
       $ENIPTABLESSAVE
+      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
+	  echo "*/1 * * * * root /usr/local/bin/CTparental.sh -nomade" >> /etc/cron.d/CTparentalnomade
+
     
 }
+nomade () {
+	
+#### si il y a un changement dan la conf réseaux ####
+if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
+ "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
+ "$interface_WAN" != "$(cat < $FILE_CONF | grep I_WAN | cut -d"=" -f2)"  -o \
+ "$ipbox" != "$(cat < $FILE_CONF | grep IP_BOX | cut -d"=" -f2)"  -o \
+ "$ipinterface_WAN" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" ];then
+# on sauvegarde ces chnagement dans le fichier de conf CTparental.
+$SED "/^I_WAN=/d" "$FILE_CONF"
+$SED "/^IP_BOX=/d" "$FILE_CONF"
+$SED "/^IP_IWAN=/d" "$FILE_CONF"
+$SED "/^DNS1=/d" "$FILE_CONF"
+$SED "/^DNS2=/d" "$FILE_CONF"
+{ echo I_WAN="$interface_WAN"
+  echo IP_BOX="$ipbox"
+  echo IP_IWAN="$ipinterface_WAN"
+  echo DNS1="$DNS1"
+  echo DNS2="$DNS2"
+} >> $FILE_CONF
+# on modifi la conf dnsmasq
+dnsmasqon
+iptablesreload
+fi
 
+}
 
 updatelistgctoff () {
 	result="0"
@@ -2481,6 +2511,11 @@ case $arg1 in
       iptablesreload
       exit 0
       ;;
+    -nomade )
+	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
+	  nomade
+	  exit 0
+      ;;  
     -uctl )
 	 # appelé toutes les minutes par cron pour activer désactiver les usagers ayant des restrictions de temps journalier de connexion.
 	  updatetimelogin

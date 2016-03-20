@@ -1,3 +1,12 @@
+ctparental (4.10-0) unstable; urgency=medium
+
+  * corection de bug DNS1 et DNS2 male dissocié.
+  * Ajoute une tache planifier qui corige la configuration en cas de changement de réseaux .
+    évite les problême de connéction sur les pc "nomage" , connection a plusieur poins wifi par exemple.
+    il faut attendre au moins une minute pour que le nouveaux réseau soit bien prit en compte.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 18:09:13 +0100
+ 
 ctparental (4.09-0) unstable; urgency=medium
 
   * corection de bug de non traduction des message d'alerte.
