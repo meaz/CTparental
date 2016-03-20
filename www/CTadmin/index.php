@@ -196,12 +196,23 @@ case 'MAJ_H' :
 	else 
 	{
 		if (isset($_POST["tmax"])){
-			if ( preg_match( "/^[1-9]$|^[1-9][0-9]$|^[1-9][0-9][0-9]$|^1[0-3][0-9][0-9]$|^14[0-3][0-9]$|^1440$/", $_POST["tmax"] ) == 1  )
-			{fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."\n");}
-			else {fwrite($pointeur,"$selectuser=user=1440"."\n"); 
+			if ( ( preg_match( "/^[1-9]$|^[1-9][0-9]$|^[1-9][0-9][0-9]$|^1[0-3][0-9][0-9]$|^14[0-3][0-9]$|^1440$/", $_POST["tmax"] ) and preg_match( "/^[1-9]$|^[1-9][0-9]$|^[1-9][0-9][0-9]$|^1[0-3][0-9][0-9]$|^14[0-3][0-9]$|^1440$/", $_POST["tmax2"] )) == 1  )
+			{
+				if ( $_POST["tmax2"] <= $_POST["tmax"] ) 
+				{
+				fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."=".$_POST["tmax2"]."\n");
+				}
+				else
+				{
+					fwrite($pointeur,"$selectuser=user=".$_POST["tmax"]."=".$_POST["tmax"]."\n");
+					echo "<H3>".gettext('Time surf between 1 to time session.')."</H3>";
+					
+				}
+			}
+			else {fwrite($pointeur,"$selectuser=user=1440=1440"."\n"); 
 				  echo "<H3>".gettext('You must enter a value between 1 and 1440 minutes.')."</H3>";}
 		}
-		else {fwrite($pointeur,"$selectuser=user=1440"."\n"); }
+		else {fwrite($pointeur,"$selectuser=user=1440=1440"."\n"); }
 		foreach ($weeknum as $numday)
 		{
 			$formatheuresok=1;

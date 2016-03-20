@@ -1,6 +1,12 @@
 ctparental (4.07-0) unstable; urgency=medium
 
-  * Ajout de la jestion du temps max de navigation web / jour. activable seullement par Ctparental.sh -tlo
+  * corection de bug sur la gestion du temps max de navigation web + modif interface web pour sa prise en compte.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
+ 
+ctparental (4.07-0) unstable; urgency=medium
+
+  * Ajout de la gestion du temps max de navigation web / jour. activable seullement par Ctparental.sh -tlo
 	
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
  

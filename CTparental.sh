@@ -1829,21 +1829,33 @@ updatetimelogin () {
 						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de connexion restant est de $temprest minutes "
 						fi
 					fi
-					if [ $temprestweb -le 0 ];then
-						echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT # on interdit l'acces web pour l'usager ." >> "$FILEIPTIMEWEB"
-						iptablesreload
+					if [ "$temprestweb" -le 0 ];then
+						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -eq 0 ];then
+							echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT # on interdit l'acces web pour l'usager ." >> "$FILEIPTIMEWEB"
+							iptablesreload
+							HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
+							export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de navigation est écoulé! "
+						fi
 					else
+						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
+							$SED "/$PCUSER/d" $FILEIPTIMEWEB
+							iptablesreload
+						fi
 						# On alerte l'usager que son quota temps web arrive à expiration 5-4-3-2-1 minutes avant.
 						if [ $temprestweb -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
 						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "Alerte CTparental" "Votre temps de navigation restant est de $temprestweb minutes "
 						fi
 					fi
-			   fi
-			   
+			   fi   
 			else
 			# on efface les lignes relatives à cet utilisateur
+			if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -ge 1 ];then
+					$SED "/$PCUSER/d" $FILEIPTIMEWEB
+					iptablesreload
+			fi
 			$SED "/^$PCUSER=/d" $FILE_HCOMPT
+		
 			fi
 
 		done	

@@ -28,7 +28,7 @@ if ($HOURSCONNECT == "ON")
 	echo "</FORM>";
 	if (isset($selectuser)) {
 		echo "</TABLE>";
-		echo "<TABLE width='600' border=0 cellspacing=0 cellpadding=0>";
+		echo "<TABLE width='800' border=0 cellspacing=0 cellpadding=0>";
 		echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Hours of allowed connections' method=POST>";
 		echo "<CENTER><H3>".gettext("the selected user is: ")." $selectuser</H3></CENTER>";
 		
@@ -48,7 +48,8 @@ if ($HOURSCONNECT == "ON")
 							if ( $numday == "admin") { echo "<tr><td>".gettext('24/7')." : <input type='checkbox' name='isadmin' checked></td></tr>";}
 							elseif ( $numday == "user") {echo "<tr><td>".gettext('24/7')." : <input type='checkbox' name='isadmin' ></td></tr>";
 										if ( intval ($field[2]) == 0 ) { $field[2]="1440"; }
-										echo"<tr><td>".gettext('Minutes max / 24 hours')."<td><INPUT type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440<td</tr>";	
+										echo"<tr><td>".gettext('time max pc connection')." ".gettext('( minutes for 24 hours )')."<td><INPUT type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440<td</tr>";
+										echo"<tr><td>".gettext('time max for web surfing')." ".gettext('( minutes for 24 hours )')."<td><INPUT type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2]."<td</tr>";	
 										}
 										
 							else {
