@@ -272,3 +272,6 @@ msgstr ""
 
 msgid "is allowed to surf the Internet X minutes per day"
 msgstr ""
+
+msgid "error recovery network settings"
+msgstr ""

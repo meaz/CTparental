@@ -307,3 +307,6 @@ msgstr "X doit prendre un valeur entre 1 et"
 
 msgid "is allowed to surf the Internet X minutes per day"
 msgstr "est autorisé à surfer X minutes par jours"
+
+msgid "error recovery network settings"
+msgstr "erreur de récupération des paramètres réseaux"

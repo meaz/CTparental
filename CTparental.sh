@@ -232,6 +232,15 @@ DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
 fi
+if [ "$interface_WAN" = "" -o "$ipbox" = "" -o "$ipinterface_WAN" = "" \
+ -o "$DNS1" = ""  -o "$DNS2" = ""  -o "$DNS1" = ""  -o "$ip_broadcast" = "" \
+ -o "$reseau_box" = "" ];then
+gettext 'error recovery network settings'
+echo
+exit 1
+ 
+fi 
+
 resolvconffixon () {
 echo "<resolvconffixon>"
 # redemare dnsmasq 
@@ -1536,7 +1545,12 @@ install () {
       $ENIPTABLESSAVE
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/local/bin/CTparental.sh -nomade" >> /etc/cron.d/CTparentalnomade
-
+	  { echo I_WAN="$interface_WAN"
+		  echo IP_BOX="$ipbox"
+		  echo IP_IWAN="$ipinterface_WAN"
+		  echo DNS1="$DNS1"
+		  echo DNS2="$DNS2"
+	  } >> $FILE_CONF
     
 }
 nomade () {
