@@ -17,16 +17,13 @@ export TEXTDOMAIN=${LANG:0:2}
 . /usr/bin/gettext.sh
 
 
-arg1=${1}
-if [ $# -ge 1 ];then
-	if [ "$arg1" != "-listusers" ] ; then
-		if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
-		   gettext 'It root of the need to run this script.'
-		   echo ""
-		   exit 1
-		fi
-	fi
+
+if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
+	gettext 'It root of the need to run this script.'
+	echo ""
+	exit 1
 fi
+
 if  [ "$(groups "$(whoami)" | grep -c -E "( ctoff$)|( ctoff )")" -eq 0 ];then
   export https_proxy=http://127.0.0.1:8080
   export HTTPS_PROXY=http://127.0.0.1:8080
@@ -159,6 +156,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
 DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -207,7 +205,7 @@ if [ -z "$CMDINSTALL" ] ; then
    set -e
    exit 1
 fi
-if [ $UID -le 499 ]; then
+
 ip_route="$(ip route)"
 interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
 ipbox="$(awk '{print $3}' <<< ${ip_route})"   
@@ -231,14 +229,13 @@ nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n'
 DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
-fi
+
 if [ "$interface_WAN" = "" -o "$ipbox" = "" -o "$ipinterface_WAN" = "" \
  -o "$DNS1" = ""  -o "$DNS2" = "" -o "$ip_broadcast" = "" \
  -o "$reseau_box" = "" ];then
 gettext 'error recovery network settings'
 echo
 exit 1
- 
 fi 
 
 resolvconffixon () {
@@ -359,8 +356,8 @@ $(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !
 EOF
 
 $E2GUARDIANrestart
-cp -f /usr/local/share/CTparental/confDansgouardian/template.html "$DIRE2GLANG"ukenglish/
-cp -f /usr/local/share/CTparental/confDansgouardian/template-fr.html "$DIRE2GLANG"french/template.html
+cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/
+cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
 sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
 echo "</confdansguardian>"
@@ -1286,17 +1283,6 @@ else
     echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -dgreload,/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff" >> /etc/sudoers
 fi
 	
-if [ "$(grep -c "%ctoff" /etc/sudoers )" -ge "1" ] ; then	
-   $SED "s?^%ctoff.*?%ctoff ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -on?g" /etc/sudoers
-else
-   echo "%ctoff ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -on"  >> /etc/sudoers
-fi
-
-if [ "$(grep -c "ALL  ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh" /etc/sudoers )" -ge "1" ] ; then	
-	$SED "s?^ALL  ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh.*?ALL  ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -on?g" /etc/sudoers
-else
-	echo "ALL  ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -on" >> /etc/sudoers
-fi
 unset sudotest
     
 chmod 440 /etc/sudoers
@@ -2375,6 +2361,7 @@ usage="$(gettext "Use"): CTparental.sh    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|
 
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
 "
+arg1=${1}
 case $arg1 in
    -\? | -h* | --h*)
       echo "$usage"

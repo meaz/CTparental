@@ -19,8 +19,6 @@ db_purge
 chmod 755 /usr/local/bin/CTparental.sh
 chmod 755 /usr/local/bin/CTparental-bl-infos.sh
 /usr/local/bin/CTparental.sh -i -nodep -nomanuel  
-#db_unregister ctparental/httplogin 
-#db_unregister ctparental/httppassword
-#db_unregister ctparental/httppassword2
+
 
 exit 0
