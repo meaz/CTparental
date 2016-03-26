@@ -233,7 +233,7 @@ DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
 fi
 if [ "$interface_WAN" = "" -o "$ipbox" = "" -o "$ipinterface_WAN" = "" \
- -o "$DNS1" = ""  -o "$DNS2" = ""  -o "$DNS1" = ""  -o "$ip_broadcast" = "" \
+ -o "$DNS1" = ""  -o "$DNS2" = "" -o "$ip_broadcast" = "" \
  -o "$reseau_box" = "" ];then
 gettext 'error recovery network settings'
 echo
