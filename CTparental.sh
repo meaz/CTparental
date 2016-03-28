@@ -893,6 +893,29 @@ cat << EOF >  $FILEIPTABLES
 \$IPTABLES -A OUTPUT -p tcp -m tcp --dport 995 -j ACCEPT		# pop/ssl
 \$IPTABLES -A OUTPUT -p tcp -m tcp --dport 465 -j ACCEPT     # smtp/ssl
 
+## Client Steam voir infos https://support.steampowered.com/kb_article.php?ref=8571-GLVN-8711&l=french
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport 27000:27015 -j ACCEPT  		# (trafic pour le client jeu)
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport 27015:27030 -j ACCEPT  		# (en général pour les matchs et HLTV)
+#\$IPTABLES -A OUTPUT -p tcp -m tcp --dport 27014:27050 -j ACCEPT  		# (pour les téléchargements sur Steam)
+#\$IPTABLES -A INPUT  -p udp --sport 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A INPUT  -p tcp --sport 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 4380 -j ACCEPT 			# chat audio Steam
+
+
+## Serveurs dédiés ou Serveurs d'écoute
+#\$IPTABLES -A INPUT  -p tcp --dport 27015 -j ACCEPT 					# (port Rcon SRCDS)
+
+##Steamworks P2P et chat audio Steam
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 3478 -j ACCEPT 	
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 4379 -j ACCEPT 	
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 4380 -j ACCEPT 	
+ 
+## Steam Ports supplémentaires pour for Call of Duty: Modern Warfare 2 Multijoueur
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 1500 -j ACCEPT 	
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 3005 -j ACCEPT 	
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 3101 -j ACCEPT 	
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 28960 -j ACCEPT
+
 # Ping Externe
 # \$IPTABLES -A INPUT -i \$interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
 # \$IPTABLES -A INPUT -i \$interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT
