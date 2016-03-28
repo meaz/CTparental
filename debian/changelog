@@ -1,8 +1,8 @@
 ctparental (4.10-1) unstable; urgency=medium
 
-  * petit nétoyage du code, notament sur la configuration /etc/sudoers,
-    ou le group ctoff avais des droits suplémentaire ce qui n'est plus utiles dans les version réssente du scripte.
-    de même suprésion du droit de lancer /usr/local/bin/CTparental.sh -on a tous les utilisateurs.
+  * petit nettoyage du code, notamment sur la configuration /etc/sudoers,
+    ou le group ctoff avais des droits supplémentaire ce qui n'est plus utiles dans les version récente du scripte.
+    de même suppression du droit de lancer /usr/local/bin/CTparental.sh -on a tous les utilisateurs.
 	
  -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 26 Mar 2016 14:13:39 +0100
  

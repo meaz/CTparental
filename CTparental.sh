@@ -230,9 +230,51 @@ DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
 
-if [ "$interface_WAN" = "" -o "$ipbox" = "" -o "$ipinterface_WAN" = "" \
- -o "$DNS1" = ""  -o "$DNS2" = "" -o "$ip_broadcast" = "" \
- -o "$reseau_box" = "" ];then
+ipMaskValide() {
+ip=$(echo "$1" | cut -d"/" -f1)
+mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
+if [ "$(echo "$1" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
+	echo 1
+	return 1
+fi
+if [ ! "$(echo "$ip" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
+	echo 0
+	return 0
+fi
+if [ "$(echo "$mask" | grep -c "^\([1-9]\|[1-2][0-9]\|3[0-2]\)$")" -eq 1 ];then
+	echo 1
+	return 1
+fi
+i=1 
+octn=255
+result=1
+while [ $i -le 4 ]
+do
+oct=$( echo "$mask" | grep '\.'| cut -d "." -f$i )
+if [ -z "$oct" ] ; then
+	result=0
+	break
+fi
+if [ ! "$octn" -eq 255 ];then
+	if [ ! "$oct" -eq 0 ];then
+		result=0
+		break
+	fi
+fi 
+octn=$oct
+if [ ! "$oct" -eq 255 ] &&  [ ! "$oct" -eq 254 ]  &&  [ ! "$oct" -eq 252 ] &&  [ ! "$oct" -eq 248 ] &&  [ ! "$oct" -eq 240 ] &&  [ ! "$oct" -eq 224 ] &&  [ ! "$oct" -eq 192 ] &&  [ ! "$oct" -eq 128 ] &&  [ ! "$oct" -eq 0 ]; then
+	result=0
+	break	
+  fi
+i=$(( i + 1 ))
+done
+   echo $result
+   return $result
+}
+
+if [ "$(echo "$interface_WAN" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox" )" -eq 0 -o "$( ipMaskValide "$ipinterface_WAN" )" -eq 0 \
+ -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast" )" -eq 0 \
+ -o "$( ipMaskValide "$reseau_box" )" -eq 0 ];then
 gettext 'error recovery network settings'
 echo
 exit 1
@@ -763,47 +805,7 @@ $E2GUARDIANrestart
 $PRIVOXYrestart
 echo "</dnsmasqoff>"
 }
-ipMaskValide() {
-ip=$(echo "$1" | cut -d"/" -f1)
-mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
-if [ "$(echo "$1" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
-	echo 1
-	return 1
-fi
-if [ ! "$(echo "$ip" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
-	echo 0
-	return 0
-fi
-if [ "$(echo "$mask" | grep -c "^\([1-9]\|[1-2][0-9]\|3[0-2]\)$")" -eq 1 ];then
-	echo 1
-	return 1
-fi
-i=1 
-octn=255
-result=1
-while [ $i -le 4 ]
-do
-oct=$( echo "$mask" | grep '\.'| cut -d "." -f$i )
-if [ -z "$oct" ] ; then
-	result=0
-	break
-fi
-if [ ! "$octn" -eq 255 ];then
-	if [ ! "$oct" -eq 0 ];then
-		result=0
-		break
-	fi
-fi 
-octn=$oct
-if [ ! "$oct" -eq 255 ] &&  [ ! "$oct" -eq 254 ]  &&  [ ! "$oct" -eq 252 ] &&  [ ! "$oct" -eq 248 ] &&  [ ! "$oct" -eq 240 ] &&  [ ! "$oct" -eq 224 ] &&  [ ! "$oct" -eq 192 ] &&  [ ! "$oct" -eq 128 ] &&  [ ! "$oct" -eq 0 ]; then
-	result=0
-	break	
-  fi
-i=$(( i + 1 ))
-done
-   echo $result
-   return $result
-}
+
 ipglobal () {
     ### BLOQUE TOUT PAR DEFAUT (si aucune règle n'est définie par la suite) ###
     $IPTABLES -P INPUT DROP
