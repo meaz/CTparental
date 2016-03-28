@@ -897,9 +897,9 @@ cat << EOF >  $FILEIPTABLES
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 27000:27015 -j ACCEPT  		# (trafic pour le client jeu)
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 27015:27030 -j ACCEPT  		# (en général pour les matchs et HLTV)
 #\$IPTABLES -A OUTPUT -p tcp -m tcp --dport 27014:27050 -j ACCEPT  		# (pour les téléchargements sur Steam)
-#\$IPTABLES -A INPUT  -p udp --sport 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
-#\$IPTABLES -A INPUT  -p tcp --sport 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
-#\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 4380 -j ACCEPT 			# chat audio Steam
+#\$IPTABLES -A INPUT  -s \$reseau_box -p udp -m multiport --sports 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A INPUT  -s \$reseau_box -p tcp -m multiport --sports 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A OUTPUT -p udp -m udp --dport 4380 -j ACCEPT 			# chat audio Steam
 
 
 ## Serveurs dédiés ou Serveurs d'écoute
