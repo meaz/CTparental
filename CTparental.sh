@@ -2265,7 +2265,7 @@ grub-mkpasswd-pbkdf2 | tee /tmp/passgrub
 done    
 passwordgrub=$(awk '{print $NF}' /tmp/passgrub | grep grub.)
 ##on rebascule sur la keymap system
-setxkbmap "$(echo "$LANG" | awk -F "_" '{print $1}')"
+setxkbmap "$(cat < /etc/default/keyboard | grep XKBLAYOUT | cut -d "=" -f2| sed -e "s/\"//g")"
 vide=""
 cat << EOF > /etc/grub.d/99_password
 #!/bin/sh
