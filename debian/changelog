@@ -1,3 +1,11 @@
+ctparental (4.11-0) unstable; urgency=medium
+
+  * Ajout du safesearch youtube.com (conviens aux jeune enfants mais trops restrictif pour des adolécent)
+    tous les safesearch peuvent ètre désactiver en éditent le fichier /usr/local/etc/CTparental/CTparental.conf
+    et en commantent les ligne adécoite puis en lancent CTparental.sh -ubl pour appliquer les changements.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 01 Apr 2016 17:54:00 +0200
+
 ctparental (4.10-3) unstable; urgency=medium
 
   * Amelioration de la gestion du mot de pass grub2.
