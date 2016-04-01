@@ -115,7 +115,7 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" dansguardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
 
@@ -2239,9 +2239,13 @@ $CRONrestart
 
 confgrub2() {
 	
+#!/bin/sh
 PTNlogin='^[a-zA-Z]*$'
 ##Passage en keymap us pour le password comme sa quelque soit votre clavier le mot de passe correspond bien ##au touche frappée.ce qui, ce qui évite de ce prendre la tête pour le clavier avec le mot de passe grub.
+#apt-get install console-data
+layout1="$(cat < /etc/default/keyboard | grep "XKBLAYOUT" | awk -F "\"" '{print $2}' | awk -F "," '{print $1}')"
 setxkbmap us
+loadkeys us
 clear
 gettext 'keymap is in qwerty us in grub menu.
     - Only letters or numbers.
@@ -2265,7 +2269,8 @@ grub-mkpasswd-pbkdf2 | tee /tmp/passgrub
 done    
 passwordgrub=$(awk '{print $NF}' /tmp/passgrub | grep grub.)
 ##on rebascule sur la keymap system
-setxkbmap "$(cat < /etc/default/keyboard | grep XKBLAYOUT | cut -d "=" -f2| sed -e "s/\"//g")"
+setxkbmap "$layout1"
+loadkeys "$layout1"
 vide=""
 cat << EOF > /etc/grub.d/99_password
 #!/bin/sh

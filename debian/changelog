@@ -1,3 +1,9 @@
+ctparental (4.10-3) unstable; urgency=medium
+
+  * Amelioration de la gestion du mot de pass grub2.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 01 Apr 2016 12:21:30 +0200
+
 ctparental (4.10-2) unstable; urgency=medium
 
   * Ajout de règles iptables pour steam, a décomenter dans /usr/local/etc/CTparental/iptables.
