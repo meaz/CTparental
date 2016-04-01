@@ -84,6 +84,10 @@ DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
+SAFEGOOGLE=ON
+SAFEYOUTUBE=ON
+SAFEBING=ON
+SAFEDUCK=ON
 # Parfeux minimal.
 IPRULES=OFF
 EOF
@@ -730,27 +734,36 @@ date +%H:%M:%S
 
 
 {
+
+
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
-echo "# forcesafesearch redirect server for google" 
-for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
-do 
-echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" 	
-done
-echo "# on force a passer par safe.duckduckgo.com" 
-for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
-do
-	echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" 
-done
-## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
-echo "address=/duckduckgo.com/127.0.0.1" 
+if [ "$(cat < $FILE_CONF | grep -c "^SAFEGOOGLE=ON" )" -eq 1 ];then
+	echo "# forcesafesearch redirect server for google" 
+	for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
+	do 
+	echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" 	
+	done
+fi
+if [ "$(cat < $FILE_CONF | grep -c "^SAFEYOUTUBE=ON" )" -eq 1 ];then
+	echo "address=/www.youtube.com/$forcesafesearchgoogle" 
+fi
+if [ "$(cat < $FILE_CONF | grep -c "^SAFEDUCK=ON" )" -eq 1 ];then
+	echo "# on force a passer par safe.duckduckgo.com" 
+	for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
+	do
+		echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" 
+	done
+	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
+	echo "address=/duckduckgo.com/127.0.0.1" 
+fi
 
-## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
-## et ainci forcer le safesearch via privoxy.
-## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
-
-echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4)"
-
+if [ "$(cat < $FILE_CONF | grep -c "^SAFEBING=ON" )" -eq 1 ];then
+	## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
+	## et ainci forcer le safesearch via privoxy.
+	## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
+	echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4)"
+fi
 ## on force a passer par search.yahoo.com pour redirection url par lighttpd
 #ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
 #echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
@@ -984,11 +997,11 @@ iptablesreload () {
       
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	  
-	  # on interdit l'accès a bing en https .
-	  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
-	  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
-	  
+	  if [ "$(cat < $FILE_CONF | grep -c "^SAFEBING=ON" )" -eq 1 ];then
+		  # on interdit l'accès a bing en https .
+		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
+		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
+	  fi
 	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
 	  do 
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
