@@ -56,13 +56,13 @@ if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; }
 	switch ($dg_confswitch)
 {
 	case 'extensions has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedextensionlist";
+		 $dg_file_edit="/etc/e2guardian/lists/bannedextensionlist";
 		break;
 	case 'mimetype has filtered' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedmimetypelist";
+		 $dg_file_edit="/etc/e2guardian/lists/bannedmimetypelist";
 		break;
 	case '*ip **ips ...' :
-		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
+		 $dg_file_edit="/etc/e2guardian/lists/bannedsitelist";
 		break;
 	case 'WhiteList Filtering' :
 		$bl_categories="/usr/local/etc/CTparental/wl-categories-available";

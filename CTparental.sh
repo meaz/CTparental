@@ -119,9 +119,9 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
-CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
 
 #### COMMANDES de services par DEFAULT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -158,11 +158,11 @@ ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 UIDMINUSER=${UIDMINUSER:=1000}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
-DIRE2G=${DIRE2G:="/etc/dansguardian/"}
-DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
-FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
-FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
+DIRE2G=${DIRE2G:="/etc/e2guardian/"}
+DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confe2guardian}
+FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
+FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -366,7 +366,7 @@ EOF
 confe2guardian () {
   # replace the default deny HTML page
  
-  echo "<confdansguardian>"
+  echo "<confe2guardian>"
   $SED "s?^loglevel =.*?loglevel = 0?g" "$FILEConfe2gu"
   $SED "s?^languagedir =.*?languagedir = $DIRE2GLANG?g" "$FILEConfe2gu"
   $SED "s?^language =.*?language = 'french'?g" "$FILEConfe2gu"
@@ -404,9 +404,10 @@ EOF
 $E2GUARDIANrestart
 cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/
 cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
+sed -i "s/é/\&eacute;/g" "$DIRE2GLANG"french/messages
+sed -i "s/è/\&egrave;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
-echo "</confdansguardian>"
+echo "</confe2guardian>"
 }
 
 confprivoxy () {
@@ -1428,7 +1429,7 @@ echo "</CActparental>"
 install () {
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/local/share/CTparental
-		cp -rf confDansgouardian /usr/local/share/CTparental
+		cp -rf confe2guardian /usr/local/share/CTparental
 		cp -rf locale /usr/local/etc/CTparental
 	fi
 	iptablesoff

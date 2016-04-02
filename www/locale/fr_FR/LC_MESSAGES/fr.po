@@ -404,5 +404,5 @@ msgstr "Sélectionnez les extensions a filtrées"
 msgid "Select the mimetype has filtered"
 msgstr "Sélectionnez le type MIME a filtré"
 
-msgid "Dansguardian configuration"
-msgstr "Configuration de Dansguardian"
+msgid "E2guardian configuration"
+msgstr "Configuration de E2guardian"

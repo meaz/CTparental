@@ -2,7 +2,7 @@
 ## affichage des formulaires
 
 echo "<table width='100%' border=1 cellspacing=0 cellpadding=1>";
-	echo "<CENTER><H3>".gettext('Dansguardian configuration')."</H3></CENTER>";
+	echo "<CENTER><H3>".gettext('E2guardian configuration')."</H3></CENTER>";
 
 	
 	echo "<tr><td colspan=2 align='center'>";
