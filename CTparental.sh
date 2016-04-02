@@ -138,7 +138,7 @@ NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
-E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
+E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
