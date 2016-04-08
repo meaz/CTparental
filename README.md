@@ -4,18 +4,44 @@ Controle parental.
  une interface web (http://127.0.0.1/CTadmin) permettant de paramétrer tous ça.
  Le couple login mot de passe doit être saisi à l'install, mais peut être
  modifié par la suite grâce à la commande CTparental.sh -uhtml.
+ 
  Filtrage par Blackliste ou par Whiteliste .
- Filtre par Catégorie .
- Filtre personnalisé de site .
- Filtre Personnalisé de sites à laisser accessibles même s'il sont présents dans une des catégories que l'on veut bloquer.
+ 
+ Filtre par Catégories.
+ 
+ Filtre personnalisé de sites.
+ 
+ Filtre Personnalisé de sites à laisser accessibles même s'ils sont présents dans une des catégories que l'on veut bloquer.
+ 
  Réglages des heures de connexions autorisées par utilisateur.
+ 
+ Réglage du temps max de navigation des utilisateurs.
+ 
  Nombres de minutes de connexions max par jours autorisées.
+ 
  Groupe de personnes privilégiées ne subissant pas de filtrage web.
+ 
  Notifications des Utilisateurs toutes les minutes durant les 5 dernières minutes avant déconnexion.
- dansguardian + privoxy (paramètre non disponible via l'interface.)
- force SafeSearch google
- force SafeSearch duckduckgo
- force SafeSearch bing
- blocage de moteurs de recherches jugés non sûr comme bing en https et search.yahoo.com.
- ajout de la gestion de règle personnalisées pour iptables a activer avec CTparental.sh -ipton
+ 
+ Dansguardian (extentions + type mime paramétrable via l'interface.)
+ 
+ Privoxy (paramètre non disponible via l'interface.)
+ 
+ Force SafeSearch google
+ 
+ Force safesearch youtube.com ( très restrictifs conviens au jeune enfants , pas a des adolescents.)
+ 
+ Force SafeSearch duckduckgo
+ 
+ Force SafeSearch bing (en http seulement)
+ 
+ Blocage de moteurs de recherches jugés non sûr comme bing en https et search.yahoo.com.
+ 
+ Ajout du mot de passe grub2 , le mot de passe est persistants, après un update-grub ou une mise a jour grub2. le clavier bascule en qwerty pour le paramétrage du login mots de passe grub2 cela évite les problèmes de caractère impossible a faire avec le clavier qwerty du menu grub2.
+ 
+ Fonctionne avec firefox,midori,chromium …
+ 
+ Gestion de règles personnalisées pour iptables. Activé avec CTparental.sh -ipton
+ 
+
 
