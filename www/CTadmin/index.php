@@ -70,6 +70,10 @@ if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; }
 	case 'Blacklist filtering' :
 		$bl_categories="/usr/local/etc/CTparental/bl-categories-available";
 		break;
+	case 'safesearch Enebeled' :
+		$dg_file_edit="/usr/local/etc/CTparental/CTsafe.conf";
+	break;
+
 
 		
 
@@ -112,6 +116,39 @@ case 'change_file1' :
 		fclose($pointeur);
 		}
 	exec ("sudo -u root /usr/local/bin/CTparental.sh -dgreload");
+	break;
+case 'change_safesearch' :
+	$tab=file($dg_file_edit);
+	if ($tab)
+		{
+		$pointeur=fopen($dg_file_edit,"w+");
+		$numline=1;
+		foreach ($tab as $ligne)
+			{
+			$line=$ligne ;
+			if (trim($ligne) != '') # the line isn't empty
+			{
+				$ext_lignes=explode(" ", $line);
+				
+				if ($_POST['chk-'.$numline] == "on" )
+				{
+					if(preg_match('/^#/',$ligne)) {
+						$line=substr($ligne,1);
+					}
+				}
+				else { 				
+						if(!preg_match('/^#/',$ligne)) {
+							$line="#".$ligne;			
+						}
+				}
+				//echo $line."<br>";
+				fwrite($pointeur,$line);
+		    }	
+		    $numline=$numline+1;			
+			}
+		fclose($pointeur);
+		}
+	exec ("sudo -u root /usr/local/bin/CTparental.sh -ubl");
 	break;
 case 'gct_Off' :
 	exec ("sudo -u root /usr/local/bin/CTparental.sh -gctoff");
@@ -375,6 +412,9 @@ if ($DNSMASQ <> "OFF")
 	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=*ip **ips ...\" title=\"\"><font color=\"black\"><b>".gettext('*ip **ips ...')."</b></font></a></td>";
 	echo "<td align=center"; if ( $dg_confswitch == 'privileged group' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
 	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=privileged group\" title=\"\"><font color=\"black\"><b>".gettext('privileged group')."</b></font></a></td>";
+	echo "<td align=center"; if ( $dg_confswitch == 'safesearch Enebeled' ) { echo " bgcolor=\"#FFCC66\"";} echo ">";
+	echo "<a href=\"$_SERVER[PHP_SELF]?dgfile=safesearch Enebeled\" title=\"\"><font color=\"black\"><b>".gettext('safesearch')."</b></font></a></td>";
+	
 	
 	}
 else
@@ -417,6 +457,10 @@ switch ($dg_confswitch)
 	case 'Hours of allowed connections' :
 		include 'hours.php';
 	break;
+	case 'safesearch Enebeled' :
+		include 'safesearch.php';
+	break;
+	
 		
 	
 }

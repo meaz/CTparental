@@ -72,6 +72,7 @@ pause () {   # fonction pause pour debugage
 }
 SED="/bin/sed -i"
 FILE_CONF="$DIR_CONF/CTparental.conf"
+SAFE_CONF="$DIR_CONF/CTsafe.conf"
 FILE_GCTOFFCONF="$DIR_CONF/GCToff.conf"
 FILE_HCOMPT="$DIR_CONF/CThourscompteur"
 FILE_HCONF="$DIR_CONF/CThours.conf"
@@ -84,12 +85,16 @@ DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
-SAFEGOOGLE=ON
-SAFEYOUTUBE=ON
-SAFEBING=ON
-SAFEDUCK=ON
 # Parfeux minimal.
 IPRULES=OFF
+EOF
+fi
+if [ ! -f $SAFE_CONF ] ; then
+cat << EOF > $SAFE_CONF
+SAFEGOOGLE
+SAFEYOUTUBE
+SAFEBING
+SAFEDUCK
 EOF
 
 fi
@@ -738,17 +743,17 @@ date +%H:%M:%S
 
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
-if [ "$(cat < $FILE_CONF | grep -c "^SAFEGOOGLE=ON" )" -eq 1 ];then
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEGOOGLE" )" -eq 1 ];then
 	echo "# forcesafesearch redirect server for google" 
 	for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
 	do 
 	echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" 	
 	done
 fi
-if [ "$(cat < $FILE_CONF | grep -c "^SAFEYOUTUBE=ON" )" -eq 1 ];then
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
 	echo "address=/www.youtube.com/$forcesafesearchgoogle" 
 fi
-if [ "$(cat < $FILE_CONF | grep -c "^SAFEDUCK=ON" )" -eq 1 ];then
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
 	for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
 	do
@@ -758,7 +763,7 @@ if [ "$(cat < $FILE_CONF | grep -c "^SAFEDUCK=ON" )" -eq 1 ];then
 	echo "address=/duckduckgo.com/127.0.0.1" 
 fi
 
-if [ "$(cat < $FILE_CONF | grep -c "^SAFEBING=ON" )" -eq 1 ];then
+if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 	## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
 	## et ainci forcer le safesearch via privoxy.
 	## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
@@ -997,7 +1002,7 @@ iptablesreload () {
       
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	  if [ "$(cat < $FILE_CONF | grep -c "^SAFEBING=ON" )" -eq 1 ];then
+	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 		  # on interdit l'accès a bing en https .
 		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
 		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
@@ -1301,6 +1306,8 @@ chown root:"$GROUPHTTPD" "$DNS_FILTER_OSSI"
 chmod 660 "$DNS_FILTER_OSSI"
 chown root:"$GROUPHTTPD" "$CATEGORIES_ENABLED"
 chmod 660 "$CATEGORIES_ENABLED"
+chown root:"$GROUPHTTPD" "$SAFE_CONF"
+chmod 660 "$SAFE_CONF"
 chmod 660 /etc/sudoers
 chown root:"$GROUPHTTPD" "${DIRE2G}lists/bannedextensionlist"
 chmod 664 "${DIRE2G}lists/bannedextensionlist"
