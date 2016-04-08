@@ -1,3 +1,9 @@
+ctparental (4.12-0) unstable; urgency=medium
+
+  * Ajout du parametrage des safesearch a l'interface.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 08 Apr 2016 19:26:53 +0200
+
 ctparental (4.11-0) unstable; urgency=medium
 
   * Ajout du safesearch youtube.com (conviens aux jeune enfants mais trops restrictif pour des adolécent)
