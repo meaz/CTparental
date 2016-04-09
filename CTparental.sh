@@ -143,6 +143,7 @@ NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
+IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 #### LOCALISATION du fichier PID lighttpd par default ####
@@ -228,6 +229,9 @@ else
 	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
 fi
 reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
+if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
+reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $8}' <<< ${ip_route})"
+fi
 export interface_WAN
 export ipbox
 export ipinterface_WAN
@@ -1034,7 +1038,11 @@ iptablesreload () {
    fi
 
 # Save configuration so that it survives a reboot
+if [ "$IPTABLESsaveFILE" = "" ] ;then
    $IPTABLESsave
+else
+   $IPTABLESsave > $IPTABLESsaveFILE
+fi
    
 updatecauser
 setproxy
@@ -1073,7 +1081,11 @@ iptablesoff () {
    $IPTABLES -t nat -D OUTPUT -j ctparental  2> /bin/null
    $IPTABLES -t nat -F ctparental  2> /bin/null
    $IPTABLES -t nat -X ctparental  2> /bin/null
-   $IPTABLESsave
+   if [ "$IPTABLESsaveFILE" = "" ] ;then
+	   $IPTABLESsave
+   else
+	   $IPTABLESsave > $IPTABLESsaveFILE
+   fi
    unsetproxy
 }
 dnsmasqwhitelistonly  () {
