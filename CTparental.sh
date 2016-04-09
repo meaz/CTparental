@@ -305,6 +305,8 @@ resolvconf -u
 cat < /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
 fi
 $DNSMASQstart
+sleep 1
+
 echo "</resolvconffixon>"
 }
 resolvconffixoff () {
@@ -999,8 +1001,8 @@ iptablesreload () {
    $IPTABLES -t nat -X ctparental  2> /bin/null
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
-   $IPTABLES -P FORWARD ACCEPT
-   if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+   $IPTABLES -P FORWARD ACCEPT 
+if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
       
@@ -1015,9 +1017,8 @@ iptablesreload () {
 	  do 
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
 	  done
-	  if [ "$(cat < $FILE_CONF | grep -c GCTOFF=ON )" -eq 1 ];then
-		  for user in $(listeusers) ; do
-		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )" )" -eq 0 ];then
+	  	  for user in $(listeusers) ; do
+		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )" )" ];then
 			 #on rediriges les requet DNS des usagers filtrés sur dnsmasq
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1028,19 +1029,7 @@ iptablesreload () {
 			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
 		  fi
 		  done
-	   else
-			for user in $(listeusers) ; do
-			#on rediriges les requet DNS des usagers filtrés sur dnsmasq
-			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
-			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-			 #force passage par dansguardian pour les utilisateurs filtrés 
-			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
-			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
-			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
-			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
-			done
-	   fi
-   fi
+   
    if [ -e "$FILEIPTIMEWEB" ] ;  then
 		source "$FILEIPTIMEWEB"
    fi
@@ -1048,6 +1037,9 @@ iptablesreload () {
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
+else
+unsetproxy
+fi
 
 # Save configuration so that it survives a reboot
 if [ "$IPTABLESsaveFILE" = "" ] ;then
@@ -1462,7 +1454,7 @@ install () {
 		cp -rf confDansgouardian /usr/local/share/CTparental
 		cp -rf locale /usr/local/etc/CTparental
 	fi
-	iptablesoff
+	iptablesreload
 	groupadd ctoff
 	unset https_proxy
 	unset HTTPS_PROXY
@@ -1720,11 +1712,11 @@ uninstall () {
 			exit 0
 	   fi
    fi
+   desactivegourpectoff
    autoupdateoff 
    dnsmasqoff
-   desactivetimelogin
-   iptablesoff
-   desactivegourpectoff
+   FILTRAGEISOFF=1
+   iptablesreload
    $LIGHTTPDstop
    $DNSMASQstop
    if [ $nomanuel -eq 1 ]; then 
@@ -2480,15 +2472,17 @@ case $arg1 in
       exit 0
       ;;
    -on )
+	  FILTRAGEISOFF=0
       dnsmasqon
       iptablesreload
       exit 0
       ;;
    -off )
-	  desactivegourpectoff
+  	  desactivegourpectoff
       autoupdateoff 
       dnsmasqoff
-      iptablesoff
+      FILTRAGEISOFF=1
+      iptablesreload
       exit 0
       ;;
    -wlo )
