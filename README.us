@@ -1,0 +1,41 @@
+Parental control. web filtering iptables dnsmasq dansguardian privoxy lighttpd cron and the blacklist of the University of Toulouse. 
+a management connection schedule is also integrated a web interface (http://127.0.0.1/CTadmin) for setting all this. 
+The login password pair must be entered to install, but can be changed later with the command CTparental.sh -uhtml.
+
+Blacklist filtering or Whiteliste.
+
+Filter Categories.
+
+site custom filter.
+
+Custom filter sites accessible to leave even if present in any category you want to block.
+
+Settings hours allowed per user connections.
+
+Setting the max time user traffic.
+
+minute numbers max connections allowed per day.
+
+privileged people group not undergoing web filtering.
+
+Notifications of users every minute during the last 5 minutes before disconnection.
+
+Dansguardian (+ extensions mime type configurable via the interface.)
+
+Privoxy (parameter not the interface.)
+
+Google SafeSearch Force
+
+Force safesearch youtube.com (very restrictive agree to young children, has not teenagers.)
+
+Force SafeSearch DuckDuckGo
+
+Force SafeSearch bing (http only)
+
+search engines blocking deemed unsafe as bing https and search.yahoo.com.
+
+Added grub2 password, the password is persistent after an update-grub or lay a grub2 day. qwerty keyboard switches for setting grub2 password login words it avoids the problems of possible character has to do with the qwerty keyboard grub2 menu.
+
+Works with firefox, Midori, chromium ...
+
+custom business rules for iptables. Enabled with CTparental.sh -ipton
