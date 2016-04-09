@@ -1075,23 +1075,7 @@ for user in $(listeusers) ; do
 done
 echo "</updatecauser>"
 }
-iptablesoff () {
 
-   $IPTABLES -F
-   $IPTABLES -X
-   $IPTABLES -P INPUT ACCEPT
-   $IPTABLES -P OUTPUT ACCEPT
-   $IPTABLES -P FORWARD ACCEPT
-   $IPTABLES -t nat -D OUTPUT -j ctparental  2> /bin/null
-   $IPTABLES -t nat -F ctparental  2> /bin/null
-   $IPTABLES -t nat -X ctparental  2> /bin/null
-   if [ "$IPTABLESsaveFILE" = "" ] ;then
-	   $IPTABLESsave
-   else
-	   $IPTABLESsave > $IPTABLESsaveFILE
-   fi
-   unsetproxy
-}
 dnsmasqwhitelistonly  () {
 $SED "s?^DNSMASQ.*?DNSMASQ=WHITE?g" $FILE_CONF
 cat << EOF > $DNSMASQCONF
