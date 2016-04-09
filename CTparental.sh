@@ -1449,6 +1449,7 @@ echo "</CActparental>"
 
 
 install () {
+	FILTRAGEISOFF=1
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/local/share/CTparental
 		cp -rf confDansgouardian /usr/local/share/CTparental
@@ -1584,6 +1585,7 @@ install () {
 	  confprivoxy
       FoncHTTPDCONF
       activegourpectoff
+      FILTRAGEISOFF=0
       iptablesreload
       $ENCRON
       $ENLIGHTTPD
