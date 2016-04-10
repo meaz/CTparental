@@ -124,9 +124,9 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data dansguardian unbound lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
-CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" dnsmasq e2guardian mini-httpd apache2 firewalld "}
 
 #### COMMANDES de services par DEFAULT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -136,9 +136,9 @@ CRONrestart=${CRONrestart:="$CMDSERVICE cron restart "}
 LIGHTTPDstart=${LIGHTTPDstart:="$CMDSERVICE lighttpd start "}
 LIGHTTPDstop=${LIGHTTPDstop:="$CMDSERVICE lighttpd stop "}
 LIGHTTPDrestart=${LIGHTTPDrestart:="$CMDSERVICE lighttpd restart "}
-DNSMASQstart=${DNSMASQstart:="$CMDSERVICE dnsmasq start "}
-DNSMASQstop=${DNSMASQstop:="$CMDSERVICE dnsmasq stop "}
-DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE dnsmasq restart "}
+DNSMASQstart=${DNSMASQstart:="$CMDSERVICE unbound start "}
+DNSMASQstop=${DNSMASQstop:="$CMDSERVICE unbound stop "}
+DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE unbound restart "}
 NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
@@ -588,7 +588,7 @@ autoupdate() {
 		download
 		adapt
 		catChoice
-		dnsmasqon
+		unboundon
                 $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
 		exit 0
 	fi
@@ -608,7 +608,7 @@ $CRONrestart
 adapt() {
 echo adapt
 date +%H:%M:%S
-dnsmasqoff
+unboundoff
 $MFILEtmp
 if [ ! -f $DNS_FILTER_OSSI ] ; then
 	echo > $DNS_FILTER_OSSI
@@ -642,7 +642,7 @@ if [ -d $tempDIR  ] ; then
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-						$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+						$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
@@ -664,7 +664,7 @@ else
 	$SED "/^#.*/d" "$FILE_tmp" 
 	$SED "/^$/d" "$FILE_tmp" 
 	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
-	$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq
+	$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 fi     
 echo
@@ -789,6 +789,48 @@ echo "</reabdomaine>"
 
 }
 
+unboundon () {
+echo "<unboundon>"
+	
+if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
+$SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
+
+cat << EOF > $DNSMASQCONF 
+# Configuration file for "unbound with blackhole"
+# Inclusion de la blacklist <domains> de Toulouse dans la configuration
+server:
+verbosity: 1
+interface: 127.0.0.1
+access-control: 127.0.0.0/8 allow
+#access-control: 192.168.1.0/24 allow
+port: 54
+do-ip4: yes
+do-ip6: no
+do-udp: yes
+do-tcp: yes
+hide-identity: yes
+hide-version: yes
+# on inclut le répertoir des blacklistes actitée.
+include: "$DIR_DNS_BLACKLIST_ENABLED/*.conf"
+
+
+forward-zone:
+name: "."
+forward-addr: $DNS1
+forward-addr: $DNS2  
+
+EOF
+
+resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
+$E2GUARDIANrestart
+$PRIVOXYrestart
+else
+  unboundwhitelistonly
+fi
+echo "</unboundon>"
+	
+}
+
 dnsmasqon () {
 echo "<dnsmasqon>"
 	
@@ -818,17 +860,17 @@ resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de r
 $E2GUARDIANrestart
 $PRIVOXYrestart
 else
-  dnsmasqwhitelistonly
+  unboundwhitelistonly
 fi
 echo "</dnsmasqon>"
 }
-dnsmasqoff () {
-echo "<dnsmasqoff>"
+unboundoff () {
+echo "<unboundoff>"
 $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
 resolvconffixoff
 $E2GUARDIANrestart
 $PRIVOXYrestart
-echo "</dnsmasqoff>"
+echo "</unboundoff>"
 }
 
 ipglobal () {
@@ -1079,27 +1121,34 @@ done
 echo "</updatecauser>"
 }
 
-dnsmasqwhitelistonly  () {
+unboundwhitelistonly  () {
 $SED "s?^DNSMASQ.*?DNSMASQ=WHITE?g" $FILE_CONF
 cat << EOF > $DNSMASQCONF
-# Configuration file for "dnsmasq with blackhole"
+# Configuration file for "unbound with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
-conf-dir=$DIR_DNS_WHITELIST_ENABLED
-# conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
-interface=lo
-listen-address=127.0.0.1
-port=54
-no-dhcp-interface=$interface_WAN
-no-dhcp-interface=lo
-bind-interfaces
-cache-size=1024
-domain-needed
-expand-hosts
-bogus-priv
-server=$DNS1
-server=$DNS2 
-address=/localhost/127.0.0.1
-address=/#/$PRIVATE_IP #redirige vers $PRIVATE_IP pour tout ce qui n'a pas été resolu dans les listes blanches
+server:
+verbosity: 1
+interface: 127.0.0.1
+access-control: 127.0.0.0/8 allow
+#access-control: 192.168.1.0/24 allow
+port: 54
+do-ip4: yes
+do-ip6: no
+do-udp: yes
+do-tcp: yes
+hide-identity: yes
+hide-version: yes
+# on inclut le répertoir des blacklistes actitée.
+
+
+forward-zone:
+include: "$DIR_DNS_WHITELIST_ENABLED/*.conf"
+
+
+local-zone: "." redirect
+local-data: ". A $PRIVATE_IP"
+
+
 EOF
 
 $DNSMASQrestart
@@ -1567,7 +1616,7 @@ install () {
       fi
       adapt
       catChoice
-      dnsmasqon
+      unboundon
       $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
 	  confe2guardian
 	  confprivoxy
@@ -1613,7 +1662,7 @@ $SED "/^DNS2=/d" "$FILE_CONF"
   echo DNS2="$DNS2"
 } >> $FILE_CONF
 # on modifi la conf dnsmasq
-dnsmasqon
+unboundon
 # on reconfigure les règle du parfeux.
 iptablesreload
 fi
@@ -1704,7 +1753,7 @@ uninstall () {
    fi
    desactivegourpectoff
    autoupdateoff 
-   dnsmasqoff
+   unboundoff
    FILTRAGEISOFF=1
    iptablesreload
    $LIGHTTPDstop
@@ -2436,7 +2485,7 @@ case $arg1 in
 		  download
 		  adapt
 		  catChoice
-		  dnsmasqon
+		  unboundon
 		  $SED "s?^LASTUPDATE.*?LASTUPDATE=$THISDAYS=$(date +%d-%m-%Y\ %T)?g" $FILE_CONF
       fi
       exit 0
@@ -2445,7 +2494,7 @@ case $arg1 in
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		  adapt
 		  catChoice
-		  dnsmasqon
+		  unboundon
       fi
        
       exit 0
@@ -2457,27 +2506,27 @@ case $arg1 in
    -rl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
          catChoice
-         dnsmasqon
+         unboundon
       fi 
       exit 0
       ;;
    -on )
 	  FILTRAGEISOFF=0
-      dnsmasqon
+      unboundon
       iptablesreload
       exit 0
       ;;
    -off )
   	  desactivegourpectoff
       autoupdateoff 
-      dnsmasqoff
+      unboundoff
       FILTRAGEISOFF=1
       iptablesreload
       exit 0
       ;;
    -wlo )
 	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-		  dnsmasqwhitelistonly
+		  unboundwhitelistonly
       fi
       exit 0
       ;;
@@ -2485,7 +2534,7 @@ case $arg1 in
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		  choiblenabled
 		  catChoice
-		  dnsmasqon
+		  unboundon
       fi
       exit 0
       ;;
@@ -2493,7 +2542,7 @@ case $arg1 in
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		  initblenabled
 		  catChoice
-		  dnsmasqon
+		  unboundon
       fi
       exit 0
       ;;
