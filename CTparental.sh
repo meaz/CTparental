@@ -81,7 +81,7 @@ mkdir -p $DIR_CONF
 mkdir -p /usr/local/share/CTparental/
 cat << EOF > $FILE_CONF
 LASTUPDATE=0
-DNSMASQ=BLACK
+UNBOUND=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
@@ -98,7 +98,7 @@ SAFEDUCK
 EOF
 
 fi
-FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
+FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "UNBOUND=OFF" )"
 
 
 
@@ -136,9 +136,9 @@ CRONrestart=${CRONrestart:="$CMDSERVICE cron restart "}
 LIGHTTPDstart=${LIGHTTPDstart:="$CMDSERVICE lighttpd start "}
 LIGHTTPDstop=${LIGHTTPDstop:="$CMDSERVICE lighttpd stop "}
 LIGHTTPDrestart=${LIGHTTPDrestart:="$CMDSERVICE lighttpd restart "}
-DNSMASQstart=${DNSMASQstart:="$CMDSERVICE unbound start "}
-DNSMASQstop=${DNSMASQstop:="$CMDSERVICE unbound stop "}
-DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE unbound restart "}
+UNBOUNDstart=${UNBOUNDstart:="$CMDSERVICE unbound start "}
+UNBOUNDstop=${UNBOUNDstop:="$CMDSERVICE unbound stop "}
+UNBOUNDrestart=${UNBOUNDrestart:="$CMDSERVICE unbound restart "}
 NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
@@ -157,7 +157,7 @@ RSYSLOGCTPARENTAL=${RSYSLOGCTPARENTAL:="/etc/rsyslog.d/iptables.conf"}
 #### COMMANDES D'ACTIVATION DES SERVICES AU DEMARAGE DU PC ####
 ENCRON=${ENCRON:=""}
 ENLIGHTTPD=${ENLIGHTTPD:=""}
-ENDNSMASQ=${ENDNSMASQ:=""}
+ENUNBOUND=${ENUNBOUND:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 #### UID MINIMUM pour les UTILISATEUR
@@ -169,8 +169,10 @@ DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
 NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
-DNSMASQCONF=${DNSMASQCONF:="/etc/unbound/unbound.conf.d/CTparental.conf"}
-UNBOUNDBLCONF=${UNBOUNDBLCONF:="/etc/unbound/unbound.conf.d/CTparentalBL.conf"}
+UNBOUNDCONF=${UNBOUNDCONF:="/etc/unbound/unbound.conf"}
+UNBOUNDRKEY=${UNBOUNDRKEY:="/var/lib/unbound/root.key"}
+UNBOUNDBLCONF=${UNBOUNDBLCONF:="$DIR_CONF/unboundBL.conf"}
+UNBOUNDWLCONF=${UNBOUNDWLCONF:="$DIR_CONF/unboundWL.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
 CTPARENTALCONFHTTPD=${CTPARENTALCONFHTTPD:="$DIRCONFENABLEDHTTPD/10-CTparental.conf"}
@@ -296,23 +298,23 @@ fi
 
 resolvconffixon () {
 echo "<resolvconffixon>"
-# redemare dnsmasq 
-$DNSMASQstop
+# redemare unbound 
+$UNBOUNDstop
 
 resolvconf -u 2&> /dev/null 
 if [ $? -eq 1 ];then # si resolvconf et bien installé
 resolvconf -u
-# on s'assure que les dns du FAI soit bien ajoutés au fichier /etc/resolv.conf malgré l'utilisation de dnsmasq.
+# on s'assure que les dns du FAI soit bien ajoutés au fichier /etc/resolv.conf malgré l'utilisation de unbound.
 cat < /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
 fi
-$DNSMASQstart
+$UNBOUNDstart
 sleep 1
 
 echo "</resolvconffixon>"
 }
 resolvconffixoff () {
 echo "<resolvconffixoff>"
-$DNSMASQstop	
+$UNBOUNDstop	
 resolvconf -u 2&> /dev/null 
 if [ $? -eq 1 ];then # si resolvconf et bien installé
 echo > /etc/resolvconf/resolv.conf.d/tail
@@ -409,7 +411,7 @@ cat << EOF > "$DIRE2G"lists/bannedsitelist
 #remove the # from the next line to leave only a '**ips':
 #**ips
 
-$(gettext "#the domain filtering is handled by dnsmasq, do not touch this file !!")
+$(gettext "#the domain filtering is handled by unbound, do not touch this file !!")
 
 EOF
 
@@ -640,7 +642,8 @@ if [ -d $tempDIR  ] ; then
 				if [ -e "$tempDIR"/blacklists/"$categorie"/usage ] ; then
 					if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
 						echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
-						$SED "s?.*?server=/&/#?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes blanches
+						$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches
+						$SED  1"i\forward-zone:"  "$FILE_tmp" 
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
@@ -659,6 +662,7 @@ if [ -d $tempDIR  ] ; then
 	done
 
 else
+	#on traite le fichier OSSI
 	mkdir   $tempDIR
 	echo -n "."
 	# suppression des @IP, de caractères acccentués et des lignes commentées ou vides
@@ -729,7 +733,8 @@ do
 		done
     fi
 done < $CATEGORIES_ENABLED
-
+$UMFILEtmp
+rm -f "$FILE_tmp"
 { 
 echo 'localhost' 
 echo '127.0.0.1' 
@@ -742,10 +747,24 @@ cat < "$DREAB" | sed -e"s/^\.//g" | sed -e"s/^www.//g"
 }  > "$E2GUXSITELIST"
 
 echo -n "."
-cat < "$DREAB" | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.ossi.conf
-echo
+
+$MFILEtmp
+cat < "$DREAB" | sed -e "s? ??g"> "$FILE_tmp"
+$SED -r '/([0-9]{1,3}\.){3}[0-9]{1,3}/d' "$FILE_tmp"
+$SED "/[äâëêïîöôüû]/d" "$FILE_tmp"
+$SED "/^#.*/d" "$FILE_tmp"
+$SED "/^$/d" "$FILE_tmp"
+$SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
+$SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
+$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
+$SED  1"i\forward-zone:"  "$FILE_tmp" 
+mv "$FILE_tmp" "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.ossi.conf
 $UMFILEtmp
 rm -f "$FILE_tmp"
+
+
+echo
+
 date +%H:%M:%S
 
 
@@ -803,6 +822,8 @@ echo "local-data: \"search.yahoo.com A 127.0.0.10\""
 $MFILEtmp
 cat "$DIR_DNS_BLACKLIST_ENABLED"/*.conf > "$FILE_tmp"
 nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > "$UNBOUNDBLCONF"
+cat "$DIR_DNS_WHITELIST_ENABLED"/*.conf > "$FILE_tmp"
+nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > "$UNBOUNDWLCONF"
 $UMFILEtmp
 rm -f "$FILE_tmp"
 echo "</reabdomaine>"
@@ -813,12 +834,15 @@ unboundon () {
 echo "<unboundon>"
 	
 if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
-$SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
+$SED "s?^UNBOUND.*?UNBOUND=BLACK?g" $FILE_CONF
 
-cat << EOF > $DNSMASQCONF 
+cat << EOF > $UNBOUNDCONF 
 # Configuration file for "unbound with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
 server:
+# The following line will configure unbound to perform cryptographic
+# DNSSEC validation using the root trust anchor.
+auto-trust-anchor-file: "$UNBOUNDRKEY"
 verbosity: 1
 interface: 127.0.0.1
 access-control: 127.0.0.0/8 allow
@@ -830,7 +854,7 @@ do-udp: yes
 do-tcp: yes
 hide-identity: yes
 hide-version: yes
-
+include: "$UNBOUNDBLCONF"
 forward-zone:
 name: "."
 forward-addr: $DNS1
@@ -838,7 +862,7 @@ forward-addr: $DNS2
 
 EOF
 
-resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
+resolvconffixon # redemare unbound en prenent en compte la présence ou non de resolvconf.
 $E2GUARDIANrestart
 $PRIVOXYrestart
 else
@@ -848,42 +872,10 @@ echo "</unboundon>"
 	
 }
 
-dnsmasqon () {
-echo "<dnsmasqon>"
-	
-if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
-$SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
 
-cat << EOF > $DNSMASQCONF 
-# Configuration file for "dnsmasq with blackhole"
-# Inclusion de la blacklist <domains> de Toulouse dans la configuration
-conf-dir=$DIR_DNS_BLACKLIST_ENABLED
-# conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
-interface=lo
-listen-address=127.0.0.1
-port=54
-no-dhcp-interface=$interface_WAN
-no-dhcp-interface=lo
-bind-interfaces
-cache-size=1024
-domain-needed
-expand-hosts
-bogus-priv
-server=$DNS1
-server=$DNS2  
-EOF
-
-resolvconffixon # redemare dnsmasq en prenent en compte la présence ou non de resolvconf.
-$E2GUARDIANrestart
-$PRIVOXYrestart
-else
-  unboundwhitelistonly
-fi
-echo "</dnsmasqon>"
-}
 unboundoff () {
 echo "<unboundoff>"
-$SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
+$SED "s?^UNBOUND.*?UNBOUND=OFF?g" $FILE_CONF
 resolvconffixoff
 $E2GUARDIANrestart
 $PRIVOXYrestart
@@ -1066,7 +1058,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
       
-      # Force privoxy a utiliser dnsmasq sur le port 54
+      # Force privoxy a utiliser unbound sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 		  # on interdit l'accès a bing en https .
@@ -1079,7 +1071,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	  done
 	  	  for user in $(listeusers) ; do
 		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )" )" -eq 0 ];then
-			 #on rediriges les requet DNS des usagers filtrés sur dnsmasq
+			 #on rediriges les requet DNS des usagers filtrés sur unbound
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 			 #force passage par dansguardian pour les utilisateurs filtrés 
@@ -1139,11 +1131,15 @@ echo "</updatecauser>"
 }
 
 unboundwhitelistonly  () {
-$SED "s?^DNSMASQ.*?DNSMASQ=WHITE?g" $FILE_CONF
-cat << EOF > $DNSMASQCONF
+$SED "s?^UNBOUND.*?UNBOUND=WHITE?g" $FILE_CONF
+cat << EOF > $UNBOUNDCONF
 # Configuration file for "unbound with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
 server:
+# The following line will configure unbound to perform cryptographic
+# DNSSEC validation using the root trust anchor.
+auto-trust-anchor-file: "$UNBOUNDRKEY"
+
 verbosity: 1
 interface: 127.0.0.1
 access-control: 127.0.0.0/8 allow
@@ -1155,20 +1151,20 @@ do-udp: yes
 do-tcp: yes
 hide-identity: yes
 hide-version: yes
-# on inclut le répertoir des blacklistes actitée.
-
-
-forward-zone:
-include: "$DIR_DNS_WHITELIST_ENABLED/*.conf"
-
 
 local-zone: "." redirect
 local-data: ". A $PRIVATE_IP"
 
+forward-zone:
+include: "$UNBOUNDWLCONF"
+
+
+
+
 
 EOF
 
-$DNSMASQrestart
+$UNBOUNDrestart
 $E2GUARDIANrestart
 $PRIVOXYrestart
 }
@@ -1643,7 +1639,7 @@ install () {
       iptablesreload
       $ENCRON
       $ENLIGHTTPD
-      $ENDNSMASQ
+      $ENUNBOUND
       $ENNWMANAGER
       $ENIPTABLESSAVE
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
@@ -1678,7 +1674,7 @@ $SED "/^DNS2=/d" "$FILE_CONF"
   echo DNS1="$DNS1"
   echo DNS2="$DNS2"
 } >> $FILE_CONF
-# on modifi la conf dnsmasq
+# on modifi la conf unbound
 unboundon
 # on reconfigure les règle du parfeux.
 iptablesreload
@@ -1774,7 +1770,7 @@ uninstall () {
    FILTRAGEISOFF=1
    iptablesreload
    $LIGHTTPDstop
-   $DNSMASQstop
+   $UNBOUNDstop
    if [ $nomanuel -eq 1 ]; then 
 	   # en install par le deb on n'efface pas les fichiers installer par celuis si
        rm -f /etc/cron.d/CTparental*
