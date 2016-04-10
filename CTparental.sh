@@ -642,12 +642,14 @@ if [ -d $tempDIR  ] ; then
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-						$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+						$SED "s?.*?local-zone: \"& redirect\" \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+						$SED  1"i\server:"  "$FILE_tmp" 
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
 					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-					$SED "s?.*?address=/&/$PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme dnsmasq des listes noires
+					$SED "s?.*?local-zone: \"& redirect\" \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+					$SED  1"i\server:"  "$FILE_tmp" 
 					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 				fi
 			fi
@@ -802,7 +804,7 @@ server:
 verbosity: 1
 interface: 127.0.0.1
 access-control: 127.0.0.0/8 allow
-#access-control: 192.168.1.0/24 allow
+access-control: $reseau_box allow
 port: 54
 do-ip4: yes
 do-ip6: no
