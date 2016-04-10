@@ -1056,20 +1056,22 @@ updatecauser () {
 echo "<updatecauser>"
 for user in $(listeusers) ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [ -d "$HOMEPCUSER" ] ;then
+	if [ -f "$HOMEPCUSER"/.mozilla/firefox/profiles.ini ] ;then
 			#on install le certificat dans tous les prifile firefoxe utilisateur existant 
 		profileliste=$(cat < "$HOMEPCUSER"/.mozilla/firefox/profiles.ini | grep Path= | cut -d"=" -f2)
 		for profilefirefox in $profileliste ; do
-			# on supprime tous les anciens certificats
-			while true
-			do
-				certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
-				if [ ! $? -eq 0 ];then 
-					break
-				fi
-			done
-			# on ajoute le nouveau certificat
-			certutil -A -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+			if [ -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ ];then
+				# on supprime tous les anciens certificats
+				while true
+				do
+					certutil -D -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -n"CActparental - ctparental" 2&> /dev/null
+					if [ ! $? -eq 0 ];then 
+						break
+					fi
+				done
+				# on ajoute le nouveau certificat
+				certutil -A -d "$HOMEPCUSER"/.mozilla/firefox/"$profilefirefox"/ -i "$DIRHTML"/cactparental.crt -n"CActparental - ctparental" -t "CT,c,c"		
+			fi
 		done
 	fi
 done
@@ -1508,11 +1510,11 @@ install () {
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
-			$CMDREMOVE "$PACKAGECT" 2> /dev/null
+			${CMDREMOVE} "${PACKAGECT}" 2> /dev/null
          done
 	  fi
       if [ "$noinstalldep" = "0" ]; then
-	      $CMDINSTALL "$DEPENDANCES"
+	      ${CMDINSTALL} "${DEPENDANCES}"
       fi
       # on desactive l'ipv6
 		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
