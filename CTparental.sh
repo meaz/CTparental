@@ -170,6 +170,7 @@ NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/unbound/unbound.conf.d/CTparental.conf"}
+UNBOUNDBLCONF=${UNBOUNDBLCONF:="/etc/unbound/unbound.conf.d/CTparentalBL.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
 CTPARENTALCONFHTTPD=${CTPARENTALCONFHTTPD:="$DIRCONFENABLEDHTTPD/10-CTparental.conf"}
@@ -635,6 +636,7 @@ if [ -d $tempDIR  ] ; then
 				$SED "/^#.*/d" "$FILE_tmp"
 				$SED "/^$/d" "$FILE_tmp"
 				$SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
+				$SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
 				if [ -e "$tempDIR"/blacklists/"$categorie"/usage ] ; then
 					if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
 						echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
@@ -642,13 +644,13 @@ if [ -d $tempDIR  ] ; then
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-						$SED "s?.*?local-zone: \"& redirect\" \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+						$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 						$SED  1"i\server:"  "$FILE_tmp" 
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
 					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-					$SED "s?.*?local-zone: \"& redirect\" \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+					$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 					$SED  1"i\server:"  "$FILE_tmp" 
 					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 				fi
@@ -666,6 +668,7 @@ else
 	$SED "/^#.*/d" "$FILE_tmp" 
 	$SED "/^$/d" "$FILE_tmp" 
 	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
+	$SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
 	$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 fi     
@@ -748,34 +751,42 @@ date +%H:%M:%S
 
 {
 
-
+echo "server:"
 ## on force a passer par forcesafesearch.google.com de maninière transparente
 forcesafesearchgoogle=$(host -ta forcesafesearch.google.com|cut -d" " -f4)	# retrieve forcesafesearch.google.com ip
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEGOOGLE" )" -eq 1 ];then
 	echo "# forcesafesearch redirect server for google" 
 	for subdomaingoogle in $(wget http://www.google.com/supported_domains -O - 2> /dev/null )  # pour chaque sous domain de google
 	do 
-	echo "address=/www$subdomaingoogle/$forcesafesearchgoogle" 	
+	echo "local-zone: \"www$subdomaingoogle\" redirect "
+	echo "local-data: \"www$subdomaingoogle A $forcesafesearchgoogle\""
+	
 	done
 fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
-	echo "address=/www.youtube.com/$forcesafesearchgoogle" 
+	echo "local-zone: \"www.youtube.com\" redirect "
+	echo "local-data: \"www.youtube.com A $forcesafesearchgoogle\""
 fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
+	echo "local-zone: \"safe.duckduckgo.com\" redirect "
 	for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
 	do
-		echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" 
+		echo "local-data: \"www.youtube.com A $ipsafeduckduckgo\""
+
 	done
+	echo "local-zone: \"duckduckgo.com\" redirect "
 	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
-	echo "address=/duckduckgo.com/127.0.0.1" 
+	echo "local-data: \"duckduckgo.com A 127.0.0.1\""
 fi
 
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 	## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
 	## et ainci forcer le safesearch via privoxy.
 	## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
-	echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4)"
+	echo "local-zone: \"bing.com\" redirect "
+	echo "local-data: \"bing.com A $(host -ta bing.com|cut -d" " -f4)\""
+
 fi
 ## on force a passer par search.yahoo.com pour redirection url par lighttpd
 #ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
@@ -783,10 +794,17 @@ fi
 #echo "address=/search.yahoo.com/127.0.0.1" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
 # on bloque les moteurs de recherche pas asser sur
-echo "address=/search.yahoo.com/127.0.0.10"
+echo "local-zone: \"search.yahoo.com\" redirect "
+echo "local-data: \"search.yahoo.com A 127.0.0.10\""
+
 } > $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
 
-
+# suppréssion des "duplicate local-zone"
+$MFILEtmp
+cat < "$DIR_DNS_BLACKLIST_ENABLED"/.*conf > "$FILE_tmp"
+nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > $UNBOUNDBLCONF
+$UMFILEtmp
+rm -f "$FILE_tmp"
 echo "</reabdomaine>"
 
 }
@@ -812,8 +830,8 @@ do-udp: yes
 do-tcp: yes
 hide-identity: yes
 hide-version: yes
-# on inclut le répertoir des blacklistes actitée.
-include: "$DIR_DNS_BLACKLIST_ENABLED/*.conf"
+# on inclut le fichier des blacklistes actitée.
+include: "$UNBOUNDBLCONF"
 
 
 forward-zone:
