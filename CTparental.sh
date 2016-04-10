@@ -802,13 +802,14 @@ conf-dir=$DIR_DNS_BLACKLIST_ENABLED
 # conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
 interface=lo
 listen-address=127.0.0.1
+port=54
 no-dhcp-interface=$interface_WAN
+no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
 domain-needed
 expand-hosts
 bogus-priv
-port=54
 server=$DNS1
 server=$DNS2  
 EOF
@@ -1087,13 +1088,14 @@ conf-dir=$DIR_DNS_WHITELIST_ENABLED
 # conf-file=$DIR_DEST_ETC/alcasar-dns-name   # zone de definition de noms DNS locaux
 interface=lo
 listen-address=127.0.0.1
+port=54
 no-dhcp-interface=$interface_WAN
+no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
 domain-needed
 expand-hosts
 bogus-priv
-port=54
 server=$DNS1
 server=$DNS2 
 address=/localhost/127.0.0.1
