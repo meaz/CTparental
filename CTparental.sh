@@ -772,7 +772,7 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "local-zone: \"safe.duckduckgo.com\" redirect "
 	for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
 	do
-		echo "local-data: \"www.youtube.com A $ipsafeduckduckgo\""
+		echo "local-data: \"safe.duckduckgo.com A $ipsafeduckduckgo\""
 
 	done
 	echo "local-zone: \"duckduckgo.com\" redirect "
@@ -801,8 +801,8 @@ echo "local-data: \"search.yahoo.com A 127.0.0.10\""
 
 # suppréssion des "duplicate local-zone"
 $MFILEtmp
-cat < "$DIR_DNS_BLACKLIST_ENABLED"/.*conf > "$FILE_tmp"
-nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > $UNBOUNDBLCONF
+cat "$DIR_DNS_BLACKLIST_ENABLED"/*.conf > "$FILE_tmp"
+nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > "$UNBOUNDBLCONF"
 $UMFILEtmp
 rm -f "$FILE_tmp"
 echo "</reabdomaine>"
@@ -830,9 +830,6 @@ do-udp: yes
 do-tcp: yes
 hide-identity: yes
 hide-version: yes
-# on inclut le fichier des blacklistes actitée.
-include: "$UNBOUNDBLCONF"
-
 
 forward-zone:
 name: "."
