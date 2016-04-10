@@ -169,7 +169,7 @@ DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
 NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
-DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
+DNSMASQCONF=${DNSMASQCONF:="/etc/unbound/unbound.conf.d/CTparental.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
 CTPARENTALCONFHTTPD=${CTPARENTALCONFHTTPD:="$DIRCONFENABLEDHTTPD/10-CTparental.conf"}
