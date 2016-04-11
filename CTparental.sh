@@ -327,8 +327,8 @@ echo "</resolvconffixoff>"
 PRIVATE_IP="127.0.0.10"
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
-FILE_tmpSizeMax=${FILE_tmpSizeMax:="128M"}  # 70 Min, Recomend 128M 
-LOWRAM=${LOWRAM:=0}
+FILE_tmpSizeMax=${FILE_tmpSizeMax:="160M"}  # 160 Min, Recomend 256M 
+LOWRAM=${LOWRAM:=1}
 if [ "$LOWRAM" -eq 0 ] ; then
 MFILEtmp="mount -t tmpfs -o size=$FILE_tmpSizeMax tmpfs $tempDIRRamfs"
 UMFILEtmp="umount $tempDIRRamfs"
@@ -642,19 +642,19 @@ if [ -d $tempDIR  ] ; then
 				if [ -e "$tempDIR"/blacklists/"$categorie"/usage ] ; then
 					if [ "$(grep -c "white" "$tempDIR"/blacklists/"$categorie"/usage)" -ge 1 ] ;then
 						echo "$categorie" >> $WL_CATEGORIES_AVAILABLE
-						$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches
-						$SED  1"i\forward-zone:"  "$FILE_tmp" 
+				#		$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches
+					#	$SED  1"i\forward-zone:"  "$FILE_tmp" 
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf
 					else
 						echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-						$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
-						$SED  1"i\server:"  "$FILE_tmp" 
+				#		$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+				#		$SED  1"i\server:"  "$FILE_tmp" 
 						mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 					fi				
 				else
 					echo "$categorie" >> $BL_CATEGORIES_AVAILABLE
-					$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
-					$SED  1"i\server:"  "$FILE_tmp" 
+				#	$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+				#	$SED  1"i\server:"  "$FILE_tmp" 
 					mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/"$categorie".conf  	
 				fi
 			fi
@@ -673,7 +673,7 @@ else
 	$SED "/^$/d" "$FILE_tmp" 
 	$SED "s/\.\{2,10\}/\./g" "$FILE_tmp" # supprime les suite de "." exemple: address=/fucking-big-tits..com/127.0.0.10 devient address=/fucking-big-tits.com/127.0.0.10
 	$SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
-	$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+	#$SED "s?.*?local-zone: & redirect \nlocal-data: & A $PRIVATE_IP?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
 	mv "$FILE_tmp" "$DIR_DNS_FILTER_AVAILABLE"/ossi.conf
 fi     
 echo
@@ -756,8 +756,8 @@ $SED "/^#.*/d" "$FILE_tmp"
 $SED "/^$/d" "$FILE_tmp"
 $SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
 $SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
-$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
-$SED  1"i\forward-zone:"  "$FILE_tmp" 
+#$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
+#$SED  1"i\forward-zone:"  "$FILE_tmp" 
 mv "$FILE_tmp" "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.ossi.conf
 $UMFILEtmp
 rm -f "$FILE_tmp"
@@ -765,7 +765,6 @@ rm -f "$FILE_tmp"
 
 echo
 
-date +%H:%M:%S
 
 
 {
@@ -816,18 +815,27 @@ fi
 echo "local-zone: \"search.yahoo.com\" redirect "
 echo "local-data: \"search.yahoo.com A 127.0.0.10\""
 
-} > $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
+} > $DIR_CONF/forcesafesearch.conf
 
-# suppréssion des "duplicate local-zone"
+echo " suppréssion des \"duplicate local-zone\""
 $MFILEtmp
-cat "$DIR_DNS_BLACKLIST_ENABLED"/*.conf > "$FILE_tmp"
-nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > "$UNBOUNDBLCONF"
-cat "$DIR_DNS_WHITELIST_ENABLED"/*.conf > "$FILE_tmp"
-nl "$FILE_tmp" | sort --key 2 --unique | sort --key 1 --numeric-sort | cut --fields 2 > "$UNBOUNDWLCONF"
+echo "BL"
+cat "$DIR_DNS_BLACKLIST_ENABLED"/*.conf | sort -u > "$FILE_tmp"
+$SED  '/^$/d'  "$FILE_tmp"
+$SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A $PRIVATE_IP\"?g" "$FILE_tmp"  # Mise en forme unbound des listes noires
+$SED  1"i\server:"  "$FILE_tmp" 
+cp -f "$FILE_tmp"  "$UNBOUNDBLCONF"
+echo "WL"
+cat "$DIR_DNS_WHITELIST_ENABLED"/*.conf | sort -u > "$FILE_tmp"
+$SED  '/^$/d'  "$FILE_tmp"
+$SED "s?.*?forward-zone: \nname: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
+#$SED  1"i\forward-zone:"  "$FILE_tmp" 
+cp -f "$FILE_tmp"  "$UNBOUNDWLCONF"
 $UMFILEtmp
 rm -f "$FILE_tmp"
 echo "</reabdomaine>"
 
+date +%H:%M:%S
 }
 
 unboundon () {
@@ -855,6 +863,7 @@ do-tcp: yes
 hide-identity: yes
 hide-version: yes
 include: "$UNBOUNDBLCONF"
+include: "$DIR_CONF/forcesafesearch.conf"
 forward-zone:
 name: "."
 forward-addr: $DNS1
@@ -1158,7 +1167,7 @@ local-data: ". A $PRIVATE_IP"
 forward-zone:
 include: "$UNBOUNDWLCONF"
 
-
+include: "$DIR_CONF/forcesafesearch.conf"
 
 
 
