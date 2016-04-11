@@ -745,6 +745,15 @@ do
 done 
 cat < "$DREAB" | sed -e"s/^\.//g" | sed -e"s/^www.//g" 
 }  > "$E2GUXSITELIST"
+{
+echo 'localhost' 
+echo '127.0.0.1' 
+echo "$BL_SERVER" 
+for domain in $DOMAINEDEPOTS 
+do 
+	echo "$domain" 
+done 
+} > "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.depots.conf
 
 echo -n "."
 
@@ -756,8 +765,6 @@ $SED "/^#.*/d" "$FILE_tmp"
 $SED "/^$/d" "$FILE_tmp"
 $SED "s/\.\{2,10\}/\./g" "$FILE_tmp"
 $SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
-#$SED "s?.*?name: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
-#$SED  1"i\forward-zone:"  "$FILE_tmp" 
 mv "$FILE_tmp" "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.ossi.conf
 $UMFILEtmp
 rm -f "$FILE_tmp"
@@ -815,7 +822,7 @@ fi
 echo "local-zone: \"search.yahoo.com\" redirect "
 echo "local-data: \"search.yahoo.com A 127.0.0.10\""
 
-} > $DIR_CONF/forcesafesearch.conf
+} > "$DIR_CONF"/forcesafesearch.conf
 
 echo " suppréssion des \"duplicate local-zone\""
 $MFILEtmp
@@ -828,8 +835,8 @@ cp -f "$FILE_tmp"  "$UNBOUNDBLCONF"
 echo "WL"
 cat "$DIR_DNS_WHITELIST_ENABLED"/*.conf | sort -u > "$FILE_tmp"
 $SED  '/^$/d'  "$FILE_tmp"
-$SED "s?.*?forward-zone: \nname: \"&\" \nforward-addr: \"$DNS1\" \nforward-addr: \"$DNS2\"?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
-#$SED  1"i\forward-zone:"  "$FILE_tmp" 
+$SED "s/^\.\{1,10\}//g" "$FILE_tmp"  # supprime les ... en debut de lignes
+$SED "s?.*?local-zone: \"&\" transparent?g" "$FILE_tmp"   #Mise en forme unbound des listes blanches ossi
 cp -f "$FILE_tmp"  "$UNBOUNDWLCONF"
 $UMFILEtmp
 rm -f "$FILE_tmp"
@@ -1071,7 +1078,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 		  # on interdit l'accès a bing en https .
-		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
+		  ipbing=$(cat < $DIR_CONF/forcesafesearch.conf | grep "bing.com A" | sed -e "s/\"//g" |  cut -d " " -f4)
 		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 	  fi
 	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
@@ -1079,7 +1086,8 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
 	  done
 	  	  for user in $(listeusers) ; do
-		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )" )" -eq 0 ];then
+		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
+		     echo $user
 			 #on rediriges les requet DNS des usagers filtrés sur unbound
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1148,11 +1156,10 @@ server:
 # The following line will configure unbound to perform cryptographic
 # DNSSEC validation using the root trust anchor.
 auto-trust-anchor-file: "$UNBOUNDRKEY"
-
 verbosity: 1
 interface: 127.0.0.1
 access-control: 127.0.0.0/8 allow
-#access-control: 192.168.1.0/24 allow
+access-control: $reseau_box allow
 port: 54
 do-ip4: yes
 do-ip6: no
@@ -1162,14 +1169,9 @@ hide-identity: yes
 hide-version: yes
 
 local-zone: "." redirect
-local-data: ". A $PRIVATE_IP"
+local-data: ". IN A $PRIVATE_IP"
 
-forward-zone:
 include: "$UNBOUNDWLCONF"
-
-include: "$DIR_CONF/forcesafesearch.conf"
-
-
 
 EOF
 
