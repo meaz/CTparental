@@ -11,9 +11,7 @@ cd mageia
 CTparental.sh -i
 
 
-actuellement cela ne marche pas il semble que dnsmasq prend 90 % de la charge processeur a la moindre requet ???
-cessi sur mageia 4 et sur mageia 5 ??
-
+en test sur mageia cauldron
 
 
 

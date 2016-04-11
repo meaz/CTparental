@@ -170,7 +170,8 @@ NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 UNBOUNDCONF=${UNBOUNDCONF:="/etc/unbound/unbound.conf"}
-UNBOUNDRKEY=${UNBOUNDRKEY:="/var/lib/unbound/root.key"}
+DIRUNBOUNDKEY=${DIRUNBOUNDKEY:=/var/lib/unbound/}
+UNBOUNDRKEY=${UNBOUNDRKEY:=$DIRUNBOUNDKEY"root.key"}
 UNBOUNDBLCONF=${UNBOUNDBLCONF:="$DIR_CONF/unboundBL.conf"}
 UNBOUNDWLCONF=${UNBOUNDWLCONF:="$DIR_CONF/unboundWL.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
@@ -850,7 +851,8 @@ echo "<unboundon>"
 	
 if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
 $SED "s?^UNBOUND.*?UNBOUND=BLACK?g" $FILE_CONF
-
+mkdir -p "$DIRUNBOUNDKEY"
+unbound-anchor -a "$UNBOUNDRKEY"
 cat << EOF > $UNBOUNDCONF 
 # Configuration file for "unbound with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
