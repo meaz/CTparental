@@ -737,6 +737,15 @@ cat < "$DREAB" | sed -e"s/^\.//g" | sed -e"s/^www.//g"
 }  > "$E2GUXSITELIST"
 
 echo -n "."
+{
+echo "$BL_SERVER" 
+for domain in $DOMAINEDEPOTS 
+do 
+echo "$domain" | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" 
+done 
+
+}> "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.depots.conf
+
 cat < "$DREAB" | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" >  "$DIR_DNS_WHITELIST_ENABLED"/whiteliste.ossi.conf
 echo
 $UMFILEtmp
