@@ -1019,7 +1019,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
 	  done
 	  	  for user in $(listeusers) ; do
-		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )" )" -eq 0 ];then
+		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
 			 #on rediriges les requet DNS des usagers filtrés sur dnsmasq
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
