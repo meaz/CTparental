@@ -738,7 +738,7 @@ cat < "$DREAB" | sed -e"s/^\.//g" | sed -e"s/^www.//g"
 
 echo -n "."
 {
-echo "$BL_SERVER" 
+echo "$BL_SERVER" | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" 
 for domain in $DOMAINEDEPOTS 
 do 
 echo "$domain" | sed -e "s? ??g" | sed -e "s?.*?server=/&/#?g" 
