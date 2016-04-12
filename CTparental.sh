@@ -1046,7 +1046,7 @@ fi
 if [ "$IPTABLESsaveFILE" = "" ] ;then
    $IPTABLESsave
 else
-   $IPTABLESsave > $IPTABLESsaveFILE
+   $IPTABLESsave > "$IPTABLESsaveFILE"
 fi
    
 updatecauser
