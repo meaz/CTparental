@@ -324,31 +324,37 @@ case 'MAJ_H' :
 	break;
 	
 case 'change_user' :
-$tab=file($conf_ctoff_file);
+	$tab=file($conf_ctoff_file);
 	if ($tab)
 		{
 		$pointeur=fopen($conf_ctoff_file,"w+");
+		$numline=1;
 		foreach ($tab as $ligne)
 			{
-			$CONF_CTOFF1 = str_replace('#','',$ligne);
-			$actif = False ;	
-			foreach ($_POST as $key => $value)
-				{
-					if (strstr($key,'chk-'))
-					{
-						$CONF_CTOFF2 = str_replace('chk-','',$key);
-						if ( trim($CONF_CTOFF1) == trim($CONF_CTOFF2) )
-						{ 
-							$actif = True; 
-							break;
-						}
-					}
-				}
-
-			if (! $actif) {	$line="#$CONF_CTOFF1";}
-			else { $line="$CONF_CTOFF1";}
-			fwrite($pointeur,$line);
+			$line=$ligne ;
+			if (trim($ligne) != '') # the line isn't empty
+			{
+				$ext_lignes=explode(" ", $line);
 				
+				if ($_POST['chk-'.$numline] == "on" )
+				{
+					if(preg_match('/^#/',$ligne)) {
+						$line=substr($ligne,1);
+					}
+
+				}
+				else { 				
+						if(!preg_match('/^#/',$ligne)) {
+							$line="#".$ligne;			
+						}
+						if(preg_match('/^\+/',$ligne)) {
+						$line=$ligne;
+						}
+				}
+				//echo $line."<br>";
+				fwrite($pointeur,$line);
+		    }	
+		    $numline=$numline+1;			
 			}
 		fclose($pointeur);
 		}

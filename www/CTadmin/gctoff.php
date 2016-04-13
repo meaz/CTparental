@@ -22,20 +22,30 @@ if ($GCTOFF == "ON")
 	$tab=file($conf_ctoff_file);
 	if ($tab)  # the file isn't empty
 		{
+		$chknum=1;
 		foreach ($tab as $line)
 			{
 			if (trim($line) != '') # the line isn't empty
 				{
 				$user_lignes=explode(" ", $line);
-				$userx=trim($user_lignes[0],"#");
+				$userx=trim($user_lignes[0],"#+");
 				echo "<tr><td>$userx";
-				echo "<td><input type='checkbox' name='chk-$userx'";
+			
+				echo "<td><input ";
+				if (preg_match('/^\+/',$line, $r)) {
+				 echo " disabled='disabled' ";
+			    }
+				echo "type='checkbox' name='chk-$chknum'";
 				if (preg_match('/^#/',$line, $r)) {
 					echo ">";}
 				else {
 					echo "checked>";}
+				if (preg_match('/^\+/',$line, $r)) {
+				echo gettext('Is Administrator.');
+			    }
 				echo "</tr>";
 				}
+			$chknum=$chknum+1;
 			}
 		}
 	

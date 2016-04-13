@@ -1638,16 +1638,25 @@ updatelistgctoff () {
 	## on ajoute tous les utilisateurs manquants dans la liste
 	for PCUSER in $(listeusers)
 	do
-		if [ "$(cat < $FILE_GCTOFFCONF | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
+		if [ "$(cat < $FILE_GCTOFFCONF | sed -e "s/+//g" | sed -e "s/#//g" | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"	
-			if [ "$(groups "$PCUSER" | grep -c -E "( sudo )|( sudo$)")" -eq 1 ];then
-				#si l'utilisateur fait parti du group sudo on l'ajoute sans filtrage par default.
-				echo "$PCUSER" >> $FILE_GCTOFFCONF
+			if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 1 ];then
+				#si l'utilisateur fait parti d'un group d'administration de la machine on l'ajoute sans filtrage par default.
+				echo "+$PCUSER" >> $FILE_GCTOFFCONF
 			else
-				#si l'utilisateur ne fait pas parti du group sudo on l'ajoute avec filtrage  par default.
+				#si non avec filtrage  par default.
 				echo "#$PCUSER" >> $FILE_GCTOFFCONF
 			fi
 		fi
+		
+		if [ "$(groups "$PCUSER" | grep -c -E "( root$)|( root )|( sudo$)|( sudo )")" -eq 0 ];then
+			$SED "s/^+${PCUSER}$/#$PCUSER/g" "$FILE_GCTOFFCONF"	
+		else
+			$SED "s/^#${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"
+			$SED "s/^$${PCUSER}$/+$PCUSER/g" "$FILE_GCTOFFCONF"	
+		fi
+		
+		
 	done
 	## on supprime tout ceux qui n'existent plus sur le pc.
 	while read PCUSER
@@ -1655,8 +1664,9 @@ updatelistgctoff () {
 		PCUSER=${PCUSER//#/} 
 		if [ "$( listeusers | grep -c -E "^$PCUSER$")" -eq 0 ];then
 			result="1"
-			$SED "/^$PCUSER$/d" "$FILE_GCTOFFCONF"
-			$SED "/^#$PCUSER$/d" "$FILE_GCTOFFCONF"
+			$SED "/^$${PCUSER}$/d" "$FILE_GCTOFFCONF"
+			$SED "/^#${PCUSER}$/d" "$FILE_GCTOFFCONF"
+			$SED "/^+${PCUSER}$/d" "$FILE_GCTOFFCONF"
 		fi
 	done < $FILE_GCTOFFCONF
 	echo $result
