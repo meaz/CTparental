@@ -242,7 +242,8 @@ nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n'
 DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
 #echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
-
+DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
+DNS2=${DNS2:=208.67.222.222} #
 ipMaskValide() {
 ip=$(echo "$1" | cut -d"/" -f1)
 mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
