@@ -1,4 +1,11 @@
-ctparental (4.12-) unstable; urgency=medium
+ctparental (4.13) unstable; urgency=medium
+
+  * fix bug détection des paramètre réseaux dans le cas ou seulement 127.0.0.1 est présent dans /etc/resolv.conf
+    notament sous ubuntu , networkmanager jouant le role de mini serveur dnsmasq.
+	
+ -- Guillaume Marsat <guillaume.marsat@laposte.net>  Wed, 13 Apr 2016 20:06:15 +0200
+ 
+ctparental (4.12-1) unstable; urgency=medium
 
   * fix quelque petit bug .
 	
