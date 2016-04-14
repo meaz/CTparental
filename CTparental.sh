@@ -504,7 +504,7 @@ if [  -f "$XSESSIONFILE" ] ; then
 test=$(grep -c "^### CTparental ###" "$XSESSIONFILE" )
 		if [ "$test" -eq "0" ] ; then	 
 		 $SED  2"i\### CTparental ###" "$XSESSIONFILE"
-		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )\") -eq 0 ];then" "$XSESSIONFILE"
+		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )|( root\$)|( root )|( sudo\$)|( sudo )\") -eq 0 ];then" "$XSESSIONFILE"
 		 $SED  4"i\  export https_proxy=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
 		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
 		 $SED  6"i\  export http_proxy=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
@@ -519,7 +519,7 @@ for user in $(listeusers) ; do
 	test=$(grep -c "^### CTparental ###" "$HOMEPCUSER"/.profile )
 		if [ "$test" -eq "0" ] ; then	 
 		 $SED  2"i\### CTparental ###" "$HOMEPCUSER"/.profile
-		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )\") -eq 0 ];then" "$HOMEPCUSER"/.profile
+		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )|( root\$)|( root )|( sudo\$)|( sudo )\") -eq 0 ];then" "$HOMEPCUSER"/.profile
 		 $SED  4"i\  export https_proxy=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
 		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
 		 $SED  6"i\  export http_proxy=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
