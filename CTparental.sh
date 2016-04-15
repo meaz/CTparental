@@ -7,7 +7,7 @@
 # présente dans le code du projet alcasar en version 2.6.1 ; web page http://www.alcasar.net/
 
 # This script is distributed under the Gnu General Public License (GPL)
-DIR_CONF="/usr/local/etc/CTparental"
+DIR_CONF="/usr/etc/CTparental"
 #chargement des locales.
 set -a
 source gettext.sh
@@ -78,7 +78,7 @@ FILE_HCOMPT="$DIR_CONF/CThourscompteur"
 FILE_HCONF="$DIR_CONF/CThours.conf"
 if [ ! -f $FILE_CONF ] ; then
 mkdir -p $DIR_CONF
-mkdir -p /usr/local/share/CTparental/
+mkdir -p /usr/share/CTparental/
 cat << EOF > $FILE_CONF
 LASTUPDATE=0
 DNSMASQ=BLACK
@@ -166,7 +166,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
 DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confDansgouardian}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
@@ -1128,11 +1128,11 @@ mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
    cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
-cp -rf /usr/local/share/CTparental/www/locale "$DIRHTML"
-cp -rf /usr/local/share/CTparental/www/CTparental/* "$DIRHTML"
+cp -rf /usr/share/CTparental/www/locale "$DIRHTML"
+cp -rf /usr/share/CTparental/www/CTparental/* "$DIRHTML"
 fi
-cp -rf /usr/local/share/CTparental/www/locale "$DIRadminHTML"
-cp -rf /usr/local/share/CTparental/www/CTadmin/* "$DIRadminHTML"
+cp -rf /usr/share/CTparental/www/locale "$DIRadminHTML"
+cp -rf /usr/share/CTparental/www/CTadmin/* "$DIRadminHTML"
 
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
 GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
@@ -1337,9 +1337,9 @@ else
 fi
 
 if [ "$(grep -c "$USERHTTPD"" ALL=" /etc/sudoers )" -ge "1" ] ; then
-    $SED "s?^$USERHTTPD.*?$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -dgreload,/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff?g" /etc/sudoers
+    $SED "s?^$USERHTTPD.*?$USERHTTPD ALL=(ALL) NOPASSWD:/usr/bin/CTparental.sh -dgreload,/usr/bin/CTparental.sh -gctalist,/usr/bin/CTparental.sh -gctulist,/usr/bin/CTparental.sh -gcton,/usr/bin/CTparental.sh -gctoff,/usr/bin/CTparental.sh -tlu,/usr/bin/CTparental.sh -trf,/usr/bin/CTparental.sh -dble,/usr/bin/CTparental.sh -ubl,/usr/bin/CTparental.sh -dl,/usr/bin/CTparental.sh -on,/usr/bin/CTparental.sh -off,/usr/bin/CTparental.sh -aupon,/usr/bin/CTparental.sh -aupoff?g" /etc/sudoers
 else
-    echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/local/bin/CTparental.sh -dgreload,/usr/local/bin/CTparental.sh -gctalist,/usr/local/bin/CTparental.sh -gctulist,/usr/local/bin/CTparental.sh -gcton,/usr/local/bin/CTparental.sh -gctoff,/usr/local/bin/CTparental.sh -tlu,/usr/local/bin/CTparental.sh -trf,/usr/local/bin/CTparental.sh -dble,/usr/local/bin/CTparental.sh -ubl,/usr/local/bin/CTparental.sh -dl,/usr/local/bin/CTparental.sh -on,/usr/local/bin/CTparental.sh -off,/usr/local/bin/CTparental.sh -aupon,/usr/local/bin/CTparental.sh -aupoff" >> /etc/sudoers
+    echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/bin/CTparental.sh -dgreload,/usr/bin/CTparental.sh -gctalist,/usr/bin/CTparental.sh -gctulist,/usr/bin/CTparental.sh -gcton,/usr/bin/CTparental.sh -gctoff,/usr/bin/CTparental.sh -tlu,/usr/bin/CTparental.sh -trf,/usr/bin/CTparental.sh -dble,/usr/bin/CTparental.sh -ubl,/usr/bin/CTparental.sh -dl,/usr/bin/CTparental.sh -on,/usr/bin/CTparental.sh -off,/usr/bin/CTparental.sh -aupon,/usr/bin/CTparental.sh -aupoff" >> /etc/sudoers
 fi
 	
 unset sudotest
@@ -1448,9 +1448,9 @@ echo "</CActparental>"
 install () {
 	FILTRAGEISOFF=1
 	if [ $nomanuel -eq 0 ]; then  
-		cp -rf www /usr/local/share/CTparental
-		cp -rf confDansgouardian /usr/local/share/CTparental
-		cp -rf locale /usr/local/etc/CTparental
+		cp -rf www /usr/share/CTparental
+		cp -rf confDansgouardian /usr/share/CTparental
+		cp -rf locale /usr/etc/CTparental
 	fi
 	iptablesreload
 	groupadd ctoff
@@ -1473,16 +1473,16 @@ install () {
 		fi
 	
 		if [ -f gpl-3.0.fr.txt ] ; then
-			cp -f gpl-3.0.fr.txt /usr/local/share/CTparental/
+			cp -f gpl-3.0.fr.txt /usr/share/CTparental/
 		fi
 		if [ -f gpl-3.0.txt ] ; then
-			cp -f gpl-3.0.txt /usr/local/share/CTparental/
+			cp -f gpl-3.0.txt /usr/share/CTparental/
 		fi
 		if [ -f CHANGELOG ] ; then
-			cp -f CHANGELOG /usr/local/share/CTparental/
+			cp -f CHANGELOG /usr/share/CTparental/
 		fi
 		if [ -f dist.conf ];then
-			cp -f dist.conf /usr/local/share/CTparental/dist.conf.orig
+			cp -f dist.conf /usr/share/CTparental/dist.conf.orig
 			cp -f dist.conf $DIR_CONF/
 		fi
 		while (true); do
@@ -1590,7 +1590,7 @@ install () {
       $ENNWMANAGER
       $ENIPTABLESSAVE
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
-	  echo "*/1 * * * * root /usr/local/bin/CTparental.sh -nomade" >> /etc/cron.d/CTparentalnomade
+	  echo "*/1 * * * * root /usr/bin/CTparental.sh -nomade" >> /etc/cron.d/CTparentalnomade
 	  { echo I_WAN="$interface_WAN"
 		  echo IP_BOX="$ipbox"
 		  echo IP_IWAN="$ipinterface_WAN"
@@ -1696,7 +1696,7 @@ echo "<activegourpectoff>"
    chown root:"$GROUPHTTPD" "$FILE_GCTOFFCONF"
    chmod 660 "$FILE_GCTOFFCONF"
    echo "PATH=$PATH"  > /etc/cron.d/CTparentalupdateuser
-   echo "*/1 * * * * root /usr/local/bin/CTparental.sh -ucto" >> /etc/cron.d/CTparentalupdateuser
+   echo "*/1 * * * * root /usr/bin/CTparental.sh -ucto" >> /etc/cron.d/CTparentalupdateuser
    $CRONrestart
 echo "</activegourpectoff>"
 }
@@ -1732,7 +1732,7 @@ uninstall () {
 	   # en install par le deb on n'efface pas les fichiers installer par celuis si
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRHTML"
-       rm -rf /usr/local/share/CTparental
+       rm -rf /usr/share/CTparental
        cd "$DIR_CONF"
        for file in *
        do
@@ -1745,7 +1745,7 @@ uninstall () {
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRadminHTML"
        rm -rf "$DIRHTML"
-       rm -rf /usr/local/share/CTparental
+       rm -rf /usr/share/CTparental
        rm -rf "$DIR_CONF"
    fi
    
@@ -2159,7 +2159,7 @@ requiredpamtime
    done
    echo >> $FILE_HCONF
 { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }   > /etc/cron.d/CTparentalmaxtimelogin
-echo "*/1 * * * * root /usr/local/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
+echo "*/1 * * * * root /usr/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }
@@ -2277,7 +2277,7 @@ readTimeFILECONF () {
 	fi
    done
 { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalmaxtimelogin  
-echo "*/1 * * * * root /usr/local/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
+echo "*/1 * * * * root /usr/bin/CTparental.sh -uctl" >> /etc/cron.d/CTparentalmaxtimelogin
 $SED "s?^HOURSCONNECT.*?HOURSCONNECT=ON?g" $FILE_CONF
 $CRONrestart
 }

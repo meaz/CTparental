@@ -1,6 +1,6 @@
-CTparental.sh									usr/local/bin
-CTparental-bl-infos.sh 							usr/local/bin
-debian/dist.conf								usr/local/etc/CTparental
-locale											usr/local/etc/CTparental
-www												usr/local/share/CTparental
-confDansgouardian								usr/local/share/CTparental
+CTparental.sh									usr/bin
+CTparental-bl-infos.sh 							usr/bin
+debian/dist.conf								usr/etc/CTparental
+locale											usr/etc/CTparental
+www												usr/share/CTparental
+confDansgouardian								usr/share/CTparental
