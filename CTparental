@@ -166,7 +166,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
 DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/CTparental/confDansgouardian}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
