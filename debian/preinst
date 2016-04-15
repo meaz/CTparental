@@ -1,12 +1,10 @@
 #!/bin/bash
-#DEBHELPER#
+
 set -e
-# Source debconf library.
-. /usr/share/debconf/confmodule
 
 
 
-
+#DEBHELPER#
 exit 0
 
 

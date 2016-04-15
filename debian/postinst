@@ -12,7 +12,7 @@ test="$?"
 if [ ! "$test" -eq 0 ];then
 	db_input critical ctparental/erreurinternet
 	db_go
-	exit 1
+
 else
 
 	# Fetching configuration from debconf
