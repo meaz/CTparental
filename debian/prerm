@@ -1,5 +1,7 @@
 #!/bin/bash
-#DEBHELPER#
+
 set -e
 CTparental -u -nodep -nomanuel 
 exit 0
+
+#DEBHELPER#

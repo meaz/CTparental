@@ -1,5 +1,5 @@
 #!/bin/bash
-#DEBHELPER#
+
 set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
@@ -9,7 +9,11 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		ping -c3 www.google.fr > /dev/null
 		test="$?"
 		if [ "$test" -eq 0 ];then
-			export debconfloginhttp="admin"
+			RET=""
+			db_get ctparental/httplogin
+			export debconfloginhttp=$RET
+			RET=""
+			db_get ctparental/httppassword
 			export debconfpassword="admin"
 			
 			CTparental -i -nodep -nomanuel  
@@ -20,3 +24,5 @@ else
     echo "postinst called with unknown argument '$1'" 1>&2
     exit 1
 fi
+
+#DEBHELPER#
