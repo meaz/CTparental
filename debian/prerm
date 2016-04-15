@@ -2,5 +2,5 @@
 #DEBHELPER#
 set -e
 chmod 755 /usr/local/bin/CTparental.sh
-/usr/bin/CTparental.sh -u -nodep -nomanuel 
+/usr/bin/CTparental -u -nodep -nomanuel 
 exit 0
