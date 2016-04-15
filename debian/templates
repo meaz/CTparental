@@ -7,11 +7,13 @@ _Description: Enter login to the administration interface
 
 Template: ctparental/httppassword
 Type: password
-_Description: Enter your password and press OK to continue.
+_Description: Enter your password:
+ and press OK to continue.
 
 Template: ctparental/httppassword2
 Type: password
-_Description: Confirm your password and press OK to continue.
+_Description: Confirm your password:
+ and press OK to continue.
 
 Template: ctparental/httppassword_non_ident
 Type: error
