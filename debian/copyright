@@ -4,7 +4,7 @@ Upstream-Contact: Guillaume Marsat <guillaume.marsat@laposte.net>
 Upstream-Source:
  https://github.com/marsat/CTparental.git
 
-Files: *
+Files: \*
 Copyright: © 2013-2014 Guillaume Marsat <guillaume.marsat@laposte.net>
 
 Files: CTparental.sh
