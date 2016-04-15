@@ -9,13 +9,8 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		ping -c3 www.google.fr > /dev/null
 		test="$?"
 		if [ "$test" -eq 0 ];then
-			RET=""
-			db_get ctparental/httplogin 
-			export debconfloginhttp="$RET"
-			RET=""
-			db_get ctparental/httppassword 
-			export debconfpassword="$RET"
-			
+			export debconfloginhttp="admin"
+			export debconfpassword="admin"
 			
 			CTparental -i -nodep -nomanuel  
 		fi
