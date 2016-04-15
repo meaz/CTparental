@@ -24,7 +24,7 @@ else
 	export debconfpassword="$RET"
 	RET=""
 	db_purge
-    /usr/bin/CTparental -i -nodep -nomanuel  
+    CTparental -i -nodep -nomanuel  
 
 fi
 exit 0
