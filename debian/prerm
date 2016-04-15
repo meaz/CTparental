@@ -1,6 +1,5 @@
 #!/bin/bash
 #DEBHELPER#
 set -e
-chmod 755 /usr/local/bin/CTparental.sh
 CTparental -u -nodep -nomanuel 
 exit 0
