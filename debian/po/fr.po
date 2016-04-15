@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the ctparental package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ctparental\n"
+"Report-Msgid-Bugs-To: ctparental@packages.debian.org\n"
+"POT-Creation-Date: 2016-04-15 18:23+0200\n"
+"PO-Revision-Date: 2016-04-15 18:25+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Type: string
+#. Description
+#: ../templates:1001
+msgid "Enter login to the administration interface"
+msgstr "Entrer l'identifiant  pour l'interface d'administration "
+
+#. Type: string
+#. Description
+#: ../templates:1001
+msgid "- Only letters or numbers. - 5 characters minimum:"
+msgstr "- que des lettres ou des chiffres. - 5 caractères minimum :"
+
+#. Type: password
+#. Description
+#: ../templates:2001
+msgid "Enter your password and press OK to continue."
+msgstr "Entrez votre mot de passe et validez par Ok pour continuer."
+
+#. Type: password
+#. Description
+#: ../templates:3001
+msgid "Confirm your password and press OK to continue."
+msgstr "Confirmez votre mot de passe et validez par Ok pour continuer."
+
+#. Type: error
+#. Description
+#: ../templates:4001
+msgid "The password entered is not identical to the first."
+msgstr "Le mot de passe rentré n'est pas identique au premier."
+
+#. Type: error
+#. Description
+#: ../templates:5001
+msgid "Password is not complex enough, it must contain at least:"
+msgstr "Mot de passe n'est pas assez complexe, il doit contenir au moins:"
+
+#. Type: error
+#. Description
+#: ../templates:5001
+msgid ""
+"- 8 characters total, 1 Uppercase, lowercase 1, number 1 - and one special "
+"character."
+msgstr ""
+"- 8 caractères au total,1 Majuscule,1 minuscule,1 nombre - et 1 caractère "
+"spécial parmi les suivants"
+
+#. Type: error
+#. Description
+#: ../templates:6001
+msgid "Internet connection required!"
+msgstr "Connection internet requise!"
