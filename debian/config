@@ -16,9 +16,6 @@ do
 		db_get ctparental/httplogin
 		if [ "$(echo $RET | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
 				break
-		else
-			db_input critical ctparental/httplogin_erreur
-			db_go
 		fi	
 done
 	

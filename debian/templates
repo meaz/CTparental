@@ -1,48 +1,29 @@
 
 Template: ctparental/httplogin
 Type: string
-Description: Entrer le login pour l'interface d'administration 
- -que des lettres et/ou des chifres .
- -5 carratères minimum .
-
-Template: ctparental/httplogin_erreur
-Type: error
-Description: Erreur de saisie du login
- Le login est mal formé.
- Veuillez recommencer.
+_Description: Enter login to the administration interface
+ - Only letters or numbers.
+ - 5 characters minimum:
 
 Template: ctparental/httppassword
 Type: password
-Description: Entrer votre mot de passe pour pour l'interface d'administration
- il doit comptenir au moins:
- - 8 carataire aux total
- - 1 majuscule
- - 1 minuscule
- - 1 nombre
- - 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£%
+_Description: Enter your password and press OK to continue.
 
 Template: ctparental/httppassword2
 Type: password
-Description: Confirmation du mot de passe pour pour l'interface d'administration
+_Description: Confirm your password and press OK to continue.
 
 Template: ctparental/httppassword_non_ident
 Type: error
-Description: Erreur de saisie du mot de passe
- Le mot de passe et sa confirmation ne sont pas identiques. Veuillez recommencer.
+_Description: The password entered is not identical to the first.
 
 Template: ctparental/httppassword_trop_simple
 Type: error
-Description: Erreur de saisie du mot de passe
- Le mot de passe et sa confirmation sont trops simple,
- ils doivent comptenir au moins:
- - 8 carataire aux total
- - 1 Majuscule
- - 1 minuscule
- - 1 nombre
- - 1 caractaire spéciale parmis les suivants &éè~#{}()ç_@à?.;:/!,$<>=£%
- . Veuillez recommencer.
+_Description: Password is not complex enough, it must contain at least:
+ - 8 characters total, 1 Uppercase, lowercase 1, number 1
+ - and one special character.
 
 Template: ctparental/erreurinternet
 Type: error
-Description: Connection internet requise!
+_Description: Internet connection required!
 
