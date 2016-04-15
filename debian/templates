@@ -1,7 +1,7 @@
 
 Template: ctparental/httplogin
 Type: string
-_Description: Enter login to the administration interface
+_Description: Enter login to the administration interface:
  - Only letters or numbers.
  - 5 characters minimum:
 
