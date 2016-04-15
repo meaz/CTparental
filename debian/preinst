@@ -1,5 +1,6 @@
 #!/bin/bash
 # Source debconf library.
+#DEBHELPER#
 . /usr/share/debconf/confmodule
 
 # Show interface
