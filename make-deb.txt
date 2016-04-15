@@ -4,6 +4,13 @@ su
 apt-get install git git-buildpackage debhelper gnupg
 exit
 gpg --gen-key
+gpg --list-keys
+/home/hulk/.gnupg/pubring.gpg
+-----------------------------
+pub   ZZZZZ/XXXXXXXX 2016-04-15
+uid                  marsat <CTparental@laposte.net>
+sub   ZZZZZ/YYYYYYYY 2016-04-15
+git config --global user.signingkey XXXXXXXX
 
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
