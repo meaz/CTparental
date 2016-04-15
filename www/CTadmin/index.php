@@ -115,7 +115,7 @@ case 'change_file1' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental.sh -dgreload");
+	exec ("sudo -u root /usr/bin/CTparental -dgreload");
 	break;
 case 'change_safesearch' :
 	$tab=file($dg_file_edit);
@@ -148,13 +148,13 @@ case 'change_safesearch' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental.sh -ubl");
+	exec ("sudo -u root /usr/bin/CTparental -ubl");
 	break;
 case 'gct_Off' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -gctoff");
+	exec ("sudo -u root /usr/bin/CTparental -gctoff");
 	break;
 case 'gct_On' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -gcton");
+	exec ("sudo -u root /usr/bin/CTparental -gcton");
 	break;
 case 'LogOFF' :
 	header('HTTP/1.0 401 Unauthorized');
@@ -162,28 +162,28 @@ case 'LogOFF' :
 	exit;
 	break;
 case 'BL_On' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -on");
+	exec ("sudo -u root /usr/bin/CTparental -on");
 	break;
 case 'BL_Off' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -off");
+	exec ("sudo -u root /usr/bin/CTparental -off");
 	break;
 case 'H_On' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -trf");
+	exec ("sudo -u root /usr/bin/CTparental -trf");
 	break;
 case 'H_Off' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -tlu");
+	exec ("sudo -u root /usr/bin/CTparental -tlu");
 	break;
 case 'AUP_On' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -aupon");
+	exec ("sudo -u root /usr/bin/CTparental -aupon");
 	break;
 case 'AUP_Off' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -aupoff");
+	exec ("sudo -u root /usr/bin/CTparental -aupoff");
 	break;
 case 'INIT_BL' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -dble");
+	exec ("sudo -u root /usr/bin/CTparental -dble");
 	break;
 case 'Download_bl' :
-	exec ("sudo -u root /usr/bin/CTparental.sh -dl");
+	exec ("sudo -u root /usr/bin/CTparental -dl");
 	break;
 case 'MAJ_cat' :
 	$tab=file($bl_categories_enabled);	
@@ -209,7 +209,7 @@ case 'MAJ_cat' :
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_wl_domains']);
-	exec ("sudo -u root /usr/bin/CTparental.sh -ubl");
+	exec ("sudo -u root /usr/bin/CTparental -ubl");
 	break;
 case 'MAJ_H' :
 	$formatheuresok=1;
@@ -320,7 +320,7 @@ case 'MAJ_H' :
 	}
 	
 	fclose($pointeur);
-	exec ("sudo -u root /usr/bin/CTparental.sh -trf");
+	exec ("sudo -u root /usr/bin/CTparental -trf");
 	break;
 	
 case 'change_user' :
@@ -358,7 +358,7 @@ case 'change_user' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental.sh -gctalist");
+	exec ("sudo -u root /usr/bin/CTparental -gctalist");
 	break;
 }
 

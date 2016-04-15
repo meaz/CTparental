@@ -62,7 +62,7 @@ textdomain($domain);
 	<b>
 	<?php
 
-exec ("/usr/local/bin/CTparental-bl-infos.sh ".$_SERVER["HTTP_HOST"],$blinfosliste);
+exec ("/usr/bin/CTparental-bl-infos ".$_SERVER["HTTP_HOST"],$blinfosliste);
 $var1=$blinfosliste[0];
 $tab1=explode(" ",$var1);
 foreach ($tab1 as $categorie )
