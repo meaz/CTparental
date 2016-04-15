@@ -1,5 +1,5 @@
-CTparental.sh									usr/bin
-CTparental-bl-infos.sh 							usr/bin
+CTparental									usr/bin
+CTparental-bl-infos							usr/bin
 debian/dist.conf								usr/etc/CTparental
 locale											usr/etc/CTparental
 www												usr/share/CTparental
