@@ -69,7 +69,7 @@ msgstr ""
 msgid "- Only letters or numbers."
 msgstr ""
 
-msgid "- 6 characters minimum:"
+msgid "- 5 characters minimum:"
 msgstr ""
 
 msgid "Password"

@@ -83,8 +83,8 @@ msgstr "Entrer l'identifiant  pour l'interface d'administration "
 msgid "- Only letters or numbers."
 msgstr "- que des lettres ou des chiffres."
 
-msgid "- 6 characters minimum:"
-msgstr "- 6 caractères minimum :"
+msgid "- 5 characters minimum:"
+msgstr "- 5 caractères minimum :"
 
 msgid "Password"
 msgstr "Mot de passe"

@@ -9,10 +9,10 @@ db_go || true
 # Fetching configuration from debconf
 RET=""
 db_get ctparental/httplogin 
-export debconfloginhttp=$RET
+export debconfloginhttp="$RET"
 RET="" 
 db_get ctparental/httppassword
-export debconfpassword=$RET
+export debconfpassword="$RET"
 RET=""
 db_purge
 

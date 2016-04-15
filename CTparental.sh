@@ -1374,13 +1374,13 @@ fi
 echo "</FoncHTTPDCONF>"
 }
 configloginpassword () {
-PTNlogin='^[a-zA-Z0-9]*$'
+
 while (true)
 do
 loginhttp=$(whiptail --title "$(gettext 'Login')" --nocancel --inputbox "$(gettext 'Enter login to the administration interface') 
 $(gettext '	- Only letters or numbers.')
-$(gettext '	- 6 characters minimum:')" 10 60 3>&1 1>&2 2>&3)			
-	if [ "$(expr "$loginhttp" : "$PTNlogin")" -gt 6  ];then 
+$(gettext '	- 5 characters minimum:')" 10 60 3>&1 1>&2 2>&3)	
+	if [ "$(echo "$loginhttp" | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
 		break
 	fi	
 done
@@ -1389,8 +1389,7 @@ do
 password=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Enter your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
 		password2=$(whiptail --title "$(gettext 'Password')" --nocancel --passwordbox "$(gettext 'Confirm your password and press OK to continue.')" 10 60 3>&1 1>&2 2>&3)
 		if [ "$password" = "$password2" ] ; then
-			test="$(echo "$password" | grep -E "[a-z]" | grep -E "[0-9]" | grep -E "[A-Z]" | grep '[&éè~#{}()ç_@à?.;:/!,$<>=£%]')"
-			if [ "${#test}" -ge 8 ] ; then
+			if [ "$(echo "$password" | grep -E "^([a-z0-9A-Z]|[&éè~#{}()ç_@à?.;:/\!,\$<>=£\%\])*$" | wc -m )" -ge 9 ] ; then
 				break
 			else
 				whiptail --title "$(gettext "Password")" --msgbox "$(gettext "Password is not complex enough, it must contain at least:")

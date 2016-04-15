@@ -14,7 +14,7 @@ do
 		db_input critical ctparental/httplogin || true
 		db_go
 		db_get ctparental/httplogin
-		if [ $(echo $RET | grep -E "^([a-z]|[A-Z]|[0-9])*$" | wc -m) -ge 7  ];then 
+		if [ "$(echo $RET | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
 				break
 		else
 			db_input critical ctparental/httplogin_erreur
@@ -36,7 +36,7 @@ do
 		p2=$RET
 		RET=""
 			if [ $p1 = $p2 ] ; then
-				if [ $(echo $p1 | grep -E [a-z] | grep -E [0-9] | grep -E [A-Z] | grep -E '[&éè~#{}()ç_@à?.;:/!,$<>=£%]' | wc -c ) -ge 8 ] ; then
+				if [ "$(echo "$p1" | grep -E "^([a-z0-9A-Z]|[&éè~#{}()ç_@à?.;:/\!,\$<>=£\%\])*$" | wc -m )" -ge 9 ] ; then
 					p1=""
 					p2=""
 					db_go

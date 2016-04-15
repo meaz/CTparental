@@ -3,7 +3,7 @@ Template: ctparental/httplogin
 Type: string
 Description: Entrer le login pour l'interface d'administration 
  -que des lettres et/ou des chifres .
- -6 carratères minimum .
+ -5 carratères minimum .
 
 Template: ctparental/httplogin_erreur
 Type: error
