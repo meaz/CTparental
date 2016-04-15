@@ -4,7 +4,7 @@ ctparental (4.15-0) unstable; urgency=medium
   a l'ouverture du serveur X seulement, devrais résoudre les problêmes , de perte de connection sur l'interface
   127.0.0.1\CTadmin avec les navigateur utilisent le proxy system ou la detection automatique de proxy.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 14 Apr 2016 17:48:00 +0200
+ -- marsat <CTparental@laposte.net>  Thu, 14 Apr 2016 17:48:00 +0200
  
  
 ctparental (4.14-0) unstable; urgency=medium
