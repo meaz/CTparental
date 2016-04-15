@@ -4,62 +4,15 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
-# Show interface
-db_go || true
 
 ping -c3 www.google.fr > /dev/null
 test="$?"
-if [ ! "$test" -eq 0 ];then
-	db_input critical ctparental/erreurinternet || true
-	db_go || true
-	db_purge || true
-else
-	while (true)
-	do
-			RET=""
-			db_input critical ctparental/httplogin || true
-			db_go || true
-			db_get ctparental/httplogin || true
-			login="$RET"
-			if [ "$(echo $login | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
-					break
-			fi	
-	done
-		
-	while (true)
-	do
-		RET=""
-		db_input critical ctparental/httppassword || true
-	    db_go || true
-		db_input critical ctparental/httppassword2 || true
-	    db_go || true
-		db_get ctparental/httppassword || true
-		p1=$RET
-		RET=""
-		db_get ctparental/httppassword2 || true
-		p2=$RET
-		RET=""
-			if [ $p1 = $p2 ] ; then
-				if [ "$(echo "$p1" | grep -E "^([a-z0-9A-Z]|[&éè~#{}()ç_@à?.;:/\!,\$<>=£\%\])*$" | wc -m )" -ge 9 ] ; then
-					db_purge || true
-					break
-				else
-					db_input critical ctparental/httppassword_trop_simple || true
-					p1=""
-					p2=""
-				fi
-			else
-				db_input critical ctparental/httppassword_non_ident || true
-				p1=""
-				p2=""
-			fi
-
-	done
-
-	# Fetching configuration from debconf
+if [ "$test" -eq 0 ];then
+	db_get ctparental/httppassword || true
+	export debconfloginhttp="$RET"
 	
-	export debconfloginhttp="$login"
-	export debconfpassword="$p1"
+	db_get ctparental/httplogin || true
+	export debconfpassword="$RET"
 
     CTparental -i -nodep -nomanuel  
 fi
