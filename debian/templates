@@ -26,4 +26,3 @@ _Description: Password is not complex enough, it must contain at least:
 Template: ctparental/erreurinternet
 Type: error
 _Description: Internet connection required!
-
