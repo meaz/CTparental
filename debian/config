@@ -15,7 +15,7 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 while (true)
 	do
 			RET=""
-			db_input critical ctparental/httplogin || true
+			db_input critical ctparental/httplogin 
 			db_go || true
 			db_get ctparental/httplogin || true
 			if [ "$(echo $RET | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
@@ -26,9 +26,9 @@ while (true)
 	while (true)
 	do
 		RET=""
-		db_input high ctparental/httppassword || true
+		db_input high ctparental/httppassword 
 	    db_go
-		db_input high ctparental/httppassword2 || true
+		db_input high ctparental/httppassword2 
 	    db_go
 		db_get ctparental/httppassword 
 		p1=$RET
@@ -37,10 +37,10 @@ while (true)
 		
 			if [ $p1 = $p2 ] ; then
 				if [ "$(echo "$p1" | grep -E "^([a-z0-9A-Z]|[&éè~#{}()ç_@à?.;:/\!,\$<>=£\%\])*$" | wc -m )" -ge 9 ] ; then
-
+					RET=""
 					break
 				else
-					db_input critical ctparental/httppassword_trop_simple || true
+					db_input critical ctparental/httppassword_trop_simple 
 					db_go
 					db_set ctparental/httppassword "" 
 					db_set ctparental/httppassword2 ""
@@ -48,11 +48,11 @@ while (true)
 					unset p2
 				fi
 			else
-				db_input critical ctparental/httppassword_non_ident || true
+				db_input critical ctparental/httppassword_non_ident 
+				db_go
 				db_set ctparental/httppassword "" 
 				db_set ctparental/httppassword2 ""
-				db_go
-
+				
 				unset p1
 				unset p2
 			fi
