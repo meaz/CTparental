@@ -7,7 +7,6 @@ set -e
 #DEBCONF_DEBUG="developer"
 # on ne demande le login/mot de pass que durant l'installation ou une reconfiguration de ctparental
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
-
 while (true)
 do
 		RET=""
@@ -18,6 +17,7 @@ do
 				break
 		else
 			db_input critical ctparental/httplogin_erreur
+			db_purge
 			db_go
 		fi	
 done
@@ -43,11 +43,13 @@ do
 					break
 				else
 					db_input critical ctparental/httppassword_trop_simple
+					db_purge
 					p1=""
 					p2=""
 				fi
 			else
 				db_input critical ctparental/httppassword_non_ident
+				db_purge
 				p1=""
 				p2=""
 			fi

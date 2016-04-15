@@ -14,7 +14,7 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 			export debconfloginhttp=$RET
 			RET=""
 			db_get ctparental/httppassword
-			export debconfpassword="admin"
+			export debconfpassword=$RET
 			
 			CTparental -i -nodep -nomanuel  
 		fi
