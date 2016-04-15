@@ -10,19 +10,18 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		test="$?"
 		if [ "$test" -eq 0 ];then
 
-			db_get ctparental/httppassword || true
+			db_get ctparental/httppassword 
 			export debconfloginhttp="$RET"
 			
-			db_get ctparental/httplogin || true
+			db_get ctparental/httplogin 
 			export debconfpassword="$RET"
+			
 			db_stop
 			CTparental -i -nodep -nomanuel  
 		fi
 	
 else
 	  db_stop
-	  echo "postinst called with unknown argument \`$1'" >&2
-	  exit 1
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 1
 fi
-
-exit 0

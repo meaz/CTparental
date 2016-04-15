@@ -25,14 +25,14 @@ while (true)
 		
 	while (true)
 	do
-		unset RET
-		db_input critical ctparental/httppassword || true
-	    db_go || true
-		db_input critical ctparental/httppassword2 || true
-	    db_go || true
-		db_get ctparental/httppassword || true
+		RET=""
+		db_input high ctparental/httppassword || true
+	    db_go
+		db_input high ctparental/httppassword2 || true
+	    db_go
+		db_get ctparental/httppassword 
 		p1=$RET
-		db_get ctparental/httppassword2 || true
+		db_get ctparental/httppassword2 
 		p2=$RET
 		
 			if [ $p1 = $p2 ] ; then
@@ -41,11 +41,18 @@ while (true)
 					break
 				else
 					db_input critical ctparental/httppassword_trop_simple || true
+					db_go
+					db_set ctparental/httppassword "" 
+					db_set ctparental/httppassword2 ""
 					unset p1
 					unset p2
 				fi
 			else
 				db_input critical ctparental/httppassword_non_ident || true
+				db_set ctparental/httppassword "" 
+				db_set ctparental/httppassword2 ""
+				db_go
+
 				unset p1
 				unset p2
 			fi
