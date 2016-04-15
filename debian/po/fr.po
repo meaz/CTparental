@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ctparental\n"
 "Report-Msgid-Bugs-To: ctparental@packages.debian.org\n"
-"POT-Creation-Date: 2016-04-15 18:23+0200\n"
-"PO-Revision-Date: 2016-04-15 18:25+0200\n"
+"POT-Creation-Date: 2016-04-15 20:22+0200\n"
+"PO-Revision-Date: 2016-04-15 20:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -21,8 +21,8 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../templates:1001
-msgid "Enter login to the administration interface"
-msgstr "Entrer l'identifiant  pour l'interface d'administration "
+msgid "Enter login to the administration interface:"
+msgstr "Entrer l'identifiant  pour l'interface d'administration :"
 
 #. Type: string
 #. Description
@@ -33,14 +33,22 @@ msgstr "- que des lettres ou des chiffres. - 5 caractères minimum :"
 #. Type: password
 #. Description
 #: ../templates:2001
-msgid "Enter your password and press OK to continue."
-msgstr "Entrez votre mot de passe et validez par Ok pour continuer."
+msgid "Enter your password:"
+msgstr "Entrer votre mot de passe :"
+
+#. Type: password
+#. Description
+#. Type: password
+#. Description
+#: ../templates:2001 ../templates:3001
+msgid "and press OK to continue."
+msgstr "validez par Ok pour continuer."
 
 #. Type: password
 #. Description
 #: ../templates:3001
-msgid "Confirm your password and press OK to continue."
-msgstr "Confirmez votre mot de passe et validez par Ok pour continuer."
+msgid "Confirm your password:"
+msgstr "Confirmez votre mot de passe:"
 
 #. Type: error
 #. Description

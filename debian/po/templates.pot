@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ctparental\n"
 "Report-Msgid-Bugs-To: ctparental@packages.debian.org\n"
-"POT-Creation-Date: 2016-04-15 18:23+0200\n"
+"POT-Creation-Date: 2016-04-15 20:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../templates:1001
-msgid "Enter login to the administration interface"
+msgid "Enter login to the administration interface:"
 msgstr ""
 
 #. Type: string
@@ -32,13 +32,21 @@ msgstr ""
 #. Type: password
 #. Description
 #: ../templates:2001
-msgid "Enter your password and press OK to continue."
+msgid "Enter your password:"
+msgstr ""
+
+#. Type: password
+#. Description
+#. Type: password
+#. Description
+#: ../templates:2001 ../templates:3001
+msgid "and press OK to continue."
 msgstr ""
 
 #. Type: password
 #. Description
 #: ../templates:3001
-msgid "Confirm your password and press OK to continue."
+msgid "Confirm your password:"
 msgstr ""
 
 #. Type: error
