@@ -1,28 +1,47 @@
+pour debian/ubuntu 
 
-On debian
-su
-apt-get install git git-buildpackage debhelper gnupg
-exit
-gpg --gen-key
-gpg --list-keys
-/home/hulk/.gnupg/pubring.gpg
------------------------------
-pub   ZZZZZ/XXXXXXXX 2016-04-15
-uid                  marsat <CTparental@laposte.net>
-sub   ZZZZZ/YYYYYYYY 2016-04-15
-git config --global user.signingkey XXXXXXXX
-
-git clone https://github.com/marsat/CTparental.git
-cd CTparental/
-gbp buildpackage
-
-
-On ubuntu.
 sudo apt-get install git git-buildpackage debhelper gnupg
 gpg --gen-key
+gpg --list-keys
+	/home/loginuser/.gnupg/pubring.gpg
+	-----------------------------
+	pub   ZZZZZ/XXXXXXXX 2016-04-15
+	uid                  marsat <CTparental@laposte.net>
+	sub   ZZZZZ/YYYYYYYY 2016-04-15
+
+git config --global user.signingkey XXXXXXXX
+git config --global user.name "marsat"
+git config --global user.email CTparental@laposte.net
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
-cp ubuntu/dist.conf debian/dist.conf debhelper
-git commit -a 
-# décomenter le fichier debian/dist.conf et sauvegarder
+
+nano debian/changelog
+
+	edite le fichier de debian/changelog
+	et ajouter un logue pour indiquer que c'est vous qui avais créer le paquet.
+	en incémentent la version et en indiquant votre uid gnupg 
+	pour la date copier coler le résulta de la commande date -R
+
+ctparental (4.15-1) unstable; urgency=medium
+
+  * paquet créer par marsat
+	
+ -- marsat <CTparental@laposte.net>  Thu, 14 Apr 2016 17:48:00 +0200
+
+nano debian/control
+
+modifier aussi le fichier debian/control
+pour que la version coresponde a celle du fichier de log.
+
+pour debian
+
+git commit -a -S
 gbp buildpackage
+
+pour ubuntu
+
+cp ubuntu/dist.conf debian/dist.conf debhelper
+git commit -a -S
+gbp buildpackage
+
+
