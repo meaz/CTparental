@@ -10,17 +10,18 @@ db_go || true
 ping -c3 www.google.fr > /dev/null
 test="$?"
 if [ ! "$test" -eq 0 ];then
-	db_input critical ctparental/erreurinternet
-	db_go
-	db_purge
+	db_input critical ctparental/erreurinternet || true
+	db_go || true
+	db_purge || true
 else
 	while (true)
 	do
 			RET=""
 			db_input critical ctparental/httplogin || true
-			db_go
-			db_get ctparental/httplogin
-			if [ "$(echo $RET | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
+			db_go || true
+			db_get ctparental/httplogin || true
+			login="$RET"
+			if [ "$(echo $login | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
 					break
 			fi	
 	done
@@ -29,28 +30,26 @@ else
 	do
 		RET=""
 		db_input critical ctparental/httppassword || true
-	    db_go
+	    db_go || true
 		db_input critical ctparental/httppassword2 || true
-	    db_go
-		db_get ctparental/httppassword
+	    db_go || true
+		db_get ctparental/httppassword || true
 		p1=$RET
 		RET=""
-		db_get ctparental/httppassword2
+		db_get ctparental/httppassword2 || true
 		p2=$RET
 		RET=""
 			if [ $p1 = $p2 ] ; then
 				if [ "$(echo "$p1" | grep -E "^([a-z0-9A-Z]|[&éè~#{}()ç_@à?.;:/\!,\$<>=£\%\])*$" | wc -m )" -ge 9 ] ; then
-					p1=""
-					p2=""
-					db_go
+					db_purge || true
 					break
 				else
-					db_input critical ctparental/httppassword_trop_simple
+					db_input critical ctparental/httppassword_trop_simple || true
 					p1=""
 					p2=""
 				fi
 			else
-				db_input critical ctparental/httppassword_non_ident
+				db_input critical ctparental/httppassword_non_ident || true
 				p1=""
 				p2=""
 			fi
@@ -58,14 +57,10 @@ else
 	done
 
 	# Fetching configuration from debconf
-	RET=""
-	db_get ctparental/httplogin 
-	export debconfloginhttp="$RET"
-	RET="" 
-	db_get ctparental/httppassword
-	export debconfpassword="$RET"
-	RET=""
-	db_purge
+	
+	export debconfloginhttp="$login"
+	export debconfpassword="$p1"
+
     CTparental -i -nodep -nomanuel  
 fi
 exit 0
