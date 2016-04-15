@@ -12,7 +12,7 @@ test="$?"
 if [ ! "$test" -eq 0 ];then
 	db_input critical ctparental/erreurinternet
 	db_go
-
+	db_purge
 else
 
 	# Fetching configuration from debconf
@@ -24,10 +24,7 @@ else
 	export debconfpassword="$RET"
 	RET=""
 	db_purge
-
-	chmod 755 /usr/local/bin/CTparental.sh
-	chmod 755 /usr/local/bin/CTparental-bl-infos.sh
-	/usr/local/bin/CTparental.sh -i -nodep -nomanuel  
+    /usr/local/bin/CTparental.sh -i -nodep -nomanuel  
 
 fi
 exit 0
