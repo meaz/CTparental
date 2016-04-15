@@ -8,7 +8,7 @@ ctparental (4.16.2-1) unstable; urgency=medium
   la conf de CTparental a migrée dans /etc/CTparental.
   les extentions des scriptes ont étés supprimées .
   
- -- marsat <CTparental@laposte.net>  Fri, 15 Apr 2016 14:34:36 +0200
+ -- marsat <CTparental@laposte.net>  Sat, 16 Apr 2016 00:24:00 +0200
 
 ctparental (4.16.1-1) unstable; urgency=medium
 
