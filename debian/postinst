@@ -7,19 +7,27 @@ set -e
 # Show interface
 db_go || true
 
-# Fetching configuration from debconf
-RET=""
-db_get ctparental/httplogin 
-export debconfloginhttp="$RET"
-RET="" 
-db_get ctparental/httppassword
-export debconfpassword="$RET"
-RET=""
-db_purge
+ping -c3 www.google.fr > /dev/null
+test="$?"
+if [ ! "$test" -eq 0 ];then
+	db_input critical ctparental/erreurinternet
+	db_go
+	exit 1
+else
 
-chmod 755 /usr/local/bin/CTparental.sh
-chmod 755 /usr/local/bin/CTparental-bl-infos.sh
-/usr/local/bin/CTparental.sh -i -nodep -nomanuel  
+	# Fetching configuration from debconf
+	RET=""
+	db_get ctparental/httplogin 
+	export debconfloginhttp="$RET"
+	RET="" 
+	db_get ctparental/httppassword
+	export debconfpassword="$RET"
+	RET=""
+	db_purge
 
+	chmod 755 /usr/local/bin/CTparental.sh
+	chmod 755 /usr/local/bin/CTparental-bl-infos.sh
+	/usr/local/bin/CTparental.sh -i -nodep -nomanuel  
 
+fi
 exit 0

@@ -1,19 +1,7 @@
 #!/bin/bash
-#DEBHELPER#
 set -e
-# Source debconf library.
-. /usr/share/debconf/confmodule
 
-# Show interface
-db_go || true
 
-ping -c3 www.google.fr > /dev/null
-test="$?"
-if [ ! "$test" -eq 0 ];then
-	db_input critical ctparental/erreurinternet
-	db_go
-	exit 1
-fi
 
 exit 0
 
