@@ -10,10 +10,10 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		test="$?"
 		if [ "$test" -eq 0 ];then
 			RET=""
-			db_get ctparental/httppassword 
+			db_get ctparental/httplogin 
 			export debconfloginhttp="$RET"
 			RET=""
-			db_get ctparental/httplogin 
+			db_get ctparental/httppassword 
 			export debconfpassword="$RET"
 			
 			

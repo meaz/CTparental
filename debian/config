@@ -16,8 +16,8 @@ while (true)
 	do
 			RET=""
 			db_input critical ctparental/httplogin 
-			db_go || true
-			db_get ctparental/httplogin || true
+			db_go 
+			db_get ctparental/httplogin 
 			if [ "$(echo $RET | grep -E "^([a-zA-Z0-9])*$" | wc -m)" -ge 6  ];then 
 					break
 			fi	
