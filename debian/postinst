@@ -3,7 +3,7 @@
 set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
-
+db_go
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
   
 		ping -c3 www.google.fr > /dev/null
