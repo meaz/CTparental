@@ -24,7 +24,7 @@ if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec u
 	exit 1
 fi
 
-if  [ "$(groups "$(whoami)" | grep -c -E "( ctoff$)|( ctoff )")" -eq 0 ];then
+if  [ "$(groups "$(whoami)" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )")" -eq 0 ];then
   export https_proxy=http://127.0.0.1:8080
   export HTTPS_PROXY=http://127.0.0.1:8080
   export http_proxy=http://127.0.0.1:8080
