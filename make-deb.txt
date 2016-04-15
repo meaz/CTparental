@@ -1,13 +1,18 @@
 
 On debian
-apt-get install git git-buildpackage debhelper
+su
+apt-get install git git-buildpackage debhelper gnupg
+exit
+gpg --gen-key
+
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
 gbp buildpackage
 
 
 On ubuntu.
-apt-get install git git-buildpackage
+sudo apt-get install git git-buildpackage debhelper gnupg
+gpg --gen-key
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
 cp ubuntu/dist.conf debian/dist.conf debhelper
