@@ -1,3 +1,15 @@
+
+ctparental (4.16.2-1) unstable; urgency=medium
+
+  * Supression des erreurs de generation du deb avec debhelper, ne reste que ces 3
+  W: ctparental source: newer-standards-version 4.16.1 (current is 3.9.7)
+  W: ctparental: binary-without-manpage usr/bin/CTparental
+  W: ctparental: binary-without-manpage usr/bin/CTparental-bl-infos
+  la conf de CTparental a migrée dans /etc/CTparental.
+  les extentions des scriptes ont étés supprimées .
+  
+ -- marsat <CTparental@laposte.net>  Fri, 15 Apr 2016 14:34:36 +0200
+
 ctparental (4.16.1-1) unstable; urgency=medium
 
   * correction du bug sur le login mot de pass.
