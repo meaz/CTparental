@@ -37,13 +37,14 @@ function form_filter ($form_content)
 }
 $week = array( gettext("monday"),gettext("tuesday"),gettext("wednesday"),gettext("thursday"),gettext("friday"),gettext("saturday"),gettext("sunday"));
 $weeknum = array( 0,1,2,3,4,5,6);
-$bl_categories="/usr/etc/CTparental/bl-categories-available";
-$bl_categories_enabled="/usr/etc/CTparental/categories-enabled";
-$conf_file="/usr/etc/CTparental/CTparental.conf";
-$conf_ctoff_file="/usr/etc/CTparental/GCToff.conf";
-$hconf_file="/usr/etc/CTparental/CThours.conf";
-$wl_domains="/usr/etc/CTparental/domaine-rehabiliter";
-$bl_domains="/usr/etc/CTparental/blacklist-local";
+$dirconf="/etc/CTparental";
+$bl_categories=$dirconf."/bl-categories-available";
+$bl_categories_enabled=$dirconf."/categories-enabled";
+$conf_file=$dirconf."/CTparental.conf";
+$conf_ctoff_file=$dirconf."/GCToff.conf";
+$hconf_file=$dirconf."/CThours.conf";
+$wl_domains=$dirconf."/domaine-rehabiliter";
+$bl_domains=$dirconf."/blacklist-local";
 
 
 if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
@@ -65,13 +66,13 @@ if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; }
 		 $dg_file_edit="/etc/dansguardian/lists/bannedsitelist";
 		break;
 	case 'WhiteList Filtering' :
-		$bl_categories="/usr/etc/CTparental/wl-categories-available";
+		$bl_categories=$dirconf."/wl-categories-available";
 		break;
 	case 'Blacklist filtering' :
-		$bl_categories="/usr/etc/CTparental/bl-categories-available";
+		$bl_categories=$dirconf."/bl-categories-available";
 		break;
 	case 'safesearch Enebeled' :
-		$dg_file_edit="/usr/etc/CTparental/CTsafe.conf";
+		$dg_file_edit=$dirconf."/CTsafe.conf";
 	break;
 
 

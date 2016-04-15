@@ -7,7 +7,7 @@
 # présente dans le code du projet alcasar en version 2.6.1 ; web page http://www.alcasar.net/
 
 # This script is distributed under the Gnu General Public License (GPL)
-DIR_CONF="/usr/etc/CTparental"
+DIR_CONF="/etc/CTparental"
 #chargement des locales.
 set -a
 source gettext.sh
@@ -1450,7 +1450,7 @@ install () {
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
 		cp -rf confDansgouardian /usr/share/CTparental
-		cp -rf locale /usr/etc/CTparental
+		cp -rf locale /etc/CTparental
 	fi
 	iptablesreload
 	groupadd ctoff
