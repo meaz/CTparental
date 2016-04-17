@@ -1,6 +1,6 @@
 #!/bin/bash
-
+dirblen="/etc/CTparental/blacklist-enabled/"
 domaine=$(echo "$1" | sed -e "s/^www././g")
-echo "$(grep -e "$domaine" -r /etc/CTparental/blacklist-enabled/ | cut -d":" -f1 | sort -u | cut -d"/" -f7 | cut -d"." -f1)"
+echo "$(grep -e "$domaine" -r $dirblen | sed -e "s|$dirblen||g" | cut -d":" -f1 | sed -e "s|.conf||g" | sort -u)"
 
 exit
