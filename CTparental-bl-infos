@@ -5,8 +5,12 @@ ndom=$(( $(echo "$domain" | awk -F "." "{print NF-1}")+1 ))
 i=2
 while [ "$return" = "" ]
 do
+	if [ "$i" -gt "$ndom" ] ;then
+		#on sort de la boucle même si on ne trouve rien avec les domains parents .
+		break
+	fi
 	return="$( grep -E "address=/(\.$domain|$domain)" -r $dirblen | sed -e "s|$dirblen||g" | cut -d":" -f1 | sed -e "s|.conf||g" | sort -u)"
-	domain="$(echo $(echo "$1" | sed -e "s/^www././g") | cut -d"." -f$i-$ndom)"
+	domain="$(echo "$1" | sed -e "s/^www././g" | cut -d"." -f$i-$ndom)"
 	i=$((i+1))
 done
 echo "$return"
