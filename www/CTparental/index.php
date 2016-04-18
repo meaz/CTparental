@@ -63,9 +63,8 @@ textdomain($domain);
 	<?php
 
 exec ("/usr/bin/CTparental-bl-infos ".$_SERVER["HTTP_HOST"],$blinfosliste);
-$var1=$blinfosliste[0];
-$tab1=explode(" ",$var1);
-foreach ($tab1 as $categorie )
+
+foreach ($blinfosliste as $categorie )
 			{
 				echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a><br>";
 			}

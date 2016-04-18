@@ -1315,13 +1315,13 @@ fi
 
 
 chown root:"$GROUPHTTPD" "$DREAB"
-chmod 660 "$DREAB"
+chmod 664 "$DREAB"
 chown root:"$GROUPHTTPD" "$DNS_FILTER_OSSI"
-chmod 660 "$DNS_FILTER_OSSI"
+chmod 664 "$DNS_FILTER_OSSI"
 chown root:"$GROUPHTTPD" "$CATEGORIES_ENABLED"
-chmod 660 "$CATEGORIES_ENABLED"
+chmod 664 "$CATEGORIES_ENABLED"
 chown root:"$GROUPHTTPD" "$SAFE_CONF"
-chmod 660 "$SAFE_CONF"
+chmod 664 "$SAFE_CONF"
 chmod 660 /etc/sudoers
 chown root:"$GROUPHTTPD" "${DIRE2G}lists/bannedextensionlist"
 chmod 664 "${DIRE2G}lists/bannedextensionlist"

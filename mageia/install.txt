@@ -1,12 +1,12 @@
 urpmi git
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
-cp CTparental.sh /usr/local/bin
-cp CTparental-bl-infos.sh /usr/local/bin
-mkdir /usr/local/etc/CTparental
-mkdir /usr/local/share/CTparental
-cp -r www /usr/local/share/CTparental
-cp -r confDansgouardian /usr/local/share/CTparental
+cp CTparental.sh /usr/bin
+cp CTparental-bl-infos.sh /usr/bin
+mkdir /etc/CTparental
+mkdir /usr/share/CTparental
+cp -r www /usr/share/CTparental
+cp -r confDansgouardian /usr/share/CTparental
 cd mageia
 CTparental.sh -i
 

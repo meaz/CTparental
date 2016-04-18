@@ -1,3 +1,9 @@
+ctparental (4.16.3-1) unstable; urgency=medium
+
+  * correction du bug sur le retours des infos de categories dans la page d'interseption dnsmasq.
+  
+ -- marsat <CTparental@laposte.net>  Mon, 18 Apr 2016 09:26:47 +0200
+ 
 ctparental (4.16.2-1) unstable; urgency=medium
 
   * Supression des erreurs de generation du deb avec debhelper.
