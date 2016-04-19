@@ -22,6 +22,7 @@ bindtextdomain($domain, "./locale");
 textdomain($domain);
 // La traduction est cherché dans ./locale/fr_FR/LC_MESSAGES/fr.mo
 }
+$dirconf="/etc/CTparental";
 $bl_dir=$dirconf."/dnsfilter-available/";
   $l_title=gettext("Blacklist categories");
   $l_error_open_file=gettext("Error opening the file");
