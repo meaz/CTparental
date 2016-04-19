@@ -339,14 +339,14 @@ BL_SERVER="dsi.ut-capitole.fr"
 FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
 FILEIPTABLES="$DIR_CONF/iptables"
 FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
-CATEGORIES_ENABLED="$DIR_CONF/categories-enabled"
+CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
 BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
 WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
 DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
 DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
 DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
-DNS_FILTER_OSSI="$DIR_CONF/blacklist-local"
-DREAB="$DIR_CONF/domaine-rehabiliter" 
+DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
+DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
 E2GUXSITELIST="/etc/dansguardian/lists/exceptionsitelist"
 THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
@@ -366,6 +366,7 @@ marketingware
 mixed_adult
 phishing
 redirector
+publicite
 sect
 strict_redirector
 strong_redirector
@@ -1754,8 +1755,8 @@ uninstall () {
        cd "$DIR_CONF"
        for file in *
        do
-		  if [ ! "$file" = "" ] ;then
-		  rm -rf ${DIR_CONF:?}/"$file"
+		  if [ ! "$(echo "$file" | grep -c -E ".*.conf")" -ge 1 ] ;then
+			 rm -rf ${DIR_CONF:?}/"$file"
 		  fi
        done
        
