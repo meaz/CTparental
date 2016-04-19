@@ -17,7 +17,7 @@ if ($HOURSCONNECT == "ON")
 
 	### on lit est on interprète le fichier CTparental.conf
 	echo "<TABLE width='100%' border=0 cellspacing=0 cellpadding=0>";
-	exec ("/usr/bin/CTparental -listusers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
+	exec ($cmdCT."-listusers 2> /dev/null",$USERSPC); # récupération des utilisateurs du poste.(UID >= 1000)
 	echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Hours of allowed connections' method=POST>";
 		echo "<select name=\"selectuser\">";
 		if (isset($selectuser)){echo "<option value=\"$selectuser\">$selectuser\n"; }

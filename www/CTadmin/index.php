@@ -45,7 +45,7 @@ $conf_ctoff_file=$dirconf."/GCToff.conf";
 $hconf_file=$dirconf."/CThours.conf";
 $wl_domains=$dirconf."/domaine-rehabiliter";
 $bl_domains=$dirconf."/blacklist-local";
-
+$cmdCT="sudo -h localhost -u root /usr/bin/CTparental "
 
 if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
 		else {
@@ -116,7 +116,7 @@ case 'change_file1' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental -dgreload");
+	exec ($cmdCT."-dgreload");
 	break;
 case 'change_safesearch' :
 	$tab=file($dg_file_edit);
@@ -149,13 +149,13 @@ case 'change_safesearch' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental -ubl");
+	exec ($cmdCT."-ubl");
 	break;
 case 'gct_Off' :
-	exec ("sudo -u root /usr/bin/CTparental -gctoff");
+	exec ($cmdCT."-gctoff");
 	break;
 case 'gct_On' :
-	exec ("sudo -u root /usr/bin/CTparental -gcton");
+	exec ($cmdCT."-gcton");
 	break;
 case 'LogOFF' :
 	header('HTTP/1.0 401 Unauthorized');
@@ -163,28 +163,28 @@ case 'LogOFF' :
 	exit;
 	break;
 case 'BL_On' :
-	exec ("sudo -u root /usr/bin/CTparental -on");
+	exec ($cmdCT."-on");
 	break;
 case 'BL_Off' :
-	exec ("sudo -u root /usr/bin/CTparental -off");
+	exec ($cmdCT."-off");
 	break;
 case 'H_On' :
-	exec ("sudo -u root /usr/bin/CTparental -trf");
+	exec ($cmdCT."-trf");
 	break;
 case 'H_Off' :
-	exec ("sudo -u root /usr/bin/CTparental -tlu");
+	exec ($cmdCT."-tlu");
 	break;
 case 'AUP_On' :
-	exec ("sudo -u root /usr/bin/CTparental -aupon");
+	exec ($cmdCT."-aupon");
 	break;
 case 'AUP_Off' :
-	exec ("sudo -u root /usr/bin/CTparental -aupoff");
+	exec ($cmdCT."-aupoff");
 	break;
 case 'INIT_BL' :
-	exec ("sudo -u root /usr/bin/CTparental -dble");
+	exec ($cmdCT."-dble");
 	break;
 case 'Download_bl' :
-	exec ("sudo -u root /usr/bin/CTparental -dl");
+	exec ($cmdCT."-dl");
 	break;
 case 'MAJ_cat' :
 	$tab=file($bl_categories_enabled);	
@@ -210,7 +210,7 @@ case 'MAJ_cat' :
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_wl_domains']);
-	exec ("sudo -u root /usr/bin/CTparental -ubl");
+	exec ($cmdCT."-ubl");
 	break;
 case 'MAJ_H' :
 	$formatheuresok=1;
@@ -321,7 +321,7 @@ case 'MAJ_H' :
 	}
 	
 	fclose($pointeur);
-	exec ("sudo -u root /usr/bin/CTparental -trf");
+	exec ($cmdCT."-trf");
 	break;
 	
 case 'change_user' :
@@ -359,7 +359,7 @@ case 'change_user' :
 			}
 		fclose($pointeur);
 		}
-	exec ("sudo -u root /usr/bin/CTparental -gctalist");
+	exec ($cmdCT."-gctalist");
 	break;
 }
 

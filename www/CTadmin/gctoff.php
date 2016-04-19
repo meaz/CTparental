@@ -18,7 +18,7 @@ if ($GCTOFF == "ON")
 	echo "<table cellspacing=2 cellpadding=2 border=1>";
 	echo "<tr><th>".gettext('Username')."<th></tr>";
 	// Read the "CTOFF.conf" file
-	exec ("sudo /usr/bin/CTparental -gctulist");
+	exec ($cmdCT."-gctulist");
 	$tab=file($conf_ctoff_file);
 	if ($tab)  # the file isn't empty
 		{

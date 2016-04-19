@@ -420,7 +420,18 @@ sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
 echo "</confdansguardian>"
 }
-
+privoxydefaultfilteroff () {
+$SED "s?^actionsfile match-all.action.*?#actionsfile match-all.action?g" "$PRIVOXYCONF"	
+$SED "s?^actionsfile default.action.*?#actionsfile default.action?g" "$PRIVOXYCONF"	
+$SED "s?^filterfile default.filter.*?#filterfile default.filter?g" "$PRIVOXYCONF"	
+$PRIVOXYrestart
+}
+privoxydefaultfilteron () {
+$SED "s?#actionsfile match-all.action.*?actionsfile match-all.action?g" "$PRIVOXYCONF"	
+$SED "s?#actionsfile default.action.*?actionsfile default.action?g" "$PRIVOXYCONF"	
+$SED "s?#filterfile default.filter.*?filterfile default.filter?g" "$PRIVOXYCONF"	
+$PRIVOXYrestart
+}
 confprivoxy () {
 	
 echo "<confprivoxy>"
@@ -1337,9 +1348,9 @@ else
 fi
 
 if [ "$(grep -c "$USERHTTPD"" ALL=" /etc/sudoers )" -ge "1" ] ; then
-    $SED "s?^$USERHTTPD.*?$USERHTTPD ALL=(ALL) NOPASSWD:/usr/bin/CTparental -dgreload,/usr/bin/CTparental -gctalist,/usr/bin/CTparental -gctulist,/usr/bin/CTparental -gcton,/usr/bin/CTparental -gctoff,/usr/bin/CTparental -tlu,/usr/bin/CTparental -trf,/usr/bin/CTparental -dble,/usr/bin/CTparental -ubl,/usr/bin/CTparental -dl,/usr/bin/CTparental -on,/usr/bin/CTparental -off,/usr/bin/CTparental -aupon,/usr/bin/CTparental -aupoff?g" /etc/sudoers
+    $SED "s?^$USERHTTPD.*?$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *?g" /etc/sudoers
 else
-    echo "$USERHTTPD ALL=(ALL) NOPASSWD:/usr/bin/CTparental -dgreload,/usr/bin/CTparental -gctalist,/usr/bin/CTparental -gctulist,/usr/bin/CTparental -gcton,/usr/bin/CTparental -gctoff,/usr/bin/CTparental -tlu,/usr/bin/CTparental -trf,/usr/bin/CTparental -dble,/usr/bin/CTparental -ubl,/usr/bin/CTparental -dl,/usr/bin/CTparental -on,/usr/bin/CTparental -off,/usr/bin/CTparental -aupon,/usr/bin/CTparental -aupoff" >> /etc/sudoers
+    echo "$USERHTTPD localhost=(root) NOPASSWD:/usr/bin/CTparental *" >> /etc/sudoers
 fi
 	
 unset sudotest
@@ -2375,68 +2386,46 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	   an additional parameter to specify a source path for the redirection page.
 	   example: CTparental -dirhtml -i /home/toto/html/
 	   if no option a page by default is used.")
-	   
 -u$(gettext "	=> uninstall the Parental Control Computer (desktop PC)")
-
 -dl$(gettext "	=> updates parental control from the blacklist of the University of Toulouse")
-
 -ubl$(gettext "	=> What to do after each change of the file") $DNS_FILTER_OSSI
-
 -rl$(gettext "	=> What to do after each change of the file") $DREAB
-
 -on$(gettext "	=> Enable parental control")
-
 -off$(gettext "	=> Disable parental controls")
-
 -cble$(gettext "	=> Set the filter mode by whitelist or blacklist (default)
 	   and the categories that you want to activate.")
-	   
 -dble$(gettext "	=> Resets the default active categories and blacklist filtering.")
-
 -tlo$(gettext "	=> Enable and configure the login time restrictions for users.")
-
 -tlu$(gettext "	=> Disable the login time restrictions for users.")
-
 -uhtml$(gettext "	=> updates the redirect page from a source directory or default.
 	   examples:
 	           - With a source directory: CTparental -uhtml -dirhtml /home/toto/html/
 	           - Default: CTparental -uhtml
 	   also lets you change the login couple password of the web interface.")
-	   
 -aupon$(gettext "	=> Enable the automatic update of the blacklist of Toulouse (every 7 days).")
-
 -aupoff$(gettext "	=> Disable the automatic update of the blacklist of Toulouse.")
-
 -aup$(gettext "	=> as -dl but only if there is no update for more than 7 days.")
-
 -nodep$(gettext "	=> if placed after -i or -u allows not install / uninstall the dependencies useful if
 	   we prefer to install them by hand, or for the postinst and prerm script of deb.
 	   examples:
 	   CTparental -i -nodep
 	   CTparental -dirhtml -i /home/toto/html/ -nodep
 	   CTparental -u -nodep")
-	   
 -nomanuel$(gettext "	=> used only for the postinst and prerm script.")
-
 -gcton$(gettext "	=> Enable privileged group.
 	   exemples:
 	           CTparental -gctulist
 	           Comment all users that you want to filter in ")$FILE_GCTOFFCONF 
 	           CTparental -gctalist
-	           
 -gctoff$(gettext "	=> Disable privileged group.")
 	   $(gettext "all users of the system undergo the filtering !!")
-	   			 
-	   			 
 -gctalist$(gettext "	=> Add / delete users in the ctoff group based on the config file ,") $FILE_GCTOFFCONF
-
 -ipton$(gettext "	=> Enable rules of custom firewall.")
-
 -iptoff$(gettext "	=> Disable rules of custom firewall.")
-
 -grubPon$(gettext "	=> Enable the superuser of grub2.")
-
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
+-pfoff$(gettext "	=> Disable default rules privoxy.")
+-pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
 "
 arg1=${1}
 case $arg1 in
@@ -2629,6 +2618,14 @@ case $arg1 in
     -grubPoff )
       rm -rf /etc/grub.d/99_password
       update-grub2
+      exit 0
+      ;;
+    -pfoff )
+	  privoxydefaultfilteroff
+      exit 0
+      ;;
+    -pfon )
+	  privoxydefaultfilteron
       exit 0
       ;;
       
