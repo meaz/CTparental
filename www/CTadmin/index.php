@@ -39,12 +39,12 @@ $week = array( gettext("monday"),gettext("tuesday"),gettext("wednesday"),gettext
 $weeknum = array( 0,1,2,3,4,5,6);
 $dirconf="/etc/CTparental";
 $bl_categories=$dirconf."/bl-categories-available";
-$bl_categories_enabled=$dirconf."/categories-enabled";
+$bl_categories_enabled=$dirconf."/categories-enabled.conf";
 $conf_file=$dirconf."/CTparental.conf";
 $conf_ctoff_file=$dirconf."/GCToff.conf";
 $hconf_file=$dirconf."/CThours.conf";
-$wl_domains=$dirconf."/domaine-rehabiliter";
-$bl_domains=$dirconf."/blacklist-local";
+$wl_domains=$dirconf."/domaine-rehabiliter.conf";
+$bl_domains=$dirconf."/blacklist-local.conf";
 $cmdCT="sudo -h localhost -u root /usr/bin/CTparental ";
 
 if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
