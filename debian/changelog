@@ -4,7 +4,7 @@ ctparental (4.16.4-1) unstable; urgency=medium
   plus réstrictif et plus simple a la foie.
   
   * Ajoute la possiblitée de désactiver/activer les règles privoxy par default.
-  
+   
   * ne supprime plus les fichiers de .conf dans /etc/CTparental a la désinstalation,
   ce qui permet de retrouver ces parramètres aprés une maj.
   
