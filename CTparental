@@ -353,7 +353,7 @@ MAXDAYSFORUPDATE="7" # update tous les 7 jours
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
 initblenabled () {
-   cat << EOF > $CATEGORIES_ENABLED
+cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
 dangerous_material
@@ -1535,7 +1535,9 @@ install () {
 
       mkdir $tempDIR
       mkdir -p $DIR_CONF
-      initblenabled
+      if [ ! -f $CATEGORIES_ENABLED ];then
+			initblenabled
+      fi
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
