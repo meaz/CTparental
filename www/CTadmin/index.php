@@ -45,7 +45,7 @@ $conf_ctoff_file=$dirconf."/GCToff.conf";
 $hconf_file=$dirconf."/CThours.conf";
 $wl_domains=$dirconf."/domaine-rehabiliter";
 $bl_domains=$dirconf."/blacklist-local";
-$cmdCT="sudo -h localhost -u root /usr/bin/CTparental "
+$cmdCT="sudo -h localhost -u root /usr/bin/CTparental ";
 
 if (isset($_GET['dgfile'])){ $dg_confswitch=$_GET['dgfile']; } 
 		else {
@@ -186,10 +186,10 @@ case 'INIT_BL' :
 case 'Download_bl' :
 	exec ($cmdCT."-dl");
 	break;
-case 'ProxyDF_On'
+case 'ProxyDF_On' :
 	exec ($cmdCT."-pfon");
 	break;
-case 'ProxyDF_Off'
+case 'ProxyDF_Off' :
 	exec ($cmdCT."-pfoff");
 	break;
 case 'MAJ_cat' :
