@@ -85,6 +85,7 @@ DNSMASQ=BLACK
 AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
+PRIVOXYDF=ON
 # Parfeux minimal.
 IPRULES=OFF
 EOF
@@ -421,12 +422,14 @@ $E2GUARDIANrestart
 echo "</confdansguardian>"
 }
 privoxydefaultfilteroff () {
+$SED "s?^PRIVOXYDF.*?PRIVOXYDF=OFF?g" $FILE_CONF
 $SED "s?^actionsfile match-all.action.*?#actionsfile match-all.action?g" "$PRIVOXYCONF"	
 $SED "s?^actionsfile default.action.*?#actionsfile default.action?g" "$PRIVOXYCONF"	
 $SED "s?^filterfile default.filter.*?#filterfile default.filter?g" "$PRIVOXYCONF"	
 $PRIVOXYrestart
 }
 privoxydefaultfilteron () {
+$SED "s?^PRIVOXYDF.*?PRIVOXYDF=ON?g" $FILE_CONF
 $SED "s?#actionsfile match-all.action.*?actionsfile match-all.action?g" "$PRIVOXYCONF"	
 $SED "s?#actionsfile default.action.*?actionsfile default.action?g" "$PRIVOXYCONF"	
 $SED "s?#filterfile default.filter.*?filterfile default.filter?g" "$PRIVOXYCONF"	

@@ -54,6 +54,21 @@ echo "</td></tr>";
 		echo "<input type=submit value=".gettext('Enable Auto Shift').">";
 		}
 	echo "</FORM>";
+	if ($PRIVOXYDF == "ON")
+		{
+		echo "<CENTER><H3>".gettext('Default filter Pivoxy is activated')."</H3></CENTER>";
+		echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";
+		echo "<input type=hidden name='choix' value=\"ProxyDF_Off\">";
+		echo "<input type=submit value=".gettext('Disable').">";
+	}
+	else
+		{
+		echo "<CENTER><H3>".gettext('Default filter Pivoxy is disabled')."</H3></CENTER>";
+		echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";
+		echo "<input type=hidden name='choix' value=\"ProxyDF_On\">";
+		echo "<input type=submit value=".gettext('Enable').">";
+		}
+	echo "</FORM>";
 	echo "</td></tr>";
 	echo "<tr><td valign=\"middle\" align=\"left\" colspan=10>";
 	echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";

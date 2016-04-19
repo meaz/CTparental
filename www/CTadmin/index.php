@@ -186,6 +186,12 @@ case 'INIT_BL' :
 case 'Download_bl' :
 	exec ($cmdCT."-dl");
 	break;
+case 'ProxyDF_On'
+	exec ($cmdCT."-pfon");
+	break;
+case 'ProxyDF_Off'
+	exec ($cmdCT."-pfoff");
+	break;
 case 'MAJ_cat' :
 	$tab=file($bl_categories_enabled);	
 	if ($tab)
@@ -375,7 +381,8 @@ if (is_file ($conf_file))
 			if ($field[0] == "DNSMASQ")		{$DNSMASQ=trim($field[1]);}
 			if ($field[0] == "AUTOUPDATE")		{$AUTOUPDATE=trim($field[1]);}
 			if ($field[0] == "HOURSCONNECT")	{$HOURSCONNECT=trim($field[1]);}
-            if ($field[0] == "GCTOFF")	{$GCTOFF=trim($field[1]);}            
+            if ($field[0] == "GCTOFF")	{$GCTOFF=trim($field[1]);}
+            if ($field[0] == "PRIVOXYDF")	{$PRIVOXYDF=trim($field[1]);}           
 			}
 		}
 	}

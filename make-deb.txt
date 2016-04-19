@@ -33,8 +33,10 @@ nano debian/control
 modifier aussi le fichier debian/control
 pour que la version coresponde a celle du fichier de log.
 
-pour debian
+pour debian jessie et ubuntu 14.04
+sed -i "s/php-cgi/php5-cgi/g" debian/control
 
+pour debian
 git commit -a -S
 gbp buildpackage
 

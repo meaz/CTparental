@@ -1,3 +1,11 @@
+ctparental (4.16.4-1) unstable; urgency=medium
+
+  * Amélioration du paramétrage de /etc/sudoers pour le compte du serveur lighttpd.
+  plus réstrictif et plus simple a la foie.
+  * Ajoute la possiblitée de désactiver/activer les règles privoxy par default.
+  
+ -- marsat <CTparental@laposte.net>  Tue, 19 Apr 2016 15:29:21 +0200
+ 
 ctparental (4.16.3-1) unstable; urgency=medium
 
   * correction du bug sur le retours des infos de categories dans la page d'interseption dnsmasq.

@@ -13,7 +13,7 @@ Standards-Version:4.16.2
 Package: ctparental
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends},${misc:Depends},debconf,dnsmasq,lighttpd,perl,sudo,wget,php5-cgi,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,dansguardian,privoxy,openssl,libnss3-tools,console-data
+Depends: ${shlibs:Depends},${misc:Depends},debconf,dnsmasq,lighttpd,perl,sudo,wget,php-cgi,libnotify-bin,notification-daemon,iptables-persistent,rsyslog,dansguardian,privoxy,openssl,libnss3-tools,console-data
 Conflicts: e2guardian,mini-httpd,apache2,firewalld
 Description: Controle parental.
  Filtrage web basé sur dnsmasq, lighttpd et cron,
