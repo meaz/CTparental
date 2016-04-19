@@ -1,5 +1,8 @@
 ctparental (4.16.4-1) unstable; urgency=medium
 
+  * dépendance php-cgi et php-xml pour ubuntu 16.04 et debian testing ,
+  remplace php5-cgi des verssions plus anciennes de ces distributions.
+
   * Amélioration du paramétrage de /etc/sudoers pour le compte du,
   serveur lighttpd,plus réstrictif et plus simple a la foie.
   
