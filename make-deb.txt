@@ -42,7 +42,7 @@ gbp buildpackage
 
 pour ubuntu 12.04 et 14.04
 
-cp ubuntu/dist debian/dist
+cp ubuntu/dist.conf debian/dist.conf
 git commit -a -S
 gbp buildpackage
 

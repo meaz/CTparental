@@ -104,7 +104,7 @@ FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
 
 
 ## imports du plugin de la distributions si il existe
-if [ -f "${DIR_CONF}/defvar" ];then . "${DIR_CONF}/defvar"; fi
+if [ -f "${DIR_CONF}/dist.conf" ];then . "${DIR_CONF}/dist.conf"; fi
 
 tempDIR="/tmp/alcasar"
 tempDIRRamfs="/tmp/alcasarRamfs"
@@ -1501,14 +1501,14 @@ install () {
 		if [ -f CHANGELOG ] ; then
 			cp -f CHANGELOG /usr/share/CTparental/
 		fi
-		if [ -f defvar ];then
-			cp -f defvar /usr/share/CTparental/defvar.orig
-			cp -f defvar $DIR_CONF/
+		if [ -f dist.conf ];then
+			cp -f dist.conf /usr/share/CTparental/dist.conf.orig
+			cp -f dist.conf $DIR_CONF/
 		fi
 		while (true); do
-		$EDIT $DIR_CONF/defvar
+		$EDIT $DIR_CONF/dist.conf
 		clear
-		cat < "$DIR_CONF"/defvar | grep -v -E ^# | grep -v ^$
+		cat < "$DIR_CONF"/dist.conf | grep -v -E ^# | grep -v ^$
 		gettext 'Enter: S to continue with these parameters.'
 		gettext 'Enter Q to Quit Setup.'
 		gettext 'Enter any other choice to change settings.'
@@ -1524,8 +1524,8 @@ install () {
 		done
 			
 	fi
-	if [ -f $DIR_CONF/defvar ];then
-		source  $DIR_CONF/defvar
+	if [ -f $DIR_CONF/dist.conf ];then
+		source  $DIR_CONF/dist.conf
 	fi
 
 	if [ -f /etc/NetworkManager/NetworkManager.conf ];then
