@@ -1073,8 +1073,9 @@ if [ "$IPTABLESsaveFILE" = "" ] ;then
 else
    $IPTABLESsave > "$IPTABLESsaveFILE"
 fi
-   
-updatecauser
+if [ -e "$DIRHTML"/cactparental.crt ];then   
+	updatecauser
+fi
 setproxy
 echo "</iptablesreload>"
 }

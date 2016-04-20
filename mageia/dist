@@ -1,0 +1,49 @@
+
+#DEPENDANCES=" dnsmasq lighttpd lighttpd-mod_auth perl sudo wget php-cgi libnotify notification-daemon rsyslog dansguardian privoxy newt iptables lib64nss3 "	# mageia 3/4/5 i386
+DEPENDANCES=" dnsmasq lighttpd lighttpd-mod_auth perl sudo wget php-cgi libnotify notification-daemon rsyslog dansguardian privoxy newt iptables lib64nss3 "	# mageia 3/4/5 amd64
+
+#UIDMINUSER=500											# mageia 3/4
+UIDMINUSER=1000											# mageia 5
+
+##################################################
+########## services gérés par systemd ############
+CRONstart="systemctl start crond "				# mageia 3/4/5 , fedora 19/20
+CRONstop="systemctl stop crond "				# mageia 3/4/5 , fedora 19/20
+CRONrestart="systemctl restart crond "			# mageia 3/4/5 , fedora 19/20
+LIGHTTPDstart="systemctl start lighttpd "		# mageia 3/4/5 , fedora 19/20
+LIGHTTPDstop="systemctl stop lighttpd "		# mageia 3/4/5 , fedora 19/20
+LIGHTTPDrestart="systemctl restart lighttpd "	# mageia 3/4/5 , fedora 19/20
+DNSMASQstart="systemctl start dnsmasq "		# mageia 3/4/5 , fedora 19/20
+DNSMASQstop="systemctl stop dnsmasq "			# mageia 3/4/5 , fedora 19/20
+DNSMASQrestart="systemctl restart dnsmasq "		# mageia 3/4/5 , fedora 19/20
+NWMANAGERstop="systemctl stop NetworkManager "		# mageia 3/4/5 , fedora 19/20
+NWMANAGERstart="systemctl start NetworkManager "	# mageia 3/4/5 , fedora 19/20
+NWMANAGERrestart="systemctl restart NetworkManager "	# mageia 3/4/5 , fedora 19/20
+IPTABLESsave="iptables-save"			# mageia 3/4/5 # Red Had , # fedora 19/20
+IPTABLESsaveFILE="/etc/sysconfig/iptables" # mageia 3/4/5
+##################################################
+
+####### Activation des services au demarage #####
+ENCRON="systemctl enable crond "				# mageia 3/4/5 , fedora 19/20
+ENLIGHTTPD="systemctl enable lighttpd "		# mageia 3/4/5 , fedora 19/20
+ENDNSMASQ="systemctl enable dnsmasq "			# mageia 3/4/5 , fedora 19/20
+ENNWMANAGER="systemctl enable NetworkManager "	# mageia 3/4/5 , fedora 19/20
+ENIPTABLESSAVE="systemctl enable iptables.service"			# fedora 19/20
+#################################################
+
+
+######## emplacement du fichier pid de lighttpd #####
+LIGHTTPpidfile="/run/lighttpd/lighttpd.pid" 	 # mageia 3/4/5
+###############################################
+PROXYuser="daemon" # mageia 3/4/5
+CADIR="/etc/pki/tls/rootcerts"
+PEMSRVDIR="/etc/pki/tls/private"
+REPCAMOZ="/etc/pki/tls/mozilla/"
+DOMAINEDEPOTS="$( urpmq --list-url | grep mageia | cut -d":" -f2 | cut -d "/" -f3 | sort -u )"
+DIRE2GLANG="/usr/share/dansguardian/languages/"
+CMDINSTALL="urpmi -a --auto "
+CMDREMOVE="rpm -e "
+
+
+
+

@@ -36,11 +36,11 @@ pour que la version coresponde a celle du fichier de log.
 pour debian jessie et ubuntu 14.04
 sed -i "s/php-cgi,php-xml/php5-cgi/g" debian/control
 
-pour debian
+pour debian et ubuntu 16.04
 git commit -a -S
 gbp buildpackage
 
-pour ubuntu
+pour ubuntu 12.04 et 14.04
 
 cp ubuntu/dist debian/dist
 git commit -a -S
