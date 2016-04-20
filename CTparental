@@ -190,7 +190,7 @@ PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
 CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
-DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g")}
+DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g" )}
 TIMERALERT=${TIMERALERT:=10}
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
