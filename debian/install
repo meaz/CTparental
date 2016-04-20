@@ -1,7 +1,7 @@
 CTparental									usr/bin
 CTparental-bl-infos							usr/bin
-debian/dist									etc/CTparental
 debian/CTparental.conf						etc/CTparental
+debian/defvar								etc/CTparental
 locale										etc/CTparental
 www											usr/share/CTparental
 confDansgouardian							usr/share/CTparental
