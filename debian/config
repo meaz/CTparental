@@ -27,7 +27,6 @@ while (true)
 do
 		RET=""
 		db_input critical ctparental/httppassword || true
-	    db_go
 		db_input critical ctparental/httppassword2 || true
 	    db_go
 		db_get ctparental/httppassword
@@ -41,17 +40,14 @@ do
 				if [ "${#p1}" -ge 8 ] ; then
 					p1=""
 					p2=""
-					db_go
 					break
 				else
 					db_input critical ctparental/httppassword_trop_simple
-					db_purge
 					p1=""
 					p2=""
 				fi
 			else
 				db_input critical ctparental/httppassword_non_ident
-				db_purge
 				p1=""
 				p2=""
 			fi
