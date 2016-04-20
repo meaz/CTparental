@@ -16,7 +16,7 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 			db_get ctparental/httppassword
 			export debconfpassword=$RET
 			
-			CTparental -i -nodep -nomanuel  
+			CTparental -i -nodep -nomanuel  1>&2   # redirection de la sortie standard sur l'erreur standad pour eviter des interactions avec debconf
 		fi
 	
 else
@@ -26,3 +26,5 @@ else
 fi
 
 #DEBHELPER#
+db_stop
+exit 0
