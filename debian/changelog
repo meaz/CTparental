@@ -1,3 +1,11 @@
+ctparental (4.16.5-1) unstable; urgency=medium
+
+  * correction des bugs suivants.
+  certutil: unable to open "/var/www/CTparental/cactparental.crt" for reading (-5950, 2).
+  cat: '/etc/apt/sources.list.d/*': Aucun fichier ou dossier de ce type
+   
+ -- marsat <CTparental@laposte.net>  Wed, 20 Apr 2016 22:27:44 +0200
+ 
 ctparental (4.16.4-1) unstable; urgency=medium
 
   * dépendance php-cgi et php-xml pour ubuntu 16.04 et debian testing ,
