@@ -1,6 +1,7 @@
 ctparental (4.16.5-1) unstable; urgency=medium
 
   * correction des bugs suivants.
+  iptables-persistent: unrecognized service
   certutil: unable to open "/var/www/CTparental/cactparental.crt" for reading (-5950, 2).
   cat: '/etc/apt/sources.list.d/*': Aucun fichier ou dossier de ce type
    
