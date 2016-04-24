@@ -1199,7 +1199,7 @@ EOF
 
 mkdir -p /usr/share/lighttpd/
 mkdir -p /var/cache/lighttpd/uploads
-chown -R "$USERHTTPD":"GROUPHTTPD" /var/cache/lighttpd/uploads
+chown -R "$USERHTTPD":"$GROUPHTTPD" /var/cache/lighttpd/uploads
 
 if [ ! -f /usr/share/lighttpd/create-mime.assign.pl ];then
 cat << EOF > /usr/share/lighttpd/create-mime.assign.pl
