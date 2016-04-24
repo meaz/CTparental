@@ -1,14 +1,14 @@
 urpmi git
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
-cp CTparental.sh /usr/bin
-cp CTparental-bl-infos.sh /usr/bin
+cp CTparental /usr/bin
+cp CTparental-bl-infos /usr/bin
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
 cp -r www /usr/share/CTparental
 cp -r confDansgouardian /usr/share/CTparental
 cd mageia
-CTparental.sh -i
+CTparental -i
 
 
 actuellement cela ne marche pas il semble que dnsmasq prend 90 % de la charge processeur a la moindre requet ???
