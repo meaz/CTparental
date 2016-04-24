@@ -10,7 +10,7 @@ cp -r confDansgouardian /usr/share/CTparental
 cd mageia
 CTparental -i
 
-
+tester le 24/04/2016 sur mageia 5 amd64 touts parais fonctioner.
 
 
 
