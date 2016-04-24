@@ -143,7 +143,7 @@ DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE dnsmasq restart "}
 NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
-IPTABLESsave=${IPTABLESsave:="$CMDSERVICE iptables-persistent save"}
+IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
@@ -820,6 +820,17 @@ echo "<dnsmasqon>"
 if [ "$(grep -c "$(sed -n "1 p" $CATEGORIES_ENABLED)" "$BL_CATEGORIES_AVAILABLE" )" -ge "1" ] ; then
 $SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
 
+# on créer l'utilisateur dnsmasq si il n'existe pas déja (comme sous mageia par exemple).
+# pas utiles sous debian et ubuntu, car deja fait par le deb
+if [ -z "`id -u dnsmasq 2> /dev/null`" ]; then
+    adduser --system  --home /dev/null --comment "system user for dnsmasq" --no-create-home --shell /bin/false dnsmasq 
+fi
+# on paramètre le service a ce lancer avec l'utilisateur dnsmasq.
+# pas utiles sous debian et ubuntu, car deja fait par le deb
+if [ -f /etc/sysconfig/dnsmasq ] ; then
+$SED "s?^OPTIONS.*?OPTIONS= --user=dnsmasq?g" /etc/sysconfig/dnsmasq
+fi
+
 cat << EOF > $DNSMASQCONF 
 # Configuration file for "dnsmasq with blackhole"
 # Inclusion de la blacklist <domains> de Toulouse dans la configuration
@@ -1187,6 +1198,8 @@ include_shell "/usr/share/lighttpd/include-conf-enabled.pl"
 EOF
 
 mkdir -p /usr/share/lighttpd/
+mkdir -p /var/cache/lighttpd/uploads
+chown -R "$USERHTTPD":"$GROUPHTTPD" /var/cache/lighttpd/uploads
 
 if [ ! -f /usr/share/lighttpd/create-mime.assign.pl ];then
 cat << EOF > /usr/share/lighttpd/create-mime.assign.pl
@@ -1543,11 +1556,11 @@ install () {
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
-			${CMDREMOVE} "${PACKAGECT}" 2> /dev/null
+			${CMDREMOVE} ${PACKAGECT} 2> /dev/null
          done
 	  fi
       if [ "$noinstalldep" = "0" ]; then
-	      ${CMDINSTALL} "${DEPENDANCES}"
+	      ${CMDINSTALL} ${DEPENDANCES}
       fi
       # on desactive l'ipv6
 		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
@@ -1999,7 +2012,7 @@ updatetimelogin () {
 	
 }
 requiredpamtime (){
-	TESTGESTIONNAIRE=""
+	TESTGESTIONNAIRE=0
    if [ ! -f $DIRPAM$COMMONFILEGS ] ; then 
 	   for FILE in $GESTIONNAIREDESESSIONS
 	   do
@@ -2010,7 +2023,7 @@ requiredpamtime (){
 			 TESTGESTIONNAIRE=1
 		  fi
 	   done
-	   if [ $TESTGESTIONNAIRE -eq 1 ] ; then
+	   if [ $TESTGESTIONNAIRE -eq 0 ] ; then
 		  gettext 'No known session manager has been detected.'
 		  gettext 'so it is impossible to activate the time control connections'
 		  desactivetimelogin

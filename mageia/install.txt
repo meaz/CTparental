@@ -1,18 +1,36 @@
+## mise a jour os + install git
+su
+urpmi.update -a 
+urpmi --update --auto-select 
 urpmi git
-git clone https://github.com/marsat/CTparental.git
+exit
+
+
+## téléchargement du scripte CTparental pour mageia
+git clone -b mageia https://github.com/marsat/CTparental.git
 cd CTparental/
-cp CTparental.sh /usr/bin
-cp CTparental-bl-infos.sh /usr/bin
+
+## install et configuration de CTparental
+su
+cp -f CTparental /usr/bin
+cp -f CTparental-bl-infos /usr/bin
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
 cp -r www /usr/share/CTparental
 cp -r confDansgouardian /usr/share/CTparental
 cd mageia
-CTparental.sh -i
+CTparental -i
+exit
+
+en suite on gère le filtrage... via http://127.0.0.1/CTadmin
+
+pour le parfeux il fait passer par iptable .
+avec la commande 
+CTparental -ipton
 
 
-actuellement cela ne marche pas il semble que dnsmasq prend 90 % de la charge processeur a la moindre requet ???
-cessi sur mageia 4 et sur mageia 5 ??
+tester le 24/04/2016 sur mageia 5 amd64 touts parais fonctioner.
+
 
 
 
