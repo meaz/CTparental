@@ -822,7 +822,7 @@ $SED "s?^DNSMASQ.*?DNSMASQ=BLACK?g" $FILE_CONF
 
 # on créer l'utilisateur dnsmasq si il n'existe pas déja (comme sous mageia par exemple).
 # pas utiles sous debian et ubuntu, car deja fait par le deb
-if [ -z "`id -u dnsmasq 2> /dev/null`" ]; then
+if [ -z "$(id -u dnsmasq 2> /dev/null)" ]; then
     adduser --system  --home /dev/null --comment "system user for dnsmasq" --no-create-home --shell /bin/false dnsmasq 
 fi
 # on paramètre le service a ce lancer avec l'utilisateur dnsmasq.
