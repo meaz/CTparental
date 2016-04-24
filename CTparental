@@ -2012,7 +2012,7 @@ updatetimelogin () {
 	
 }
 requiredpamtime (){
-	TESTGESTIONNAIRE=""
+	TESTGESTIONNAIRE=0
    if [ ! -f $DIRPAM$COMMONFILEGS ] ; then 
 	   for FILE in $GESTIONNAIREDESESSIONS
 	   do
@@ -2023,7 +2023,7 @@ requiredpamtime (){
 			 TESTGESTIONNAIRE=1
 		  fi
 	   done
-	   if [ $TESTGESTIONNAIRE -eq 1 ] ; then
+	   if [ $TESTGESTIONNAIRE -eq 0 ] ; then
 		  gettext 'No known session manager has been detected.'
 		  gettext 'so it is impossible to activate the time control connections'
 		  desactivetimelogin

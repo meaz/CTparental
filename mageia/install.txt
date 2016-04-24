@@ -1,5 +1,5 @@
 urpmi git
-git clone https://github.com/marsat/CTparental.git
+git clone -b mageia https://github.com/marsat/CTparental.git
 cd CTparental/
 cp CTparental /usr/bin
 cp CTparental-bl-infos /usr/bin
@@ -11,8 +11,7 @@ cd mageia
 CTparental -i
 
 
-actuellement cela ne marche pas il semble que dnsmasq prend 90 % de la charge processeur a la moindre requet ???
-cessi sur mageia 4 et sur mageia 5 ??
+
 
 
 
