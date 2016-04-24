@@ -1,14 +1,33 @@
+## mise a jour os + install git
+su
+urpmi.update -a 
+urpmi --update --auto-select 
 urpmi git
+exit
+
+
+## téléchargement du scripte CTparental pour mageia
 git clone -b mageia https://github.com/marsat/CTparental.git
 cd CTparental/
-cp CTparental /usr/bin
-cp CTparental-bl-infos /usr/bin
+
+## install et configuration de CTparental
+su
+cp -f CTparental /usr/bin
+cp -f CTparental-bl-infos /usr/bin
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
 cp -r www /usr/share/CTparental
 cp -r confDansgouardian /usr/share/CTparental
 cd mageia
 CTparental -i
+exit
+
+en suite on gère le filtrage... via http://127.0.0.1/CTadmin
+
+pour le parfeux il fait passer par iptable .
+avec la commande 
+CTparental -ipton
+
 
 tester le 24/04/2016 sur mageia 5 amd64 touts parais fonctioner.
 
