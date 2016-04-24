@@ -2319,7 +2319,6 @@ $CRONrestart
 
 confgrub2() {
 	
-#!/bin/sh
 PTNlogin='^[a-zA-Z]*$'
 ##Passage en keymap us pour le password comme sa quelque soit votre clavier le mot de passe correspond bien ##au touche frappée.ce qui, ce qui évite de ce prendre la tête pour le clavier avec le mot de passe grub.
 #apt-get install console-data
