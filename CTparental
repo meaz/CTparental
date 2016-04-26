@@ -8,12 +8,13 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
+DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
 source gettext.sh
 set +a
-export TEXTDOMAINDIR="$DIR_CONF/locale"
-export TEXTDOMAIN=${LANG:0:2}
+export TEXTDOMAINDIR="$DIRLOCALE"
+export TEXTDOMAIN="ctparental"
 . /usr/bin/gettext.sh
 
 
