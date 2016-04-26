@@ -1,3 +1,12 @@
+ctparental (4.16.6-1) unstable; urgency=medium
+
+  * l'interface web CTadmin , la page d'interception et le script CTparental 
+  utilise le même fichier locale, situé dans 
+  /usr/share/locale/fr_FR/LC_MESSAGES/ctparental.mo
+   
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 26 Apr 2016 15:41:51 +0200
+ 
+ 
 ctparental (4.16.5-1) unstable; urgency=medium
 
   * correction des bugs suivants.
@@ -5,7 +14,7 @@ ctparental (4.16.5-1) unstable; urgency=medium
   certutil: unable to open "/var/www/CTparental/cactparental.crt" for reading (-5950, 2).
   cat: '/etc/apt/sources.list.d/*': Aucun fichier ou dossier de ce type
    
- -- marsat <CTparental@laposte.net>  Wed, 20 Apr 2016 22:27:44 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Wed, 20 Apr 2016 22:27:44 +0200
  
 ctparental (4.16.4-1) unstable; urgency=medium
 
@@ -20,13 +29,13 @@ ctparental (4.16.4-1) unstable; urgency=medium
   * ne supprime plus les fichiers de .conf dans /etc/CTparental a la
   désinstalation,ce qui permet de retrouver ces parramètres aprés une maj.
   
- -- marsat <CTparental@laposte.net>  Tue, 19 Apr 2016 15:29:21 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 19 Apr 2016 15:29:21 +0200
  
 ctparental (4.16.3-1) unstable; urgency=medium
 
   * correction du bug sur le retours des infos de categories dans la page d'interseption dnsmasq.
   
- -- marsat <CTparental@laposte.net>  Mon, 18 Apr 2016 09:26:47 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Mon, 18 Apr 2016 09:26:47 +0200
  
 ctparental (4.16.2-1) unstable; urgency=medium
 
@@ -34,13 +43,13 @@ ctparental (4.16.2-1) unstable; urgency=medium
   * la conf de CTparental a migrée dans /etc/CTparental.
   * les extentions des scriptes ont étés supprimées.
   
- -- marsat <CTparental@laposte.net>  Sat, 16 Apr 2016 00:24:00 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Sat, 16 Apr 2016 00:24:00 +0200
 
 ctparental (4.16.1-1) unstable; urgency=medium
 
   * correction du bug sur le login mot de pass.
 	
- -- marsat <CTparental@laposte.net>  Fri, 15 Apr 2016 14:34:36 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Fri, 15 Apr 2016 14:34:36 +0200
  
 ctparental (4.15-0) unstable; urgency=medium
 
@@ -48,33 +57,33 @@ ctparental (4.15-0) unstable; urgency=medium
   a l'ouverture du serveur X seulement, devrais résoudre les problêmes , de perte de connection sur l'interface
   127.0.0.1\CTadmin avec les navigateur utilisent le proxy system ou la detection automatique de proxy.
 	
- -- marsat <CTparental@laposte.net>  Thu, 14 Apr 2016 17:48:00 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Thu, 14 Apr 2016 17:48:00 +0200
  
  
 ctparental (4.14-0) unstable; urgency=medium
 
   * les utilisateurs administrateur de la machine ne sont pas forcer a passer par le proxy et sont indiquer dans l'interface web.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Wed, 13 Apr 2016 23:19:29 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Wed, 13 Apr 2016 23:19:29 +0200
  
 ctparental (4.13-0) unstable; urgency=medium
 
   * fix bug détection des paramètre réseaux dans le cas ou seulement 127.0.0.1 est présent dans /etc/resolv.conf
     notament sous ubuntu , networkmanager jouant le role de mini serveur dnsmasq.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Wed, 13 Apr 2016 20:06:15 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Wed, 13 Apr 2016 20:06:15 +0200
  
 ctparental (4.12-1) unstable; urgency=medium
 
   * fix quelque petit bug .
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Tue, 12 Apr 2016 19:34:08 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Tue, 12 Apr 2016 19:34:08 +0200
  
 ctparental (4.12-0) unstable; urgency=medium
 
   * Ajout du parametrage des safesearch a l'interface.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 08 Apr 2016 19:26:53 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 08 Apr 2016 19:26:53 +0200
 
 ctparental (4.11-0) unstable; urgency=medium
 
@@ -82,19 +91,19 @@ ctparental (4.11-0) unstable; urgency=medium
     tous les safesearch peuvent ètre désactiver en éditent le fichier /usr/local/etc/CTparental/CTparental.conf
     et en commantent les ligne adécoite puis en lancent CTparental.sh -ubl pour appliquer les changements.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 01 Apr 2016 17:54:00 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 01 Apr 2016 17:54:00 +0200
 
 ctparental (4.10-3) unstable; urgency=medium
 
   * Amelioration de la gestion du mot de pass grub2.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 01 Apr 2016 12:21:30 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 01 Apr 2016 12:21:30 +0200
 
 ctparental (4.10-2) unstable; urgency=medium
 
   * Ajout de règles iptables pour steam, a décomenter dans /usr/local/etc/CTparental/iptables.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Mon, 28 Mar 2016 20:48:08 +0200
+ -- Guillaume Marsat <CTparental@laposte.net>  Mon, 28 Mar 2016 20:48:08 +0200
  
 ctparental (4.10-1) unstable; urgency=medium
 
@@ -102,7 +111,7 @@ ctparental (4.10-1) unstable; urgency=medium
     ou le group ctoff avais des droits supplémentaire ce qui n'est plus utiles dans les version récente du scripte.
     de même suppression du droit de lancer /usr/local/bin/CTparental.sh -on a tous les utilisateurs.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 26 Mar 2016 14:13:39 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sat, 26 Mar 2016 14:13:39 +0100
  
 ctparental (4.10-0) unstable; urgency=medium
 
@@ -111,25 +120,25 @@ ctparental (4.10-0) unstable; urgency=medium
     évite les problême de connéction sur les pc "nomage" , connection a plusieur poins wifi par exemple.
     il faut attendre au moins une minute pour que le nouveaux réseau soit bien prit en compte.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 22:18:15 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sun, 20 Mar 2016 22:18:15 +0100
  
 ctparental (4.09-0) unstable; urgency=medium
 
   * corection de bug de non traduction des message d'alerte.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 18:09:13 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sun, 20 Mar 2016 18:09:13 +0100
  
 ctparental (4.08-0) unstable; urgency=medium
 
   * corection de bug sur la gestion du temps max de navigation web + modif interface web pour sa prise en compte.
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
  
 ctparental (4.07-0) unstable; urgency=medium
 
   * Ajout de la gestion du temps max de navigation web / jour. activable seullement par Ctparental.sh -tlo
 	
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sun, 20 Mar 2016 12:27:18 +0100
  
 ctparental (4.07-0) unstable; urgency=medium
 
@@ -138,13 +147,13 @@ ctparental (4.07-0) unstable; urgency=medium
   exemple pour 5 minutes: 
   TIMERALERT=5
 
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 19 Mar 2016 13:00:26 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sat, 19 Mar 2016 13:00:26 +0100
  
 ctparental (4.06-0) unstable; urgency=medium
 
   * passage du script Ctparental.sh a shellcheck et corection du code en conséquance.
 
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 18 Mar 2016 23:33:34 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 18 Mar 2016 23:33:34 +0100
  
 ctparental (4.05-0) unstable; urgency=medium
   
@@ -156,38 +165,38 @@ ctparental (4.05-0) unstable; urgency=medium
   il et donc plus simple de basculer dans cette keymap au momment de la saisi pour évité les problêmes de éàè.. 
   si jamais on devrai booter en "recovery mode" plus tard.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Tue, 15 Mar 2016 21:05:28 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Tue, 15 Mar 2016 21:05:28 +0100
  
 ctparental (4.04-0) unstable; urgency=medium
   
   *  modification interface web en ajoutant, la gestion des extentions , des mimetype bannies et 
   quelque autre option de dansguardian...
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Wed, 09 Mar 2016 00:05:06 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Wed, 09 Mar 2016 00:05:06 +0100
  
 ctparental (4.03-0) unstable; urgency=medium
   
   *  correction du bug sur le filtrage par liste blanche qui verrouillait tout.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Mon, 07 Mar 2016 18:06:31 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Mon, 07 Mar 2016 18:06:31 +0100
  
 ctparental (4.02-0) unstable; urgency=medium
   
   *  internationalisation de CTparental.sh.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 05 Mar 2016 19:45:06 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sat, 05 Mar 2016 19:45:06 +0100
  
 ctparental (4.01-0) unstable; urgency=medium
   
   *  internationalisation de l'interface web.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 26 Feb 2016 16:38:40 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 26 Feb 2016 16:38:40 +0100
  
 ctparental (3.95-3) unstable; urgency=medium
   
   *  ajout des depots apt dans les domaines en exeption de manière transparente.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 26 Feb 2016 16:38:40 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 26 Feb 2016 16:38:40 +0100
  
 ctparental (3.95-2) unstable; urgency=medium
   
@@ -199,20 +208,20 @@ ctparental (3.95-1) unstable; urgency=medium
   
   *  Corection de bugs sur la page de redirection dnsmasq et dansguardian.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Sat, 20 Feb 2016 08:50:31 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Sat, 20 Feb 2016 08:50:31 +0100
 
 ctparental (3.95-0) unstable; urgency=medium
   
   *  probleme dansguardian + blackliste de toulouse.
   *  page d'interseption dansguardian ou dnsmasq plus parlante.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Fri, 19 Feb 2016 14:29:24 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Fri, 19 Feb 2016 14:29:24 +0100
 
 ctparental (3.94-5) unstable; urgency=medium
   
   *  corrige un bug de configuration pam_time apparue sous jessie.
     
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 01 Feb 2016 10:47:32 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 01 Feb 2016 10:47:32 +0100
 
 ctparental (3.94-3) unstable; urgency=medium
   
@@ -220,26 +229,26 @@ ctparental (3.94-3) unstable; urgency=medium
   *  léger nettoyage du code de desactivation de l'ipv6
   *  Diverses corrections orthographiques par trouyer <https://github.com/trouyer>
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 24 Oct 2015 10:47:32 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 24 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-2) unstable; urgency=medium
 
   *  debug ,iptables log tout le trafique quant on n'active pa -ipton ce qui fait gonflait /var/log/iptables.log très vite.
   
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 23 Oct 2015 10:47:32 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 23 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-1) unstable; urgency=medium
 
   * CTparental.sh -u propose la des-installation par dpkg --purge ctparental en cas de présence de l'install deb.
   * correctif du bug de non suppression de /usr/local/CTparental/ lors d'une dés-installation par dpkg.
  
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 22 Oct 2015 10:47:32 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 22 Oct 2015 10:47:32 +0100
 
 ctparental (3.94-0) unstable; urgency=medium
 
   * Upstream fix .
  
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 09 Jan 2014 21:09:00 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 09 Jan 2014 21:09:00 +0100
 
 ctparental (3.84.1-1) unstable; urgency=medium
 
@@ -266,4 +275,4 @@ ctparental (3.83) unstable; urgency=low
 
   * Initial binary only package.
 
- -- Guillaume Marsat <guillaume.marsat@laposte.net>  Thu, 09 Jan 2014 21:09:00 +0100
+ -- Guillaume Marsat <CTparental@laposte.net>  Thu, 09 Jan 2014 21:09:00 +0100
