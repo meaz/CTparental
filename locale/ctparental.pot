@@ -364,10 +364,10 @@ msgstr ""
 msgid "The update of the blacklist Toulouse every 7 days is disabled"
 msgstr ""
 
-msgid "Enable Auto Shift"
+msgid "Enable"
 msgstr ""
 
-msgid "Disable Auto Shift"
+msgid "Disable"
 msgstr ""
 
 msgid "Blacklist filtering"
@@ -662,6 +662,12 @@ msgid "Select the mimetype has filtered"
 msgstr ""
 
 msgid "Dansguardian configuration"
+msgstr ""
+
+msgid "Default filter Pivoxy is activated"
+msgstr ""
+
+msgid "Default filter Pivoxy is disabled"
 msgstr ""
 
 

@@ -44,14 +44,14 @@ echo "</td></tr>";
 		echo "<CENTER><H3>".gettext('The update of the blacklist Toulouse every 7 days is activated')."</H3></CENTER>";
 		echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";
 		echo "<input type=hidden name='choix' value=\"AUP_Off\">";
-		echo "<input type=submit value=".gettext('Disable Auto Shift').">";
+		echo "<input type=submit value=".gettext('Disable').">";
 	}
 	else
 		{
 		echo "<CENTER><H3>".gettext('The update of the blacklist Toulouse every 7 days is disabled')."</H3></CENTER>";
 		echo "<FORM action='$_SERVER[PHP_SELF]?dgfile=Blacklist filtering' method=POST>";
 		echo "<input type=hidden name='choix' value=\"AUP_On\">";
-		echo "<input type=submit value=".gettext('Enable Auto Shift').">";
+		echo "<input type=submit value=".gettext('Enable').">";
 		}
 	echo "</FORM>";
 	if ($PRIVOXYDF == "ON")

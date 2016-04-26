@@ -397,11 +397,11 @@ msgstr "La mise à jour de la blacklist de Toulouse tous les 7 jours est activé
 msgid "The update of the blacklist Toulouse every 7 days is disabled"
 msgstr "La mise à jour de la blacklist de Toulouse tous les 7 jours est désactivée"
 
-msgid "Enable Auto Shift"
-msgstr "Activer Maj Auto"
+msgid "Enable"
+msgstr "Activer"
 
-msgid "Disable Auto Shift"
-msgstr "Désactiver Maj Auto"
+msgid "Disable"
+msgstr "Désactiver"
 
 msgid "Blacklist filtering"
 msgstr "Filtrage par BlackList"
@@ -696,3 +696,9 @@ msgstr "Sélectionnez le type MIME a filtré"
 
 msgid "Dansguardian configuration"
 msgstr "Configuration de Dansguardian"
+
+msgid "Default filter Pivoxy is activated"
+msgstr "Le filtrage par défaut de privoxy est activé."
+
+msgid "Default filter Pivoxy is disabled"
+msgstr "Le filtrage par défaut de privoxy est désactivé."
