@@ -354,6 +354,8 @@ MAXDAYSFORUPDATE="7" # update tous les 7 jours
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
 initblenabled () {
+USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
+GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
@@ -376,7 +378,8 @@ warez
 ossi   
 EOF
          
-
+chown root:"$GROUPHTTPD" "$CATEGORIES_ENABLED"
+chmod 664 "$CATEGORIES_ENABLED"
 }
 confe2guardian () {
   # replace the default deny HTML page
