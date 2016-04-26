@@ -310,3 +310,15 @@ msgstr "est autorisé à surfer X minutes par jours"
 
 msgid "error recovery network settings"
 msgstr "erreur de récupération des paramètres réseaux"
+
+msgid "\t=> Enable the superuser of grub2."
+msgstr "\t=> Activer l'administrateur de grub2."
+
+msgid "\t=> Disable the superuser of grub2."
+msgstr "\t=> Désactiver l'administrateur de grub2."
+
+msgid "\t=> Disable default rules privoxy."
+msgstr "\t=> Désactiver les règles privoxy par défaut."
+
+msgid "\t=> Enable default rules privoxy. (default is Enable)"
+msgstr "\t=> Activer les règles par défaut de privoxy."

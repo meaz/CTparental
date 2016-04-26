@@ -275,3 +275,16 @@ msgstr ""
 
 msgid "error recovery network settings"
 msgstr ""
+
+msgid "	=> Enable the superuser of grub2."
+msgstr ""
+
+msgid "	=> Disable the superuser of grub2."
+msgstr ""
+
+msgid "	=> Disable default rules privoxy."
+msgstr ""
+
+msgid "	=> Enable default rules privoxy. (default is Enable)"
+msgstr ""
+
