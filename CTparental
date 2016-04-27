@@ -1845,52 +1845,45 @@ echo -n > $CATEGORIES_ENABLED
 clear
 gettext 'Want to filter by, Blacklist or Whitelist B/W :'
 while (true); do
-         read choi
-         case $choi in
+         read choiBW
+         case $choiBW in
          B | b )
-         gettext 'Choice of filtered categories.'
-        while read CATEGORIE # pour chaque catégorie 
-		do   
-		      clear
-		      eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
-		      while (true); do
-			 read choi
-			 case $choi in
-			 O | o )
-			 echo "$CATEGORIE" >> "$CATEGORIES_ENABLED"
-			 break
-			 ;;
-			 N | n )
-			 break
-			 ;;
-		      esac
-		      done
-		done < $BL_CATEGORIES_AVAILABLE
-         break
-         ;;
-         W | w )
-               gettext 'Choice of unfiltered categories.'
-        while read CATEGORIE # pour chaque catégorie
-		do   
-		      clear
-		      eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
-		      while (true); do
-			 read choi
-			 case $choi in
-			 O | o )
-			 echo "$CATEGORIE" >> "$CATEGORIES_ENABLED"
-			 break
-			 ;;
-			 N | n )
-			 break
-			 ;;
-		      esac
-		      done
-		done < $WL_CATEGORIES_AVAILABLE
+         cat_av="$BL_CATEGORIES_AVAILABLE"
+		 break
+		 ;;
+		 W | w )	
+		 cat_av="$WL_CATEGORIES_AVAILABLE"
          break
          ;;
       esac
 done
+
+
+for CATEGORIE in $(cat < $cat_av ) ; do
+clear
+gettext 'Choice of unfiltered categories.'
+echo ""
+eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
+
+	while (true) ; do
+		unset choi
+		read choi
+		case $choi in
+		O | o )
+			echo "OUI"
+			echo "$CATEGORIE" >> "$CATEGORIES_ENABLED"
+			break
+		;;
+		N | n )
+			break
+		;;
+		esac
+	done
+
+
+done
+
+
 }
 
 
