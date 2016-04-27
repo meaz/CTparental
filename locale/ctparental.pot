@@ -1,7 +1,19 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
-
-### CTparental ###
+# ## CTparental ###
 msgid "It root of the need to run this script."
 msgstr ""
 
@@ -113,7 +125,7 @@ msgstr ""
 msgid "Choice of filtered categories."
 msgstr ""
 
-msgid "You want to enable this category:"
+msgid "You want to enable this category $CATEGORIE  O/N :"
 msgstr ""
 
 msgid "Choice of unfiltered categories."
@@ -153,7 +165,10 @@ msgstr ""
 msgid "\t=> updates parental control from the blacklist of the University of Toulouse"
 msgstr ""
 
-msgid "\t=> What to do after each change of the file"
+msgid "\t=> What to do after each change of the file $DNS_FILTER_OSSI"
+msgstr ""
+
+msgid "\t=> What to do after each change of the file $DREAB"
 msgstr ""
 
 msgid "\t=> Enable parental control"
@@ -209,7 +224,8 @@ msgid ""
 "\t=> Enable privileged group.\n"
 "\t   exemples:\n"
 "\t           CTparental.sh -gctulist\n"
-"\t           Comment all users that you want to filter in "
+"\t           Comment all users that you want to filter in $FILE_GCTOFFCONF\n"
+"\t           CTparental -gctalist"
 msgstr ""
 
 msgid "\t=> Disable privileged group."
@@ -221,7 +237,7 @@ msgstr ""
 msgid "\t=> Add remove Users added in sytem on the config file ,"
 msgstr ""
 
-msgid "\t=> Add / delete users in the ctoff group based on the config file ,"
+msgid "\t=> Add / delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
 msgstr ""
 
 msgid "\t=> Enable rules of custom firewall."
@@ -230,10 +246,10 @@ msgstr ""
 msgid "\t=> Disable rules of custom firewall."
 msgstr ""
 
-msgid "to add custom rules edit the file"
-msgstr ""
-
-msgid "then run the command"
+msgid ""
+"to add custom rules edit the file \n"
+"$FILEIPTABLES \n"
+"then run the command CTparental -ipton"
 msgstr ""
 
 msgid "unknown argument"
@@ -251,10 +267,10 @@ msgstr ""
 msgid "or"
 msgstr ""
 
-msgid "Internet surfing cut in"
+msgid "Your remaining navigation time is $countweb minutes"
 msgstr ""
 
-msgid "Logout in"
+msgid "Logout in $count minutes"
 msgstr ""
 
 msgid "minutes"
@@ -263,35 +279,41 @@ msgstr ""
 msgid "Your surf time as expird!"
 msgstr ""
 
-msgid "is allowed to connect 7/7 24/24"
+msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
 msgstr ""
 
-msgid "is allowed to connect X minutes per day"
+msgid ""
+"$PCUSER is allowed to connect X minutes per day \n"
+"X (1 a 1440) = "
 msgstr ""
 
-msgid "X must take a value between 1 and"
+msgid "X must take a value between 1 and 1440 \n"
 msgstr ""
 
-msgid "is allowed to surf the Internet X minutes per day"
+msgid ""
+"$PCUSER is allowed to surf the Internet X minutes per day \n"
+"X ( 1 a $timesession )= "
+msgstr ""
+
+msgid "X must take a value between 1 and $timesession \n"
 msgstr ""
 
 msgid "error recovery network settings"
 msgstr ""
 
-msgid "	=> Enable the superuser of grub2."
+msgid "\t=> Enable the superuser of grub2."
 msgstr ""
 
-msgid "	=> Disable the superuser of grub2."
+msgid "\t=> Disable the superuser of grub2."
 msgstr ""
 
-msgid "	=> Disable default rules privoxy."
+msgid "\t=> Disable default rules privoxy."
 msgstr ""
 
-msgid "	=> Enable default rules privoxy. (default is Enable)"
+msgid "\t=> Enable default rules privoxy. (default is Enable)"
 msgstr ""
 
-### CTadmin ###
-
+# ## CTadmin ###
 msgid "the selected user is: "
 msgstr ""
 
@@ -669,5 +691,3 @@ msgstr ""
 
 msgid "Default filter Pivoxy is disabled"
 msgstr ""
-
-

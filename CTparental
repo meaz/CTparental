@@ -11,11 +11,11 @@ DIR_CONF="/etc/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
-source gettext.sh
+. /usr/bin/gettext.sh
 set +a
 export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
-. /usr/bin/gettext.sh
+
 
 
 
@@ -1843,8 +1843,7 @@ uninstall () {
 choiblenabled () {
 echo -n > $CATEGORIES_ENABLED
 clear
-gettext 'Want to filter by, Blacklist or Whitelist:'
-echo -n " B/W :"
+gettext 'Want to filter by, Blacklist or Whitelist B/W :'
 while (true); do
          read choi
          case $choi in
@@ -1853,8 +1852,7 @@ while (true); do
         while read CATEGORIE # pour chaque catégorie 
 		do   
 		      clear
-		      gettext 'You want to enable this category:'
-		      echo -n " $CATEGORIE  O/N :"
+		      eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
 		      while (true); do
 			 read choi
 			 case $choi in
@@ -1875,8 +1873,7 @@ while (true); do
         while read CATEGORIE # pour chaque catégorie
 		do   
 		      clear
-		      gettext 'You want to enable this category:'
-		      echo -n " $CATEGORIE  O/N :"
+		      eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
 		      while (true); do
 			 read choi
 			 case $choi in
@@ -1950,28 +1947,27 @@ updatetimelogin () {
 			   if [ "$(cat < $FILE_HCOMPT | grep -c "^$PCUSER=" )" -eq 0 ] ;then
 					echo "$PCUSER=1=1" >> $FILE_HCOMPT
 			   else
-					count=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
+					var=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f2) + 1 ))
 					if [ "$(netstat -e | grep "$PCUSER" | grep -c ESTABLISHED)" -ge 1 ];then
-						countweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
+						varweb=$(($(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) + 1 ))
 					else
-						countweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) 
+						varweb=$(cat < $FILE_HCOMPT | grep "^$PCUSER=" | cut -d"=" -f3) 
 					fi
-					$SED "s?^$PCUSER=.*?$PCUSER=$count=$countweb?g" $FILE_HCOMPT
-					temprest=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f3 ) - count ))
-					temprestweb=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f4 ) - countweb ))
-					echo $temprest
+					$SED "s?^$PCUSER=.*?$PCUSER=$var=$varweb?g" $FILE_HCOMPT
+					count=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f3 ) - var ))
+					countweb=$(($(cat < $FILE_HCONF | grep "^$PCUSER=user=" | cut -d "=" -f4 ) - varweb ))
 					# si le compteur de l'usager dépasse la valeur max autorisée on verrouille le compte et on déconnecte l'utilisateur.
-					if [ $temprest -le 0 ];then
+					if [ $count -le 0 ];then
 						/usr/bin/skill -KILL -u"$PCUSER"
 						passwd -l "$PCUSER"
 					else
 						# On alerte l'usager que son quota temps session arrive à expiration 5-4-3-2-1 minutes avant.
-						if [ $temprest -le "$TIMERALERT" ];then
+						if [ $count -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Logout in') $temprest $(gettext 'minutes') $LANG "
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(eval_gettext "Logout in \$count minutes") "
 						fi
 					fi
-					if [ "$temprestweb" -le 0 ];then
+					if [ "$countweb" -le 0 ];then
 						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -eq 0 ];then
 							echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT" >> "$FILEIPTIMEWEB"
 							iptablesreload
@@ -1984,9 +1980,9 @@ updatetimelogin () {
 							iptablesreload
 						fi
 						# On alerte l'usager que son quota temps web arrive à expiration 5-4-3-2-1 minutes avant.
-						if [ $temprestweb -le "$TIMERALERT" ];then
+						if [ $countweb -le "$TIMERALERT" ];then
 						HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
-						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(gettext 'Internet surfing cut in') $temprestweb $(gettext 'minutes') "
+						export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u "$PCUSER"  /usr/bin/notify-send -u critical "CTparental" "$(eval_gettext "Your remaining navigation time is \$countweb minutes") "
 						fi
 					fi
 			   fi   
@@ -2054,7 +2050,7 @@ requiredpamtime
    do
    HOMEPCUSER=$(getent passwd "$PCUSER" | cut -d ':' -f6)
    $SED "/^$PCUSER=/d" $FILE_HCONF
-   echo -e -n "$PCUSER $(gettext "is allowed to connect 7/7 24/24") O/N?" 
+   eval_gettext "\$PCUSER is allowed to connect 7/7 24/24 O/N?" 
    choi=""
    while (true); do
    read choi
@@ -2067,8 +2063,8 @@ requiredpamtime
 	 N| n )
          alltime="N"
          clear
-         echo -e "$PCUSER $(gettext 'is allowed to connect X minutes per day')" 
-         echo -e -n "X (1 a 1440) = " 
+         eval_gettext "\$PCUSER is allowed to connect X minutes per day 
+X (1 a 1440) = " 
          while (true); do
          read choi
          if [ "$choi" -ge 1 ];then
@@ -2077,11 +2073,12 @@ requiredpamtime
 				break
 			fi
 		 fi	
-         echo " $(gettext 'X must take a value between 1 and') 1440 "
+         gettext "X must take a value between 1 and 1440 
+"
          done
          clear
-         echo -e "$PCUSER $(gettext 'is allowed to surf the Internet X minutes per day')" 
-         echo -e -n "X (1 a ""$timesession"") = " 
+         eval_gettext "\$PCUSER is allowed to surf the Internet X minutes per day 
+X ( 1 a \$timesession )= "
          while (true); do
          read choi
          if [ "$choi" -ge 1 ];then
@@ -2090,7 +2087,8 @@ requiredpamtime
 				break
 			fi
 		 fi	
-         echo " $(gettext 'X must take a value between 1 and') $timesession "
+		 eval_gettext "X must take a value between 1 and $timesession 
+"
          done
          echo "$PCUSER=user=$timesession=$timeweb" >> $FILE_HCONF
 		 break
@@ -2135,7 +2133,7 @@ requiredpamtime
                         echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			do
-                        echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                        echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			done
                         break
    
@@ -2161,8 +2159,8 @@ requiredpamtime
 			      echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			      for ((count=1 ; TIMERALERT + 1 - count ; count++))
 			      do
-                              echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-                              echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                              echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+                              echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 			      done
                              
                               break   
@@ -2284,8 +2282,8 @@ readTimeFILECONF () {
 					echo "$m4 $h4 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
-					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
-					echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h4" "$m4" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					userisconfigured="1"
 					done
 
@@ -2297,7 +2295,7 @@ readTimeFILECONF () {
 				        fi
 					for ((count=1 ; TIMERALERT + 1 - count ; count++))
 					do
-					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(gettext 'Logout in') $count $(gettext 'minutes')\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
+					echo "$(timecronalert "$count" "$h2" "$m2" "$NumDAY" ) root export HOME=$HOMEPCUSER && export DISPLAY=:0.0 && export XAUTHORITY=$HOMEPCUSER/.Xauthority && sudo -u $PCUSER  /usr/bin/notify-send -u critical \"CTparental\" \"$(eval_gettext "Logout in \$count minutes")\" " >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					done
 					echo "$m2 $h2 * * ${DAYSCRON[$NumDAY]} root /usr/bin/skill -KILL -u$PCUSER" >> /etc/cron.d/CTparental"${DAYS[$NumDAY]}"
 					
@@ -2413,8 +2411,8 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	   if no option a page by default is used.")
 -u$(gettext "	=> uninstall the Parental Control Computer (desktop PC)")
 -dl$(gettext "	=> updates parental control from the blacklist of the University of Toulouse")
--ubl$(gettext "	=> What to do after each change of the file") $DNS_FILTER_OSSI
--rl$(gettext "	=> What to do after each change of the file") $DREAB
+-ubl$(eval_gettext "	=> What to do after each change of the file \$DNS_FILTER_OSSI")
+-rl$(eval_gettext "	=> What to do after each change of the file \$DREAB") 
 -on$(gettext "	=> Enable parental control")
 -off$(gettext "	=> Disable parental controls")
 -cble$(gettext "	=> Set the filter mode by whitelist or blacklist (default)
@@ -2437,14 +2435,14 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 	   CTparental -dirhtml -i /home/toto/html/ -nodep
 	   CTparental -u -nodep")
 -nomanuel$(gettext "	=> used only for the postinst and prerm script.")
--gcton$(gettext "	=> Enable privileged group.
+-gcton$(eval_gettext "	=> Enable privileged group.
 	   exemples:
-	           CTparental -gctulist
-	           Comment all users that you want to filter in ")$FILE_GCTOFFCONF 
-	           CTparental -gctalist
+	           CTparental.sh -gctulist
+	           Comment all users that you want to filter in \$FILE_GCTOFFCONF
+	           CTparental -gctalist")
 -gctoff$(gettext "	=> Disable privileged group.")
 	   $(gettext "all users of the system undergo the filtering !!")
--gctalist$(gettext "	=> Add / delete users in the ctoff group based on the config file ,") $FILE_GCTOFFCONF
+-gctalist$(eval_gettext "	=> Add / delete users in the ctoff group based on the config file, \$FILE_GCTOFFCONF") 
 -ipton$(gettext "	=> Enable rules of custom firewall.")
 -iptoff$(gettext "	=> Disable rules of custom firewall.")
 -grubPon$(gettext "	=> Enable the superuser of grub2.")
@@ -2598,9 +2596,9 @@ case $arg1 in
     -ipton )
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
       iptablesreload
-      echo -e "$RougeD $(gettext "to add custom rules edit the file") "
-      echo " $FILEIPTABLES "
-      echo -e " $(gettext "then run the command") CTparental -ipton $Fcolor"
+      echo -e "$RougeD $(eval_gettext "to add custom rules edit the file 
+\$FILEIPTABLES 
+then run the command CTparental -ipton") $Fcolor"
       exit 0
       ;;
     -iptoff )
