@@ -120,8 +120,8 @@ msgstr "Entrez tout autre choix pour modifier les paramètres."
 msgid "Install a packet was detected please use this command to uninstall ctparental."
 msgstr "Une installation par paquet a été détectée veuillez utiliser cette commande pour désinstaller ctparental."
 
-msgid "Want to filter by, Blacklist or Whitelist:"
-msgstr "Voulez-vous filtrer par Blacklist ou Whitelist :"
+msgid "Want to filter by, Blacklist or Whitelist B/W :"
+msgstr "Voulez-vous filtrer par Blacklist ou Whitelist B/W :"
 
 msgid "Choice of filtered categories."
 msgstr "Choisir les catégories filtrées à appliquer."
