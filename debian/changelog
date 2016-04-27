@@ -2,6 +2,7 @@ ctparental (4.16.7-1) unstable; urgency=medium
 
   * ajout de certaine variables dans les fichiers ctparental.pot/.po
   pour permètre une mayeur traduction.
+ 
   * correction du bug de loop infini pendent un CTparental -cble
    
  -- Guillaume marsat <CTparental@laposte.net>  Wed, 27 Apr 2016 12:23:17 +0200
