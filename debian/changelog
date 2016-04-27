@@ -1,4 +1,4 @@
-ctparental (4.16.6-1) unstable; urgency=medium
+ctparental (4.16.7-1) unstable; urgency=medium
 
   * ajout de certaine variables dans les fichiers ctparental.pot/.po
   pour permètre une mayeur traduction.
