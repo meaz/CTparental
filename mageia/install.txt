@@ -1,23 +1,26 @@
 
 ## mise a jour os + install git
-su
+su -
 urpmi.update -a 
 urpmi --update --auto-select 
 urpmi git
 exit
 
+## désinstaler l'ancienne versions.
+su -
+CTparental -u
+exit
 
 ## téléchargement du scripte CTparental pour mageia
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
 
 ## install et configuration de CTparental
-su
+su -
 cp -f CTparental /usr/bin
 cp -f CTparental-bl-infos /usr/bin
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
-mkdir -p 
 cp -rf www /usr/share/CTparental
 cp -rf confDansgouardian /usr/share/CTparental
 cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
@@ -25,7 +28,7 @@ cd mageia
 CTparental -i
 exit
 
-en suite on gère le filtrage... via http://127.0.0.1/CTadmin
+en suite on gère le filtrage... via http://localhost/CTadmin
 
 pour le parfeux il fait passer par iptable .
 avec la commande 
@@ -34,5 +37,9 @@ CTparental -ipton
 pour la gestion du mot de passe grub2 il faut au préallable avoir installer grub2 sur sons system 
 grub (legacy) étant utiliser par default sous mageia 5.
 
+en le cat ou l'interface n'apparé pas aprés l'autentification , j'ai u un problême avec php-cgi 
+qui c'étais installer en version i586 au lieu x86_64 du coup incoérance avec ma version lighttpd en x86_64,
+résolut en désinstallent urpme --auto-orphans php-cgi puis en le réinstalant urpmi php-cgi
+puis redémarage du service lighttpd pour que cela soit bien pris en compte , tous est rentré dans l'ordre.
 
 tester le 24/04/2016 sur mageia 5 amd64 touts parais fonctioner.
