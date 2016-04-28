@@ -1,3 +1,4 @@
+
 ## mise a jour os + install git
 su
 urpmi.update -a 
@@ -16,8 +17,8 @@ cp -f CTparental /usr/bin
 cp -f CTparental-bl-infos /usr/bin
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
-cp -r www /usr/share/CTparental
-cp -r confDansgouardian /usr/share/CTparental
+cp -rf www /usr/share/CTparental
+cp -rf confDansgouardian /usr/share/CTparental
 cd mageia
 CTparental -i
 exit
@@ -28,10 +29,8 @@ pour le parfeux il fait passer par iptable .
 avec la commande 
 CTparental -ipton
 
+pour la gestion du mot de passe grub2 il faut au préallable avoir installer grub2 sur sons system 
+grub (legacy) étant utiliser par default sous mageia 5.
+
 
 tester le 24/04/2016 sur mageia 5 amd64 touts parais fonctioner.
-
-
-
-
-
