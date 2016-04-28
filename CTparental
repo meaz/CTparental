@@ -1159,10 +1159,8 @@ mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
    cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
-cp -rf /usr/share/CTparental/www/locale "$DIRHTML"
 cp -rf /usr/share/CTparental/www/CTparental/* "$DIRHTML"
 fi
-cp -rf /usr/share/CTparental/www/locale "$DIRadminHTML"
 cp -rf /usr/share/CTparental/www/CTadmin/* "$DIRadminHTML"
 
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
@@ -1487,7 +1485,7 @@ install () {
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
 		cp -rf confDansgouardian /usr/share/CTparental
-		cp -rf locale /etc/CTparental
+		cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
 	fi
 	iptablesreload
 	groupadd ctoff
@@ -1859,12 +1857,13 @@ while (true); do
 done
 
 
-for CATEGORIE in $(cat < $cat_av ) ; do
+cat  < $cat_av | while read CATEGORIE
+do
 clear
 gettext 'Choice of unfiltered categories.'
 echo ""
 eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
-
+(
 	while (true) ; do
 		unset choi
 		read choi
@@ -1879,8 +1878,7 @@ eval_gettext "You want to enable this category \$CATEGORIE  O/N :"
 		;;
 		esac
 	done
-
-
+) < /dev/tty
 done
 
 
