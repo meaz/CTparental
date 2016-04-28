@@ -11,7 +11,7 @@ DIR_CONF="/etc/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
-. /usr/bin/gettext.sh
+source /usr/bin/gettext.sh
 set +a
 export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
@@ -1558,11 +1558,13 @@ install () {
       if [ $noinstalldep = "0" ]; then
 	  for PACKAGECT in $CONFLICTS
          do
-			${CMDREMOVE} ${PACKAGECT} 2> /dev/null
+			cmd="${CMDREMOVE} ${PACKAGECT}"
+			$cmd 2> /dev/null
          done
 	  fi
       if [ "$noinstalldep" = "0" ]; then
-	      ${CMDINSTALL} ${DEPENDANCES}
+	     cmd="${CMDINSTALL} ${DEPENDANCES}"
+	     $cmd
       fi
       # on desactive l'ipv6
 		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
