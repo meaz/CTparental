@@ -193,6 +193,8 @@ XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
 DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null | grep "^deb" | cut -d"/" -f3 | sort -u | sed -e "s/^www././g" )}
 TIMERALERT=${TIMERALERT:=10}
+NEWPASSGRUB2=${NEWPASSGRUB2:="grub-mkpasswd-pbkdf2"}
+BOOTREPGRUB2=${BOOTREPGRUB2:="/boot/grub"}
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
@@ -2339,7 +2341,7 @@ Enter login to the superuser of grub2 :'
 done
 echo > /tmp/passgrub
 while [ "$(awk '{print $NF}' /tmp/passgrub | grep -c grub.)" -eq 0 ];do
-grub-mkpasswd-pbkdf2 | tee /tmp/passgrub
+$NEWPASSGRUB2 | tee /tmp/passgrub
 done    
 passwordgrub=$(awk '{print $NF}' /tmp/passgrub | grep grub.)
 ##on rebascule sur la keymap system
@@ -2361,7 +2363,7 @@ confunrestricted() {
         ## fonction lancer en tache de fond par la commande
         ## confunrestricted &
         ## elle attend la fin de l’exécution de tous les scripts  update grub 
-        ## puis modifie le fichier /boot/grub/grub.cfg pour y ajouter le droits a touts le monde
+        ## puis modifie le fichier $BOOTREPGRUB2/grub.cfg pour y ajouter le droits a touts le monde
         cd /etc/grub.d/
         for file in *
         do
@@ -2377,12 +2379,12 @@ confunrestricted() {
         do
             sleep 0.2
         done
-        cp /boot/grub/grub.cfg /tmp/grub.cfg.new
+        cp $BOOTREPGRUB2/grub.cfg /tmp/grub.cfg.new
         while read linecfg 
         do
             if [ "\$(echo "\$linecfg" | grep -E "menuentry " | grep -v "uefi-firmware" | grep -c -v "recovery mode" )" -eq 1 ];then
                 line2=\$(echo "\$linecfg" | sed -e 's/ {/ --unrestricted { /g')
-                sed -i "s|\$linecfg|\$line2|" /boot/grub/grub.cfg
+                sed -i "s|\$linecfg|\$line2|" $BOOTREPGRUB2/grub.cfg
             fi
         done < /tmp/grub.cfg.new
         rm /tmp/grub.cfg.new
