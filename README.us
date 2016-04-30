@@ -38,4 +38,4 @@ Added grub2 password, the password is persistent after an update-grub or lay a g
 
 Works with firefox, Midori, chromium ...
 
-custom business rules for iptables. Enabled with CTparental.sh -ipton
+custom business rules for iptables. Enabled with CTparental -ipton

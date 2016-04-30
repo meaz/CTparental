@@ -41,7 +41,7 @@ Controle parental.
  
  Fonctionne avec firefox,midori,chromium …
  
- Gestion de règles personnalisées pour iptables. Activé avec CTparental.sh -ipton
+ Gestion de règles personnalisées pour iptables. Activé avec CTparental -ipton
  
 
 
