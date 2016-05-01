@@ -702,7 +702,10 @@ md5old=$(grep MD5DREAB= "$FILE_CONF" | cut -d"=" -f2)
 md5new="$({
 cat "$DREAB" "$CATEGORIES_ENABLED"
 echo "$DOMAINEDEPOTS" 
+md5sum $DIR_DNS_FILTER_AVAILABLE/* | grep -v ossi.conf
 } | md5sum )"
+## évite de lancer la moulinette de réabilitation des domaines quant aucun changements
+## ne le nécécite.
 if [ ! "$md5old" = "$md5new" ]; then
 rm -rf ${DIR_DNS_BLACKLIST_ENABLED:?}/
 mkdir $DIR_DNS_BLACKLIST_ENABLED
