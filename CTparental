@@ -1511,7 +1511,6 @@ echo "</CActparental>"
 
 install () {
 	FILTRAGEISOFF=1
-	rm -f $FILE_CONF 
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
 		cp -rf confDansgouardian /usr/share/CTparental
