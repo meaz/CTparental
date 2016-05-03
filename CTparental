@@ -96,6 +96,7 @@ IP_IWAN="192.168.182.2"
 DNS1="192.168.182.1"
 DNS2="192.168.182.1"
 EOF
+
 fi
 if [ ! -f $SAFE_CONF ] ; then
 cat << EOF > $SAFE_CONF
