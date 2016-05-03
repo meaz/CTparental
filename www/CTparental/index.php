@@ -1,73 +1,63 @@
 <?php
 include 'locale.php';
 ?>
+<!DOCTYPE html>
 <html>
+    <head>
+        <title><?php echo gettext("Access has been Denied!"); ?></title>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<head>
-<title>Dnsmasq - Access Denied</title>
-</head>
+        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="css/main.css" type="text/css">
+        
+        <script src="js/jquery-1.12.3.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+    </head>
 
-<body bgcolor=#FFFFFF>
+    <body>
+        <div class="container">
+            <div class="header clearfix">
+                <h3 class="text-muted"><?php echo gettext("Access has been Denied!"); ?></h3>
+            </div>
+            
+            <div class="jumbotron">
+                <img src="http://127.0.0.1/CTparental/images/2518388623_1.png" />
 
-<center>
-<table border=0 cellspacing=0 cellpadding=2 height=540 width=700>
-<tr>
-	<td colspan=2 bgcolor=#FEA700 height=100 align=center>
-	<font face=arial,helvetica size=6>
-	<b><?php echo gettext("Access has been Denied!");?></b>
-	</td>
-</tr>
-<tr>
-	<td colspan=2 bgcolor=#FFFACD height=30 align=right>
-	<font face=arial,helvetica size=3 color=black>
-	<b>-CTparental-&nbsp;</b>
-	</td>
-</tr>
-<tr>
-	<td align=center valign=bottom width=150 bgcolor=#B0C4DE>
-	<font face=arial,helvetica size=1 color=black>
-	<img src="images/Tux.png" />
-	</td>
-	<td width=550 bgcolor=#FFFFFF align=center valign=center>
-	<font face=arial,helvetica color=black>
-	<font size=4>
-	<?php echo gettext("Access to the page:");?>
-	<br><br>
-	<?php
-		echo ( $_SERVER["HTTP_HOST"] );
-	?>
-	<br><br>
-	<font size=3>
-	<?php echo gettext("... has been denied for the following reason:");?>
-	<br><br>
-	<font color=red>
-	<b>
-	<?php
+                <h1><?php echo gettext("Access to the page:");?></h1>
+                <h2><?php echo $_SERVER["HTTP_HOST"]; ?></h2>
+                <hr />
+                <h3><?php echo gettext("... has been denied for the following reason:");?></h3>
+                <h3>
+                    <strong>
+                    <?php
+                        exec ("/usr/bin/CTparental-bl-infos ".$_SERVER["HTTP_HOST"], $blinfosliste);
+                        
+                        //$var1 = $blinfosliste[0];
+                        //$tab1 = explode(" ", $var1);
+                        
+                        //foreach ($tab1 as $categorie)
+                        foreach ($blinfosliste as $categorie)
+                        {
+                            echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a>";
+                        }
+                    ?>
+                    </strong>
+                </h3>
+            </div>
+            
+            <p class="text-justify text-warning">
+                <?php
+                    echo gettext("You are seeing this error because what you attempted to access appears to contain,")."&nbsp;".gettext("or is labeled as containing, material that has been deemed inapproriate.")."&nbsp;".gettext("If you have any queries contact your ICT Co-ordinator or Network Manager.");
+                ?>
+            </p>
 
-exec ("/usr/bin/CTparental-bl-infos ".$_SERVER["HTTP_HOST"],$blinfosliste);
-
-foreach ($blinfosliste as $categorie )
-			{
-				echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a><br>";
-			}
-
-?>
-</b>
-	<font color=black>
-	<br><br><br><br>
-	<?php echo gettext("You are seeing this error because what you attempted to access appears to contain,");
-	echo "<br>		".gettext("or is labeled as containing, material that has been deemed inapproriate.");?>
-	<br><br>
-	<?php echo gettext("If you have any queries contact your ICT Co-ordinator or Network Manager.");?>
-	<br><br><br><br>
-	<font size=1>
-	<?php echo gettext("Filtered by ");?> <B><a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" target="_blank">Dnsmasq</a></B></a>
-	</td>
-</tr>
-</table>
-
-</body>
-
+            <footer class="footer">
+                <span><?php echo gettext("Filtered by ");?> <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" target="_blank">Dnsmasq</a></span>
+                <span class="pull-right">CTparental</span>
+            </footer>
+        </div>
+    </body>
 </html>
-
-
