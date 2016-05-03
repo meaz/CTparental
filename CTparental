@@ -229,9 +229,15 @@ if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then
 	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/adr:/{print substr($2,5)}')"
 	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/{ print substr($3,7)}')"	
 else
-	## testing/sid
-	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/inet /{print substr($2,1)}')"
-	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
+	if [ "$(ifconfig | grep -c "addr" )" -ge 1 ];then 
+		## elementaryos
+		ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/addr:/{print substr($2,6)}')"
+		ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/{ print substr($3,7)}')"
+	else
+		## testing/sid
+		ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/inet /{print substr($2,1)}')"
+		ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
+	fi
 fi
 reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
 if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
