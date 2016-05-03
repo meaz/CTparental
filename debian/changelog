@@ -1,3 +1,10 @@
+ctparental (4.16.8-1.0) unstable; urgency=medium
+
+  * correction du bug error recovery network settings sous elementaryos.
+  * amméliration de la fonction de réabilitation de domaine.
+
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 03 May 2016 18:40:11 +0200
+
 ctparental (4.16.7-1.0) unstable; urgency=medium
 
   * ajout de certaine variables dans les fichiers ctparental.pot/.po
