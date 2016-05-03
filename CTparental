@@ -90,6 +90,11 @@ PRIVOXYDF=ON
 # Parfeux minimal.
 IPRULES=OFF
 MD5DREAB=
+I_WAN="eth0"
+IP_BOX="192.168.182.1"
+IP_IWAN="192.168.182.2"
+DNS1="192.168.182.1"
+DNS2="192.168.182.1"
 EOF
 fi
 if [ ! -f $SAFE_CONF ] ; then
@@ -297,13 +302,15 @@ done
    return $result
 }
 
+networkisoknext() {
 if [ "$(echo "$interface_WAN" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox" )" -eq 0 -o "$( ipMaskValide "$ipinterface_WAN" )" -eq 0 \
  -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast" )" -eq 0 \
  -o "$( ipMaskValide "$reseau_box" )" -eq 0 ];then
 gettext 'error recovery network settings'
 echo
-exit 1
+exit 0
 fi 
+}
 
 resolvconffixon () {
 echo "<resolvconffixon>"
@@ -1504,6 +1511,7 @@ echo "</CActparental>"
 
 install () {
 	FILTRAGEISOFF=1
+	rm -f $FILE_CONF 
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
 		cp -rf confDansgouardian /usr/share/CTparental
@@ -1652,12 +1660,7 @@ install () {
       $ENIPTABLESSAVE
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
-	  { echo I_WAN="$interface_WAN"
-		  echo IP_BOX="$ipbox"
-		  echo IP_IWAN="$ipinterface_WAN"
-		  echo DNS1="$DNS1"
-		  echo DNS2="$DNS2"
-	  } >> $FILE_CONF
+	  
     
 }
 nomade () {
@@ -2472,6 +2475,7 @@ case $arg1 in
       exit 0
       ;;
    -i )
+      networkisoknext
       install
       exit 0
       ;;
@@ -2481,6 +2485,7 @@ case $arg1 in
       ;;
    -dl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  download
 		  adapt
 		  catChoice
@@ -2491,6 +2496,7 @@ case $arg1 in
       ;;
    -ubl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  adapt
 		  catChoice
 		  dnsmasqon
@@ -2499,17 +2505,20 @@ case $arg1 in
       exit 0
       ;;
    -uhtml )
+      networkisoknext
       FoncHTTPDCONF
       exit 0
       ;;
    -rl )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+         networkisoknext
          catChoice
          dnsmasqon
       fi 
       exit 0
       ;;
    -on )
+      networkisoknext
 	  FILTRAGEISOFF=0
       dnsmasqon
       iptablesreload
@@ -2525,12 +2534,14 @@ case $arg1 in
       ;;
    -wlo )
 	  if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+	      networkisoknext
 		  dnsmasqwhitelistonly
       fi
       exit 0
       ;;
    -cble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  choiblenabled
 		  catChoice
 		  dnsmasqon
@@ -2539,6 +2550,7 @@ case $arg1 in
       ;;
     -dble )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  initblenabled
 		  catChoice
 		  dnsmasqon
@@ -2559,7 +2571,7 @@ case $arg1 in
       ;;
     -aupon )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-		 autoupdateon
+         autoupdateon
       fi
       exit 0
       ;;
@@ -2569,6 +2581,7 @@ case $arg1 in
       ;;
     -aup )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+         networkisoknext
 		 autoupdate
       fi
       exit 0
@@ -2579,18 +2592,20 @@ case $arg1 in
       ;;
     -gcton )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  activegourpectoff
 		  iptablesreload
 	  fi
 	  exit 0
       ;;
     -gctoff )
-	  desactivegourpectoff
+      desactivegourpectoff
 	  iptablesreload
 	  exit 0
       ;;
     -gctulist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  updatelistgctoff
 		  iptablesreload
 	  fi
@@ -2598,6 +2613,7 @@ case $arg1 in
       ;;
     -gctalist )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+          networkisoknext
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
 			updatecauser
 			setproxy
@@ -2609,6 +2625,7 @@ case $arg1 in
 	  exit 0
       ;;
     -ipton )
+      networkisoknext
       $SED "s?.*IPRULES.*?IPRULES=ON?g" $FILE_CONF
       iptablesreload
       echo -e "$RougeD $(eval_gettext "to add custom rules edit the file 
@@ -2622,6 +2639,7 @@ then run the command CTparental -ipton") $Fcolor"
       exit 0
       ;;
     -nomade )
+      networkisoknext
 	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
 	  nomade
 	  exit 0
@@ -2633,6 +2651,7 @@ then run the command CTparental -ipton") $Fcolor"
       ;;  
     -ucto )
       if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+         networkisoknext
 		 # appelé toutes les minutes par cron pour activer le filtrage sur les usagers nouvelement créé .
 		 
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
