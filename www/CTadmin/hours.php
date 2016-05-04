@@ -52,32 +52,37 @@ if ($HOURSCONNECT == "ON")
                     elseif ( $numday == "user") {echo gettext('24/7')." : <input type='checkbox' name='isadmin' >";
                                             if ( intval ($field[2]) == 0 ) { $field[2]="1440"; }
                                             echo "<br /> ";
-                                            echo gettext('time max pc connection')." ".gettext('( minutes for 24 hours )')."<INPUT type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440";
-                                            
-                                            echo gettext('time max for web surfing')." ".gettext('( minutes for 24 hours )')."<INPUT type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2];	
+                                            echo gettext('time max pc connection')." ".gettext('( minutes for 24 hours )')."<input type=\"text\" size=4 maxlength=4 value=\"$field[2]\"  name=\"tmax\">/1440";
+                                            echo "<br /> ";
+                                            echo gettext('time max for web surfing')." ".gettext('( minutes for 24 hours )')."<input type=\"text\" size=4 maxlength=4 value=\"$field[3]\"  name=\"tmax2\">/".$field[2];	
+                                            echo "<br /> ";
                                             }
                                             
                     else {
+						 if ( $numday == "0") { echo "<table>";}
+							echo "<tr>";
                             if ( isset ($field2[0]) ) {
-                                    echo "$week[$numday]:<INPUT type=\"text\" size=5 maxlength=5 value=\"$field2[0]\"  name=\"h1$numday\">";
-                                    echo gettext(' to ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"$field2[1]\" name=\"h2$numday\">";
+                                    echo "<td> $week[$numday]: </td> <td> <input type=\"text\" size=5 maxlength=5 value=\"$field2[0]\"  name=\"h1$numday\">";
+                                    echo gettext(' to ')." <input type=\"text\" size=5 maxlength=5 value=\"$field2[1]\" name=\"h2$numday\">";
                                     }
                             else {
-                                    echo "$week[$numday]:<INPUT type=\"text\" size=5 maxlength=5 value=\"\"  name=\"h1$numday\">";
-                                    echo gettext(' to ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"\" name=\"h2$numday\">";
+                                    echo "<td> $week[$numday]: </td> <td> <input type=\"text\" size=5 maxlength=5 value=\"\"  name=\"h1$numday\">";
+                                    echo gettext(' to ')." <input type=\"text\" size=5 maxlength=5 value=\"\" name=\"h2$numday\">";
                                     
                             }
                             if ( isset ($field2[2]) ) {
-                                            echo gettext(' and ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"$field2[2]\" name=\"h3$numday\">";	
-                                            echo gettext(' to ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"$field2[3]\" name=\"h4$numday\">";
+                                            echo gettext(' and ')." <input type=\"text\" size=5 maxlength=5 value=\"$field2[2]\" name=\"h3$numday\">";	
+                                            echo gettext(' to ')." <input type=\"text\" size=5 maxlength=5 value=\"$field2[3]\" name=\"h4$numday\"></td>";
                                     }
                             else {
-                                            echo gettext(' and ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"\" name=\"h3$numday\">";	
-                                            echo gettext(' to ')." <INPUT type=\"text\" size=5 maxlength=5 value=\"\" name=\"h4$numday\">";	
+                                            echo gettext(' and ')." <input type=\"text\" size=5 maxlength=5 value=\"\" name=\"h3$numday\">";	
+                                            echo gettext(' to ')." <input type=\"text\" size=5 maxlength=5 value=\"\" name=\"h4$numday\"></td>";	
                             }
+                            
+                           echo "</tr>";
+                           if ( $numday == "6") { echo "</table>";}
                         }
                     }
-                    echo "<br /> ";
                 }
             }
         }
