@@ -20,9 +20,8 @@ if(isset($LANG))
     textdomain($domain);
     // La traduction est cherché dans ./locale/fr_FR/LC_MESSAGES/fr.mo
 }
-
-$bl_dir = "/usr/local/etc/CTparental/dnsfilter-available/";
-
+$dirconf="/etc/CTparental";
+$bl_dir=$dirconf."/dnsfilter-available/";
 $l_title                      = gettext("Blacklist categories");
 $l_error_open_file            = gettext("Error opening the file");
 $l_close                      = gettext("Close");

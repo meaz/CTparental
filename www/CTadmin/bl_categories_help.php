@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <?php
 include 'locale.php';
-$bl_dir="/usr/local/etc/CTparental/dnsfilter-available/";
+  $dirconf="/etc/CTparental";
+  $bl_dir=$dirconf."/dnsfilter-available/";
   $l_title=gettext("Blacklist categories");
   $l_error_open_file=gettext("Error opening the file");
   $l_close=gettext("Close");
