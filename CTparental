@@ -1602,19 +1602,16 @@ install () {
 		else
 			echo "net.ipv6.conf.all.disable_ipv6=1" >> "$FILESYSCTL"
 		fi
-		unset test
 		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.default.disable_ipv6=1" >> "$FILESYSCTL"
 		fi
-		unset test
 		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.lo.disable_ipv6=1" >> "$FILESYSCTL"
 		fi
-		unset test
 		sysctl -p "$FILESYSCTL"
       ######################
       # on charge le(s) module(s) indispensable(s) pour iptables.
@@ -1771,6 +1768,23 @@ desactivegourpectoff () {
 }
 
 uninstall () {
+	 # on resactive l'ipv6, pour éviter les erreur d'install privoxy par la suite sur les version avec ipv6 activée par défault
+		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=0?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.all.disable_ipv6=0" >> "$FILESYSCTL"
+		fi
+		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=0?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.default.disable_ipv6=0" >> "$FILESYSCTL"
+		fi
+		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=0?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.lo.disable_ipv6=0" >> "$FILESYSCTL"
+		fi
+		sysctl -p "$FILESYSCTL"
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
