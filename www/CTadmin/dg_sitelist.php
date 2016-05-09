@@ -41,7 +41,7 @@ if ($tab) # the file isn't empty
                         echo $s[0]." ";
                         echo "</span>";
                     }
-
+                    $chknum = $chknum + 1;
                     continue;
                 }
             }

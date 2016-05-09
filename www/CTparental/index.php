@@ -41,7 +41,7 @@ include 'locale.php';
                         //foreach ($tab1 as $categorie)
                         foreach ( $blinfosliste as $categorie )
                         {
-                            echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a>";
+                            echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a><br />";
                         }
                     ?>
                     </strong>

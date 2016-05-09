@@ -27,6 +27,7 @@ if ($tab) # the file isn't empty
                 
                 if ($s[0] != '.')
                 {
+				   $chknum = $chknum + 1;
                    continue;
                 }
             }
