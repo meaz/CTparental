@@ -23,7 +23,7 @@ if ($tab)  # the file isn't empty
             if(preg_match('/^#/', $ligne) and !strstr($ligne, '/'))
             {
 				$chknum = $chknum + 1;
-                continue;
+				continue;
             }
 
             if ($cols == 1) { echo "<div class='col-md-6'>"; }
