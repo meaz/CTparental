@@ -1,3 +1,9 @@
+ctparental (4.18.1-1.0) unstable; urgency=medium
+
+  * corection dub bug de désativation filtrage aprés un download de la bl de toulouse.
+
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 24 May 2016 18:43:30 +0200
+ 
 ctparental (4.17.1-1.0) unstable; urgency=medium
 
   * nouvelle interface web.
