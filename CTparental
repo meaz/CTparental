@@ -249,7 +249,7 @@ reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
 if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
 	reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $8}' <<< ${ip_route})"
 	if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
-		reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $8}' <<< ${ip_route})"
+		reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $13}' <<< ${ip_route})"
 	fi	
 fi
 export interface_WAN
