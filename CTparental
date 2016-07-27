@@ -248,9 +248,9 @@ fi
 reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
 if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
 	reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $8}' <<< ${ip_route})"
-	if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
-		reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $13}' <<< ${ip_route})"
-	fi	
+	#if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
+	#	reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $13}' <<< ${ip_route})"
+	#fi	
 fi
 export interface_WAN
 export ipbox
@@ -261,7 +261,7 @@ unset ip_route
 nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
 DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
-#echo $interface_WAN $ipbox $ipinterface_WAN $reseau_box $ip_broadcast $DNS1 $DNS2
+#echo "intefaceWAN="$interface_WAN" ipbox="$ipbox" ipinterfaceWan="$ipinterface_WAN" reseau_box="$reseau_box" broadcast="$ip_broadcast" dns1="$DNS1" dns2="$DNS2
 DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
 DNS2=${DNS2:=208.67.222.222} #
 ipMaskValide() {
