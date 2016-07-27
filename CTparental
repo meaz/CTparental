@@ -245,12 +245,14 @@ else
 		ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
 	fi
 fi
-reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $10}' <<< ${ip_route})"
+reseau_box="$(awk '//{print $10}' <<< ${ip_route})"
 if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
-	reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $8}' <<< ${ip_route})"
-	#if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
-	#	reseau_box="$(awk '/'"${ipinterface_WAN}"'/{print $13}' <<< ${ip_route})"
-	#fi	
+	reseau_box="$(awk '//{print $8}' <<< ${ip_route})"
+	#echo "reseau_boxif1"
+	if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
+		#echo "reseau_boxif2"
+		reseau_box="$(awk '//{print $13}' <<< ${ip_route})"
+	fi	
 fi
 export interface_WAN
 export ipbox
