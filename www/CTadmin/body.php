@@ -87,7 +87,7 @@ case 'change_file1' :
 	$tab=file($dg_file_edit);
 	if ($tab)
 		{
-		$pointeur=fopen($dg_file_edit,"w+");
+		$pointeur=fopen($dg_file_edit,"w+") or die(gettext('Error opening the file')." ".$dg_file_edit);
 		$numline=1;
 		foreach ($tab as $ligne)
 			{
@@ -120,7 +120,7 @@ case 'change_safesearch' :
 	$tab=file($dg_file_edit);
 	if ($tab)
 		{
-		$pointeur=fopen($dg_file_edit,"w+");
+		$pointeur=fopen($dg_file_edit,"w+") or die(gettext('Error opening the file')." ".$dg_file_edit);
 		$numline=1;
 		foreach ($tab as $ligne)
 			{
@@ -191,10 +191,7 @@ case 'ProxyDF_Off' :
 	exec ($cmdCT."-pfoff");
 	break;
 case 'MAJ_cat' :
-	$tab=file($bl_categories_enabled);	
-	if ($tab)
-		{
-		$pointeur=fopen($bl_categories_enabled, "w+");
+		$pointeur=fopen($bl_categories_enabled, "w+") or die(gettext('Error opening the file')." ".$bl_categories_enabled);
 		foreach ($_POST as $key => $value)
 			{
                         if (strstr($key,'chk-'))
@@ -204,13 +201,12 @@ case 'MAJ_cat' :
 				}
 			}
 		fclose($pointeur);
-		}
-	else {echo gettext('Error opening the file')." ".$bl_categories_enabled;}
-	$fichier=fopen($bl_domains,"w+");
+
+	$fichier=fopen($bl_domains,"w+") or die(gettext('Error opening the file')." ".$bl_domains);
 	fputs($fichier, form_filter($_POST['OSSI_bl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_bl_domains']);
-	$fichier=fopen($wl_domains,"w+");
+	$fichier=fopen($wl_domains,"w+")or die(gettext('Error opening the file')." ".$wl_domains);
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
 	unset($_POST['OSSI_wl_domains']);
@@ -363,6 +359,7 @@ case 'change_user' :
 			}
 		fclose($pointeur);
 		}
+	else {echo gettext('Error opening the file')." $conf_ctoff_file";}
 	exec ($cmdCT."-gctalist");
 	break;
 }
