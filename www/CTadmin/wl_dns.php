@@ -26,7 +26,7 @@ require("update.php");
 echo "<div class='col-md-12'>";
 echo "<hr />";
 echo "<h3>".gettext('Choice of authorized categories')."</h3>";
-echo "<form action='$_SERVER[PHP_SELF]?dgfile=WhiteList filtering' method=POST>";
+echo "<form action='$_SERVER[PHP_SELF]?dgfile=WhiteList Filtering' method=POST>";
 echo "<input type='hidden' name='choix' value='MAJ_cat'>";
 echo "<div class='row'>";
 
