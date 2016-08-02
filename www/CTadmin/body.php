@@ -39,6 +39,23 @@ $bl_domains            = $dirconf."blacklist-local.conf";
 
 $cmdCT = "sudo -h localhost -u root /usr/bin/CTparental ";
 
+if (is_file ($conf_file))
+{
+    $tab = file($conf_file);
+    
+    if ($tab)
+    {
+        foreach ($tab as $line)
+        {
+            $field = explode("=", $line);        
+            if ($field[0] == "DNSMASQ")         { $DNSMASQ      = trim($field[1]); }        
+        }
+    }
+}
+else
+{
+    echo gettext('Error opening the file')." ".$conf_file;
+}
 
 if (isset($_GET['dgfile']))
 {
@@ -48,6 +65,7 @@ else
 {
     if ($DNSMASQ <> "OFF")
     {
+		
 		if ( $DNSMASQ == 'WHITE' )	{ $dg_confswitch = 'WhiteList Filtering'; }	else { $dg_confswitch = 'Blacklist filtering'; }
     }
     else
@@ -365,7 +383,6 @@ case 'change_user' :
 	break;
 }
 
-
 if (is_file ($conf_file))
 {
     $tab = file($conf_file);
@@ -389,6 +406,7 @@ else
 {
     echo gettext('Error opening the file')." ".$conf_file;
 }
+
 
 echo "<nav class='navbar navbar-inverse navbar-fixed-top'>";
 echo "<div class='container-fluid'>";

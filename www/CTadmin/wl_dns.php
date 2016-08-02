@@ -19,7 +19,7 @@ function echo_file ($filename)
     }
 }
 
-echo "<h1 class='page-header'>".gettext('WhiteList filtering')."</h1>";
+echo "<h1 class='page-header'>".gettext('WhiteList Filtering')."</h1>";
 
 require("update.php");
 
