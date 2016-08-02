@@ -48,7 +48,7 @@ else
 {
     if ($DNSMASQ <> "OFF")
     {
-        $dg_confswitch = 'Blacklist filtering';
+		if ( $DNSMASQ == 'WHITE' )	{ $dg_confswitch = 'WhiteList Filtering'; }	else { $dg_confswitch = 'Blacklist filtering'; }
     }
     else
     {
