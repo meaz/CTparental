@@ -201,11 +201,12 @@ case 'MAJ_cat' :
 				}
 			}
 		fclose($pointeur);
-
-	$fichier=fopen($bl_domains,"w+") or die(gettext('Error opening the file')." ".$bl_domains);
-	fputs($fichier, form_filter($_POST['OSSI_bl_domains']));
-	fclose($fichier);
-	unset($_POST['OSSI_bl_domains']);
+	if ( $dg_confswitch == 'Blacklist filtering' ) { // empèche l'éfacement du fichier de blacklist ossi quant on passe en mode whitelist.
+		$fichier=fopen($bl_domains,"w+") or die(gettext('Error opening the file')." ".$bl_domains);
+		fputs($fichier, form_filter($_POST['OSSI_bl_domains']));
+		fclose($fichier);
+		unset($_POST['OSSI_bl_domains']);
+	}
 	$fichier=fopen($wl_domains,"w+")or die(gettext('Error opening the file')." ".$wl_domains);
 	fputs($fichier, form_filter($_POST['OSSI_wl_domains']));
 	fclose($fichier);
