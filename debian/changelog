@@ -1,6 +1,7 @@
 ctparental (4.18.3-1.0) unstable; urgency=medium
 
   * corection de l'erreur d'éfacement de la blacklist ossi au passage en mode whitelist.
+  * l'interface d'administration s'ouvre dans l'onglé du mode de filtrage actif.
 
  -- Guillaume marsat <CTparental@laposte.net>  Tue, 02 Aug 2016 10:35:01 +0200
  
