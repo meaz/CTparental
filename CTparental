@@ -175,7 +175,7 @@ UIDMINUSER=${UIDMINUSER:=1000}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/e2guardian/"}
 DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/local/share/CTparental/confe2guardian}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confe2guardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
