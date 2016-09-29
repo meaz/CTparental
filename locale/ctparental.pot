@@ -683,7 +683,7 @@ msgstr ""
 msgid "Select the mimetype has filtered"
 msgstr ""
 
-msgid "Dansguardian configuration"
+msgid "e2guardian configuration"
 msgstr ""
 
 msgid "Default filter Pivoxy is activated"
