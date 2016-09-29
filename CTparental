@@ -227,7 +227,7 @@ if [ -z "$CMDINSTALL" ] ; then
    exit 1
 fi
 
-ip_route="$(ip route)"
+ip_route="$(ip route | sed '$!N;s/\n/ /')"
 interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
 ipbox="$(awk '{print $3}' <<< ${ip_route})"   
 if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
