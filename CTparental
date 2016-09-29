@@ -15,7 +15,7 @@ source /usr/bin/gettext.sh
 set +a
 export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
-
+CHEMINCTPARENTLE="$(readlink -f "$0")"
 
 
 
@@ -178,6 +178,8 @@ DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
 NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confe2guardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
+DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
+E2GUXSITELIST=$DIRE2G"lists/exceptionsitelist"
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -202,6 +204,20 @@ DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list
 TIMERALERT=${TIMERALERT:=10}
 NEWPASSGRUB2=${NEWPASSGRUB2:="grub-mkpasswd-pbkdf2"}
 BOOTREPGRUB2=${BOOTREPGRUB2:="/boot/grub"}
+BL_SERVER="dsi.ut-capitole.fr"
+FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
+FILEIPTABLES="$DIR_CONF/iptables"
+FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
+CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
+BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
+WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
+DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
+DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
+DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
+DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
+THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
+MAXDAYSFORUPDATE="7" # update tous les 7 jours
+
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
@@ -358,22 +374,7 @@ else
 MFILEtmp=""
 UMFILEtmp=""
 fi
-BL_SERVER="dsi.ut-capitole.fr"
-FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
-FILEIPTABLES="$DIR_CONF/iptables"
-FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
-CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
-BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
-WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
-DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
-DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
-DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
-DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
-DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
-E2GUXSITELIST="/etc/dansguardian/lists/exceptionsitelist"
-THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
-MAXDAYSFORUPDATE="7" # update tous les 7 jours
-CHEMINCTPARENTLE="$(readlink -f "$0")"
+
 
 initblenabled () {
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
