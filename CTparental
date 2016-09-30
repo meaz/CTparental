@@ -169,6 +169,7 @@ ENLIGHTTPD=${ENLIGHTTPD:=""}
 ENDNSMASQ=${ENDNSMASQ:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
+ENE2GUARDIAN=${ENE2GUARDIAN:=""}
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=1000}
 
@@ -1678,6 +1679,7 @@ install () {
       $ENDNSMASQ
       $ENNWMANAGER
       $ENIPTABLESSAVE
+      $ENE2GUARDIAN
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  
