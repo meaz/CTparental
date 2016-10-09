@@ -1105,7 +1105,6 @@ iptablesreload () {
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
-     
      if [ ! "$REDIRECT" -eq 1 ];then
       # on rejet les connection a la page de redirection .
       # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
@@ -2741,11 +2740,13 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
     -ion )	
 	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
+	  REDIRECT=1
 	  iptablesreload
 	  exit 0
       ;;
     -ioff )
 	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
+	  REDIRECT=0
 	  iptablesreload
       exit 0
       ;;
