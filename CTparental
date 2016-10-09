@@ -2739,12 +2739,12 @@ then run the command CTparental -ipton") $Fcolor"
 	  privoxydefaultfilteron
       exit 0
       ;;
-    -ion	
+    -ion )	
 	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
 	  iptablesreload
 	  exit 0
       ;;
-    -ioff
+    -ioff )
 	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
 	  iptablesreload
       exit 0
