@@ -87,6 +87,7 @@ AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
 PRIVOXYDF=ON
+REDIRECT=ON
 # Parfeux minimal.
 IPRULES=OFF
 MD5DREAB=
@@ -108,7 +109,7 @@ EOF
 
 fi
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
-
+REDIRECT="$(cat < $FILE_CONF | grep -c "REDIRECT=ON" )"
 
 
 ## imports du plugin de la distributions si il existe
@@ -195,9 +196,10 @@ CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
-PRIVOXYCONF=${PRIVOXYCONF:="/etc/privoxy/config"}
-PRIVOXYUSERA=${PRIVOXYUSERA:="/etc/privoxy/user.action"}
-PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
+ETCPRIVOXY=${ETCPRIVOXY:="/etc/privoxy"}
+PRIVOXYCONF=${PRIVOXYCONF:="$ETCPRIVOXY/config"}
+PRIVOXYUSERA=${PRIVOXYUSERA:="$ETCPRIVOXY/user.action"}
+PRIVOXYCTA=${PRIVOXYCTA:="$ETCPRIVOXY/ctparental.action"}
 CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
@@ -508,7 +510,10 @@ http://localhost.*
  .dailymotion.*/.*enable=(?!true)
               
 EOF
-
+if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
+	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
+fi
+echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
 $PRIVOXYrestart
 setproxy
 echo "</confprivoxy>"
@@ -934,7 +939,7 @@ ipglobal () {
     $IPTABLES -A INPUT -i "$interface_WAN" -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
     $IPTABLES -A INPUT -i "$interface_WAN" -p udp -m limit --limit 10/s -j ACCEPT
-
+    
 	### IP indésirables
  
     if [ -e "$FILEIPBLACKLIST" ] ;  then
@@ -1100,7 +1105,15 @@ iptablesreload () {
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
-      
+     
+     if [ ! "$REDIRECT" -eq 1 ];then
+      # on rejet les connection a la page de redirection .
+      # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
+      # le visuel des pages visitées sen retrouve améliorée.
+    
+	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
+	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
+     fi
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
@@ -2506,6 +2519,8 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
 -pfoff$(gettext "	=> Disable default rules privoxy.")
 -pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
+-ion$(gettext "	=> Enable intercept page.")
+-ioff$(gettext "	=> Disable intercept page.")
 "
 arg1=${1}
 case $arg1 in
@@ -2722,6 +2737,16 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
     -pfon )
 	  privoxydefaultfilteron
+      exit 0
+      ;;
+    -ion	
+	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
+	  iptablesreload
+	  exit 0
+      ;;
+    -ioff
+	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
+	  iptablesreload
       exit 0
       ;;
       
