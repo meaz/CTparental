@@ -721,3 +721,9 @@ msgstr "Le filtrage par défaut de privoxy est activé."
 
 msgid "Default filter Pivoxy is disabled"
 msgstr "Le filtrage par défaut de privoxy est désactivé."
+
+msgid "Enable rectidect page."
+msgstr "Activer la page de redirection."
+
+msgid "Disabled rectidect page."
+msgstr "Désactiver la page de redirection."

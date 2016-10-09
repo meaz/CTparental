@@ -2518,8 +2518,8 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
 -pfoff$(gettext "	=> Disable default rules privoxy.")
 -pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
--ion$(gettext "	=> Enable intercept page.")
--ioff$(gettext "	=> Disable intercept page.")
+-ion$(gettext "	=> Enable rectidect page.")
+-ioff$(gettext "	=> Disable rectidect page.")
 "
 arg1=${1}
 case $arg1 in
@@ -2738,13 +2738,13 @@ then run the command CTparental -ipton") $Fcolor"
 	  privoxydefaultfilteron
       exit 0
       ;;
-    -ion )	
+    -ron )	
 	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
 	  REDIRECT=1
 	  iptablesreload
 	  exit 0
       ;;
-    -ioff )
+    -roff )
 	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
 	  REDIRECT=0
 	  iptablesreload

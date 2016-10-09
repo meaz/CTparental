@@ -691,3 +691,10 @@ msgstr ""
 
 msgid "Default filter Pivoxy is disabled"
 msgstr ""
+
+msgid "Enable rectidect page."
+msgstr ""
+
+msgid "Disabled rectidect page."
+msgstr ""
+
