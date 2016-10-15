@@ -271,6 +271,9 @@ if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dan
 	if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
 		#echo "reseau_boxif2"
 		reseau_box="$(awk '//{print $13}' <<< ${ip_route})"
+		if [ "$reseau_box" = "metric" ];then # cat de https://github.com/marsat/CTparental/issues/25
+			reseau_box="$(awk '//{print $15}' <<< ${ip_route})"
+		fi
 	fi	
 fi
 export interface_WAN
