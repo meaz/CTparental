@@ -1,4 +1,4 @@
-ctparental (4.18.5-1.0) unstable; urgency=medium
+ctparental (3.9.8-1.0) unstable; urgency=medium
 
   * correction de l'activation au demarage de e2guardian debian sid.
  
