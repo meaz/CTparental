@@ -5,24 +5,24 @@ Upstream-Source:
  https://github.com/marsat/CTparental.git
 
 Files: *
-Copyleft © 2013-2016 Guillaume Marsat <CTparental@laposte.net>
+Copyright: 2013-2016 Guillaume Marsat <CTparental@laposte.net>
 License: GPL-3+
 
 Files: CTparental
-Copyleft © 2013-2016 Guillaume Marsat <CTparental@laposte.net>
+Copyright: 2013-2016 Guillaume Marsat <CTparental@laposte.net>
  Parts of the code come from the script alcasar-bl.sh by Franck BOUIJOUX
  and Richard REY for project alcasar [1] release 2.6.1.
  [1] http://www.alcasar.net/
 License: GPL-3+
 
 Files: www
-Copyleft © 2013-2016 Guillaume Marsat <CTparental@laposte.net>
-Copyleft © 2016	cyberesprit <cyberesprit@>
+Copyright: 2013-2016 Guillaume Marsat <CTparental@laposte.net>
+           2016	cyberesprit <cyberesprit@>
 License: GPL-3+
 
 Files: debian/*
-Copyleft © 2013-2016 Guillaume Marsat <CTparental@laposte.net>
-         © 2014 Gilles Filippini <gilles.filippini@free.fr>
+Copyright: 2013-2016 Guillaume Marsat <CTparental@laposte.net>
+           2014 Gilles Filippini <gilles.filippini@free.fr>
 License: GPL-3+
 
 License: GPL-3+
