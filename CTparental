@@ -15,7 +15,7 @@ source /usr/bin/gettext.sh
 set +a
 export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
-CHEMINCTPARENTLE="$(readlink -f "$0")"
+
 
 
 
@@ -87,7 +87,6 @@ AUTOUPDATE=OFF
 HOURSCONNECT=OFF
 GCTOFF=OFF
 PRIVOXYDF=ON
-REDIRECT=ON
 # Parfeux minimal.
 IPRULES=OFF
 MD5DREAB=
@@ -109,7 +108,7 @@ EOF
 
 fi
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"
-REDIRECT="$(cat < $FILE_CONF | grep -c "REDIRECT=ON" )"
+
 
 
 ## imports du plugin de la distributions si il existe
@@ -134,9 +133,9 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data dansguardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
-CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
+CONFLICTS=${CONFLICTS:=" e2guardian mini-httpd apache2 firewalld "}
 
 #### COMMANDES de services par DEFAULT #####
 CMDSERVICE=${CMDSERVICE:="service "}
@@ -154,7 +153,7 @@ NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
-E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
+E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE dansguardian restart"}
 PRIVOXYrestart=${PRIVOXYrestart:="$CMDSERVICE privoxy restart"}
 #### LOCALISATION du fichier PID lighttpd par default ####
 LIGHTTPpidfile=${LIGHTTPpidfile:="/var/run/lighttpd.pid"}
@@ -170,18 +169,15 @@ ENLIGHTTPD=${ENLIGHTTPD:=""}
 ENDNSMASQ=${ENDNSMASQ:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
-ENE2GUARDIAN=${ENE2GUARDIAN:=""}
 #### UID MINIMUM pour les UTILISATEUR
 UIDMINUSER=${UIDMINUSER:=1000}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
-DIRE2G=${DIRE2G:="/etc/e2guardian/"}
-DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confe2guardian}
-FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
-FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
-DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
-E2GUXSITELIST=$DIRE2G"lists/exceptionsitelist"
+DIRE2G=${DIRE2G:="/etc/dansguardian/"}
+DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confDansgouardian}
+FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
+FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
@@ -196,10 +192,9 @@ CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
-ETCPRIVOXY=${ETCPRIVOXY:="/etc/privoxy"}
-PRIVOXYCONF=${PRIVOXYCONF:="$ETCPRIVOXY/config"}
-PRIVOXYUSERA=${PRIVOXYUSERA:="$ETCPRIVOXY/user.action"}
-PRIVOXYCTA=${PRIVOXYCTA:="$ETCPRIVOXY/ctparental.action"}
+PRIVOXYCONF=${PRIVOXYCONF:="/etc/privoxy/config"}
+PRIVOXYUSERA=${PRIVOXYUSERA:="/etc/privoxy/user.action"}
+PRIVOXYCTA=${PRIVOXYCTA:="/etc/privoxy/ctparental.action"}
 CTFILEPROXY=${CTFILEPROXY:="$DIR_CONF/CT-proxy.sh"}
 XSESSIONFILE=${XSESSIONFILE:="/etc/X11/Xsession"}
 REPCAMOZ=${REPCAMOZ:="/usr/share/ca-certificates/mozilla/"}
@@ -207,20 +202,6 @@ DOMAINEDEPOTS=${DOMAINEDEPOTS:=$(cat /etc/apt/sources.list /etc/apt/sources.list
 TIMERALERT=${TIMERALERT:=10}
 NEWPASSGRUB2=${NEWPASSGRUB2:="grub-mkpasswd-pbkdf2"}
 BOOTREPGRUB2=${BOOTREPGRUB2:="/boot/grub"}
-BL_SERVER="dsi.ut-capitole.fr"
-FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
-FILEIPTABLES="$DIR_CONF/iptables"
-FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
-CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
-BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
-WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
-DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
-DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
-DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
-DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
-THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
-MAXDAYSFORUPDATE="7" # update tous les 7 jours
-
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
@@ -272,6 +253,7 @@ if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dan
 		#echo "reseau_boxif2"
 		reseau_box="$(awk '//{print $13}' <<< ${ip_route})"
 		if [ "$reseau_box" = "metric" ];then # cat de https://github.com/marsat/CTparental/issues/25
+			#echo "reseau_boxif3"
 			reseau_box="$(awk '//{print $15}' <<< ${ip_route})"
 		fi
 	fi	
@@ -380,7 +362,22 @@ else
 MFILEtmp=""
 UMFILEtmp=""
 fi
-
+BL_SERVER="dsi.ut-capitole.fr"
+FILEIPBLACKLIST="$DIR_CONF/ip-blackliste"
+FILEIPTABLES="$DIR_CONF/iptables"
+FILEIPTIMEWEB="$DIR_CONF/iptables-timerweb"
+CATEGORIES_ENABLED="$DIR_CONF/categories-enabled.conf"
+BL_CATEGORIES_AVAILABLE="$DIR_CONF/bl-categories-available"
+WL_CATEGORIES_AVAILABLE="$DIR_CONF/wl-categories-available"
+DIR_DNS_FILTER_AVAILABLE="$DIR_CONF/dnsfilter-available"
+DIR_DNS_BLACKLIST_ENABLED="$DIR_CONF/blacklist-enabled"
+DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
+DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
+DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
+E2GUXSITELIST="/etc/dansguardian/lists/exceptionsitelist"
+THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
+MAXDAYSFORUPDATE="7" # update tous les 7 jours
+CHEMINCTPARENTLE="$(readlink -f "$0")"
 
 initblenabled () {
 USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
@@ -413,7 +410,7 @@ chmod 664 "$CATEGORIES_ENABLED"
 confe2guardian () {
   # replace the default deny HTML page
  
-  echo "<confe2guardian>"
+  echo "<confdansguardian>"
   $SED "s?^loglevel =.*?loglevel = 0?g" "$FILEConfe2gu"
   $SED "s?^languagedir =.*?languagedir = $DIRE2GLANG?g" "$FILEConfe2gu"
   $SED "s?^language =.*?language = 'french'?g" "$FILEConfe2gu"
@@ -451,10 +448,9 @@ EOF
 $E2GUARDIANrestart
 cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/
 cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-sed -i "s/é/\&eacute;/g" "$DIRE2GLANG"french/messages
-sed -i "s/è/\&egrave;/g" "$DIRE2GLANG"french/messages
+sed -i "s/\&ecute;/\&eacute;/g" "$DIRE2GLANG"french/messages
 $E2GUARDIANrestart
-echo "</confe2guardian>"
+echo "</confdansguardian>"
 }
 privoxydefaultfilteroff () {
 $SED "s?^PRIVOXYDF.*?PRIVOXYDF=OFF?g" $FILE_CONF
@@ -513,10 +509,7 @@ http://localhost.*
  .dailymotion.*/.*enable=(?!true)
               
 EOF
-if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
-	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
-fi
-echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
+
 $PRIVOXYrestart
 setproxy
 echo "</confprivoxy>"
@@ -942,7 +935,7 @@ ipglobal () {
     $IPTABLES -A INPUT -i "$interface_WAN" -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
     $IPTABLES -A INPUT -i "$interface_WAN" -p udp -m limit --limit 10/s -j ACCEPT
-    
+
 	### IP indésirables
  
     if [ -e "$FILEIPBLACKLIST" ] ;  then
@@ -1108,14 +1101,7 @@ iptablesreload () {
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
-     if [ ! "$REDIRECT" -eq 1 ];then
-      # on rejet les connection a la page de redirection .
-      # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
-      # le visuel des pages visitées sen retrouve améliorée.
-    
-	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
-	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
-     fi
+      
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
@@ -1553,7 +1539,7 @@ install () {
 	FILTRAGEISOFF=1
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
-		cp -rf confe2guardian /usr/share/CTparental
+		cp -rf confDansgouardian /usr/share/CTparental
 		cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
 	fi
 	iptablesreload
@@ -1694,7 +1680,6 @@ install () {
       $ENDNSMASQ
       $ENNWMANAGER
       $ENIPTABLESSAVE
-      $ENE2GUARDIAN
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  
@@ -2521,8 +2506,6 @@ usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -
 -grubPoff$(gettext "	=> Disable the superuser of grub2.")
 -pfoff$(gettext "	=> Disable default rules privoxy.")
 -pfon$(gettext "	=> Enable default rules privoxy. (default is Enable)")
--ron$(gettext "	=> Enable rectidect page.")
--roff$(gettext "	=> Disable rectidect page.")
 "
 arg1=${1}
 case $arg1 in
@@ -2739,25 +2722,6 @@ then run the command CTparental -ipton") $Fcolor"
       ;;
     -pfon )
 	  privoxydefaultfilteron
-      exit 0
-      ;;
-    -ron )	
-	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
-	  REDIRECT=1
-	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
-	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
-	  echo $E2GUARDIANrestart
-	  $E2GUARDIANrestart
-	  iptablesreload
-	  exit 0
-      ;;
-    -roff )
-	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
-	  REDIRECT=0
-	  echo -n > "$DIRE2GLANG"ukenglish/template.html
-	  echo -n > "$DIRE2GLANG"french/template.html
-	  $E2GUARDIANrestart
-	  iptablesreload
       exit 0
       ;;
       
