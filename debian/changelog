@@ -3,6 +3,13 @@ ctparental (4.18.7-1.0) unstable; urgency=medium
   * correction d'un bug sur le temps de navigation otorisé.
  
  -- Guillaume marsat <CTparental@laposte.net>  Sat, 29 Oct 2016 16:06:48 +0200
+
+ctparental (4.18.6-1.0) unstable; urgency=medium
+
+  * correction d'un bug qui faiser planter dnsmasq a l'activation sur SAFEBING.
+  * ajout d'un parramètre pour activer ou desactiver la page de redirection.
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Fri, 30 Sep 2016 13:52:26 +0200
  
 ctparental (4.18.5-1.0) unstable; urgency=medium
 
