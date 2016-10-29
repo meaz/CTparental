@@ -2041,11 +2041,7 @@ updatetimelogin () {
 					fi
 					if [ "$countweb" -le 0 ];then
 						if [ "$(cat < "$FILEIPTIMEWEB" | grep -c "$PCUSER")" -eq 0 ];then
-<<<<<<< HEAD
-						    # on bloque l'acces direct , via dansguardian et via le proxy
-=======
 							# on bloque l'acces direct , via dansguardian et via le proxy
->>>>>>> master
 							echo "$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -j REJECT" >> "$FILEIPTIMEWEB"
 							echo "$IPTABLES -A OUTPUT -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -p tcp --dport $E2GUport -j REJECT" >> "$FILEIPTIMEWEB"
 							echo "$IPTABLES -A OUTPUT -d 127.0.0.1/8 -m owner --uid-owner $PCUSER -p tcp --dport $PROXYport -j REJECT" >> "$FILEIPTIMEWEB"
