@@ -182,6 +182,7 @@ FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DNSMASQCONF=${DNSMASQCONF:="/etc/dnsmasq.conf"}
 DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
+E2GUXSITELIST=$DIRE2G"lists/exceptionsitelist"
 MAINCONFHTTPD=${MAINCONFHTTPD:="/etc/lighttpd/lighttpd.conf"}
 DIRCONFENABLEDHTTPD=${DIRCONFENABLEDHTTPD:="/etc/lighttpd/conf-enabled"}
 CTPARENTALCONFHTTPD=${CTPARENTALCONFHTTPD:="$DIRCONFENABLEDHTTPD/10-CTparental.conf"}
