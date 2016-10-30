@@ -1,8 +1,9 @@
 ctparental (4.18.7-1.0) unstable; urgency=medium
 
   * correction d'un bug sur le temps de navigation otorisé.
+  * correction d'un bug sur domaine-rehabiliter.
  
- -- Guillaume marsat <CTparental@laposte.net>  Sat, 29 Oct 2016 16:06:48 +0200
+ -- Guillaume marsat <CTparental@laposte.net>  Sun, 30 Oct 2016 09:22:38 +0100
  
 ctparental (4.18.6-1.0) unstable; urgency=medium
 
