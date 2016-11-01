@@ -134,7 +134,7 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd php5-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
 
@@ -1010,8 +1010,10 @@ $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
 initfileiptables () {
 
 cat << EOF >  $FILEIPTABLES
+## on autorise tous le trafic sortant .
+\$IPTABLES -A OUTPUT -j ACCEPT
 ## on autorise tous le trafic sortant à destination de notre lan (PC imprimante de la maison)
-\$IPTABLES -A OUTPUT -d \$reseau_box -j ACCEPT
+#\$IPTABLES -A OUTPUT -d \$reseau_box -j ACCEPT
 ## on acepte tous le trafic entrant en provenence de notre lan (PC imprimante de la maison)
 \$IPTABLES -A INPUT -s \$reseau_box -j ACCEPT 
 
@@ -1027,6 +1029,9 @@ cat << EOF >  $FILEIPTABLES
 #\$IPTABLES -A INPUT  -s \$reseau_box -p udp -m multiport --sports 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
 #\$IPTABLES -A INPUT  -s \$reseau_box -p tcp -m multiport --sports 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 4380 -j ACCEPT 			# chat audio Steam
+## certains jeux néssesite un acces direct sans proxy pour l'autentification https a ouvrir au cas par cas.
+## exemple steam.goldenfrog.org
+#\$IPTABLES -I OUTPUT -d 208.73.211.70 -m owner --uid-owner child1 -p tcp --dport 443 -j ACCEPT 
 
 
 ## Serveurs dédiés ou Serveurs d'écoute
@@ -1636,16 +1641,31 @@ install () {
 	     $cmd
       fi
       # on desactive l'ipv6
+      # désactivation de ipv6 pour toutes les interfaces
 		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=1?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.all.disable_ipv6=1" >> "$FILESYSCTL"
 		fi
+	  # désactivation de l’auto configuration pour toutes les interfaces
+		if [ "$( grep -c "net.ipv6.conf.all.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.all.autoconf=.*?net.ipv6.conf.all.autoconf=0?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.all.autoconf=0" >> "$FILESYSCTL"
+		fi
+	  # désactivation de ipv6 pour les nouvelles interfaces
 		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.default.disable_ipv6=1" >> "$FILESYSCTL"
 		fi
+      # désactivation de l’auto configuration pour les nouvelles interfaces
+		if [ "$( grep -c "net.ipv6.conf.default.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.default.autoconf=.*?net.ipv6.conf.default.autoconf=0?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.default.autoconf=0" >> "$FILESYSCTL"
+		fi
+	   # désactivation de ipv6 pour l'interface loopback		
 		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" "$FILESYSCTL"
 		else
@@ -1809,16 +1829,31 @@ desactivegourpectoff () {
 
 uninstall () {
 	 # on resactive l'ipv6, pour éviter les erreur d'install privoxy par la suite sur les version avec ipv6 activée par défault
+	  # re-activation de ipv6 pour toutes les interfaces
 		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=0?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.all.disable_ipv6=0" >> "$FILESYSCTL"
 		fi
+	  # re-activation de l’auto configuration pour toutes les interfaces
+		if [ "$( grep -c "net.ipv6.conf.all.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.all.autoconf=.*?net.ipv6.conf.all.autoconf=1?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.all.autoconf=1" >> "$FILESYSCTL"
+		fi
+	  # re-activation de ipv6 pour les nouvelles interfaces
 		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=0?g" "$FILESYSCTL"
 		else
 			echo "net.ipv6.conf.default.disable_ipv6=0" >> "$FILESYSCTL"
 		fi
+      # re-activation de l’auto configuration pour les nouvelles interfaces
+		if [ "$( grep -c "net.ipv6.conf.default.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
+			$SED "s?^net.ipv6.conf.default.autoconf=.*?net.ipv6.conf.default.autoconf=1?g" "$FILESYSCTL"
+		else
+			echo "net.ipv6.conf.default.autoconf=1" >> "$FILESYSCTL"
+		fi
+	   # re-activation de ipv6 pour l'interface loopback		
 		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
 			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=0?g" "$FILESYSCTL"
 		else
