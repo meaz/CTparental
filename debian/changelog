@@ -1,3 +1,9 @@
+ctparental (4.18.8-1.0) unstable; urgency=medium
+
+  * ipv6 nétais pas bien désativer dans sertain cas , c'est chause faite maintenent.
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Wed, 02 Nov 2016 00:32:49 +0100
+ 
 ctparental (4.18.7-1.0) unstable; urgency=medium
 
   * correction d'un bug sur le temps de navigation otorisé.
