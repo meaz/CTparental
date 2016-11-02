@@ -476,8 +476,10 @@ confprivoxy () {
 	
 echo "<confprivoxy>"
 $SED "s?^debug.*?debug = 0?g"  "$PRIVOXYCONF"
-$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?1"  "$PRIVOXYCONF" #ipv4
-$SED "s?^listen-address.*?listen-address  [::1]:$PROXYport?2"  "$PRIVOXYCONF" #ipv6
+ligneipv4=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '1q;d' )
+ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
+$SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
+$SED "$ligneipv6 s/^listen-address.*/listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
 	test=$(grep -c "actionsfile ctparental.action" "$PRIVOXYCONF" )
 	if [ "$test" -ge "1" ] ; then
 		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" "$PRIVOXYCONF"
