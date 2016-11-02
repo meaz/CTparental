@@ -194,7 +194,7 @@ CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
-IPTABLES6=${IPTABLES:="/sbin/ip6tables"}
+IPTABLES6=${IPTABLES6:="/sbin/ip6tables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
 ETCPRIVOXY=${ETCPRIVOXY:="/etc/privoxy"}
@@ -1108,7 +1108,6 @@ iptablesreload () {
    $IPTABLES6 -P INPUT DROP
    $IPTABLES6 -P OUTPUT DROP
    $IPTABLES6 -P FORWARD DROP 
-   echo "endipv6"
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -t nat -D OUTPUT -j ctparental 2> /bin/null
