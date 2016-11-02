@@ -194,6 +194,7 @@ CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
 CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
+IPTABLES6=${IPTABLES:="/sbin/ip6tables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
 DELUSERTOGROUP=${DELUSERTOGROUP:="gpasswd -d "}
 ETCPRIVOXY=${ETCPRIVOXY:="/etc/privoxy"}
@@ -1102,6 +1103,12 @@ chmod 750  $FILEIPTABLES
 iptablesreload () {
    echo "<iptablesreload>"
    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
+   $IPTABLES6 -F
+   $IPTABLES6 -X
+   $IPTABLES6 -P INPUT DROP
+   $IPTABLES6 -P OUTPUT DROP
+   $IPTABLES6 -P FORWARD DROP 
+   echo "endipv6"
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -t nat -D OUTPUT -j ctparental 2> /bin/null
@@ -1110,6 +1117,7 @@ iptablesreload () {
    $IPTABLES -P INPUT ACCEPT
    $IPTABLES -P OUTPUT ACCEPT
    $IPTABLES -P FORWARD ACCEPT 
+   
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
@@ -1128,6 +1136,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
 		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 	  fi
+	  
 	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
 	  do 
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
@@ -1144,11 +1153,10 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
 		  fi
 		  done
-   
    if [ -e "$FILEIPTIMEWEB" ] ;  then
 		source "$FILEIPTIMEWEB"
    fi
-	
+
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
@@ -1640,39 +1648,7 @@ install () {
 	     cmd="${CMDINSTALL} ${DEPENDANCES}"
 	     $cmd
       fi
-      # on desactive l'ipv6
-      # désactivation de ipv6 pour toutes les interfaces
-		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=1?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.all.disable_ipv6=1" >> "$FILESYSCTL"
-		fi
-	  # désactivation de l’auto configuration pour toutes les interfaces
-		if [ "$( grep -c "net.ipv6.conf.all.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.all.autoconf=.*?net.ipv6.conf.all.autoconf=0?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.all.autoconf=0" >> "$FILESYSCTL"
-		fi
-	  # désactivation de ipv6 pour les nouvelles interfaces
-		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=1?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.default.disable_ipv6=1" >> "$FILESYSCTL"
-		fi
-      # désactivation de l’auto configuration pour les nouvelles interfaces
-		if [ "$( grep -c "net.ipv6.conf.default.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.default.autoconf=.*?net.ipv6.conf.default.autoconf=0?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.default.autoconf=0" >> "$FILESYSCTL"
-		fi
-	   # désactivation de ipv6 pour l'interface loopback		
-		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=1?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.lo.disable_ipv6=1" >> "$FILESYSCTL"
-		fi
-		sysctl -p "$FILESYSCTL"
-      ######################
+      
       # on charge le(s) module(s) indispensable(s) pour iptables.
 		if [ "$( grep -c ip_conntrack_ftp "$FILEMODULESLOAD" )" -ge "1" ] ; then
 			$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" "$FILEMODULESLOAD"
@@ -1828,38 +1804,7 @@ desactivegourpectoff () {
 }
 
 uninstall () {
-	 # on resactive l'ipv6, pour éviter les erreur d'install privoxy par la suite sur les version avec ipv6 activée par défault
-	  # re-activation de ipv6 pour toutes les interfaces
-		if [ "$( grep -c "net.ipv6.conf.all.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.all.disable_ipv6=.*?net.ipv6.conf.all.disable_ipv6=0?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.all.disable_ipv6=0" >> "$FILESYSCTL"
-		fi
-	  # re-activation de l’auto configuration pour toutes les interfaces
-		if [ "$( grep -c "net.ipv6.conf.all.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.all.autoconf=.*?net.ipv6.conf.all.autoconf=1?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.all.autoconf=1" >> "$FILESYSCTL"
-		fi
-	  # re-activation de ipv6 pour les nouvelles interfaces
-		if [ "$( grep -c "net.ipv6.conf.default.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.default.disable_ipv6=.*?net.ipv6.conf.default.disable_ipv6=0?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.default.disable_ipv6=0" >> "$FILESYSCTL"
-		fi
-      # re-activation de l’auto configuration pour les nouvelles interfaces
-		if [ "$( grep -c "net.ipv6.conf.default.autoconf=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.default.autoconf=.*?net.ipv6.conf.default.autoconf=1?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.default.autoconf=1" >> "$FILESYSCTL"
-		fi
-	   # re-activation de ipv6 pour l'interface loopback		
-		if [ "$( grep -c "net.ipv6.conf.lo.disable_ipv6=" "$FILESYSCTL" )" -ge "1" ] ; then
-			$SED "s?^net.ipv6.conf.lo.disable_ipv6=.*?net.ipv6.conf.lo.disable_ipv6=0?g" "$FILESYSCTL"
-		else
-			echo "net.ipv6.conf.lo.disable_ipv6=0" >> "$FILESYSCTL"
-		fi
-		sysctl -p "$FILESYSCTL"
+
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
@@ -1952,6 +1897,18 @@ uninstall () {
 		fi
    done
    unsetproxy
+   # on réouvre l'ipv6
+   $IPTABLES6 -F
+   $IPTABLES6 -X
+   $IPTABLES6 -P INPUT ACCEPT
+   $IPTABLES6 -P OUTPUT ACCEPT
+   $IPTABLES6 -P FORWARD ACCEPT
+   # Save configuration so that it survives a reboot
+   if [ "$IPTABLESsaveFILE" = "" ] ;then
+	   $IPTABLESsave
+   else
+	   $IPTABLESsave > "$IPTABLESsaveFILE"
+   fi
 }
 
 choiblenabled () {
