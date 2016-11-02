@@ -1,9 +1,8 @@
 ctparental (4.18.9-1.0) unstable; urgency=medium
 
   * ipv6 ayans toujour du mal a ce désactiver quant on utilise network manager
-  une solution de remplassement visent a laisser le support ipv6 actif 
-  mais a bloquer tous le trafic vias ip6tables, le trafique est réouver 
-  a la désinstal de ctparental.
+  un début dintégration de celui si et mis en place via ip6tables, point bloquant actuel
+  e2guardian/dansguardian ne sanble pas écouter sur une ipv6.
  
  -- Guillaume marsat <CTparental@laposte.net>  Wed, 02 Nov 2016 00:32:49 +0100
  
