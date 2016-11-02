@@ -475,8 +475,8 @@ confprivoxy () {
 	
 echo "<confprivoxy>"
 $SED "s?^debug.*?debug = 0?g"  "$PRIVOXYCONF"
-$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?g"  "$PRIVOXYCONF"
-
+$SED "s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?1"  "$PRIVOXYCONF" #ipv4
+$SED "s?^listen-address.*?listen-address  [::1]:$PROXYport?2"  "$PRIVOXYCONF" #ipv6
 	test=$(grep -c "actionsfile ctparental.action" "$PRIVOXYCONF" )
 	if [ "$test" -ge "1" ] ; then
 		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" "$PRIVOXYCONF"
@@ -1105,9 +1105,12 @@ iptablesreload () {
    ### SUPPRESSION de TOUTES LES ANCIENNES TABLES (OUVRE TOUT!!) ###
    $IPTABLES6 -F
    $IPTABLES6 -X
-   $IPTABLES6 -P INPUT DROP
-   $IPTABLES6 -P OUTPUT DROP
-   $IPTABLES6 -P FORWARD DROP 
+   $IPTABLES6 -t nat -D OUTPUT -j ctparental6 2> /bin/null
+   $IPTABLES6 -t nat -F ctparental6  2> /bin/null
+   $IPTABLES6 -t nat -X ctparental6  2> /bin/null
+   $IPTABLES6 -P INPUT ACCEPT
+   $IPTABLES6 -P OUTPUT ACCEPT
+   $IPTABLES6 -P FORWARD ACCEPT 
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -t nat -D OUTPUT -j ctparental 2> /bin/null
@@ -1142,14 +1145,18 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	  done
 	  	  for user in $(listeusers) ; do
 		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
-			 #on rediriges les requet DNS des usagers filtrés sur dnsmasq
+			 #on rediriges les requet DNS ipv4 des usagers filtrés sur dnsmasq
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
+			 #on rediriges les requet DNS ipv6 des usagers filtrés sur dnsmasq
+			 $IPTABLES6 -t nat -A ctparental6 -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to ::1:54 
+			 $IPTABLES6 -t nat -A ctparental6 -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to ::1:54
 			 #force passage par dansguardian pour les utilisateurs filtrés 
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
-			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.	
+			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
+			 # on interdit l'utilisation d'IPv6.	
 		  fi
 		  done
    if [ -e "$FILEIPTIMEWEB" ] ;  then
