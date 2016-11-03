@@ -1430,6 +1430,7 @@ fastcgi.server = (
 \$SERVER["socket"] == "$PRIVATE_IP:80" {
 server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
+}
 
 \$SERVER["socket"] == "$PRIVATE_IP6:80" {
 server.document-root = "$DIRHTML"
