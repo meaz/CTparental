@@ -370,7 +370,7 @@ echo "</resolvconffixoff>"
 
 
 PRIVATE_IP="127.0.0.10"
-
+PRIVATE_IP6="::1"
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
 FILE_tmpSizeMax=${FILE_tmpSizeMax:="128M"}  # 70 Min, Recomend 128M 
@@ -1133,6 +1133,8 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
     
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
+	  $IPTABLES -I OUTPUT -d $PRIVATE_IP6 -p tcp --dport 80 -j REJECT
+	  $IPTABLES -I OUTPUT -d $PRIVATE_IP6 -p tcp --dport 443 -j REJECT
      fi
       # Force privoxy a utiliser dnsmasq sur le port 54
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1158,8 +1160,11 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 #force passage par dansguardian pour les utilisateurs filtrés 
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
+			 $IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to ::1:"$E2GUport"
+			 $IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to ::1:"$E2GUport"
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
 			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
+			 $IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT
 			 # on interdit l'utilisation d'IPv6.	
 		  fi
 		  done
@@ -1279,7 +1284,7 @@ server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
 server.port = 80
 server.bind = "127.0.0.1"
-
+server.bind = "::1"
 
 index-file.names = ( "index.php", "index.html" )
 url.access-deny = ( "~", ".inc" )
@@ -1287,6 +1292,7 @@ static-file.exclude-extensions = (".php", ".pl", ".fcgi" )
 
 server.tag = ""
 
+include_shell "/usr/share/lighttpd/use-ipv6.pl " + server.port
 include_shell "/usr/share/lighttpd/create-mime.assign.pl"
 include_shell "/usr/share/lighttpd/include-conf-enabled.pl"
 EOF
@@ -1422,6 +1428,10 @@ fastcgi.server = (
 }
 
 \$SERVER["socket"] == "$PRIVATE_IP:80" {
+server.document-root = "$DIRHTML"
+server.error-handler-404 ="err404.php"
+
+\$SERVER["socket"] == "$PRIVATE_IP6:80" {
 server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
 }
