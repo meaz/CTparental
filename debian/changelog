@@ -1,11 +1,10 @@
 ctparental (4.20.1-1.0) unstable; urgency=medium
 
-  * ipv6 ayans toujour du mal a ce désactiver quant on utilise network manager
-  un début dintégration de celui si et mis en place via ip6tables, point bloquant actuel
-  e2guardian/dansguardian ne sanble pas écouter sur une ipv6.
-  * ajout de 2 paramètre cachés (-logqueryon  et -logqueryoff  )pour activer les log query de dnsmasq,
-  util pour savoir quel domain,  on doit bloquer. 
-  parramètre pour expère car ne doit pas ètre activer tous le temps, trops gourment en resource et en espace disque.  
+  * ipv6 ayant toujours du mal a ce désactiver quant on utilise network manager un début d’intégration de celui si et mis en place via ip6tables,
+   point bloquant actuel e2guardian ne semble pas écouter sur une ipv6.
+  * ajout de 2 paramètre cachés (-logqueryon et -logqueryoff )pour activer les log query de dnsmasq, 
+  utile pour savoir quel domaine, on doit bloquer. paramètre pour espère car ne doit pas être activer tous le temps, 
+  trop gourmand en ressource et en espace disque.  
  
  -- Guillaume marsat <CTparental@laposte.net>  Thu, 03 Nov 2016 17:16:42 +0100
  
