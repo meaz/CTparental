@@ -1433,7 +1433,7 @@ server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
 }
 
-\$SERVER["socket"] == "$PRIVATE_IP6:80" {
+\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
 server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
 }
@@ -1922,6 +1922,8 @@ uninstall () {
    # on réouvre l'ipv6
    $IPTABLES6 -F
    $IPTABLES6 -X
+   $IPTABLES6 -t nat -F  
+   $IPTABLES6 -t nat -X  
    $IPTABLES6 -P INPUT ACCEPT
    $IPTABLES6 -P OUTPUT ACCEPT
    $IPTABLES6 -P FORWARD ACCEPT
@@ -2775,6 +2777,20 @@ then run the command CTparental -ipton") $Fcolor"
 	  echo -n > "$DIRE2GLANG"french/template.html
 	  $E2GUARDIANrestart
 	  iptablesreload
+      exit 0
+      ;;
+    -logqueryon )
+      {
+      echo "log-queries"
+      echo "log-facility=/var/log/dnsmasq.query.log"
+	  } > "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
+	  resolvconffixon
+      exit 0
+      ;;
+    -logqueryoff )
+	  rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
+	  resolvconffixon
+	  rm -f /var/log/dnsmasq.query.log
       exit 0
       ;;
       
