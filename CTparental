@@ -91,9 +91,10 @@ REDIRECT=ON
 # Parfeux minimal.
 IPRULES=OFF
 MD5DREAB=
-I_WAN= 
-IP_BOX= 
-IP_IWAN= 
+I_WAN_IPV4= 
+IP_BOX_IPV4= 
+IP_IWAN_IPV4= 
+IP_IWAN_IPV6= 
 DNS1= 
 DNS2= 
 EOF
@@ -930,6 +931,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
+no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -1254,6 +1256,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
+no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -1755,20 +1758,23 @@ nomade () {
 #### si il y a un changement dan la conf réseaux ####
 if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
  "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
- "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN | cut -d"=" -f2)"  -o \
- "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX | cut -d"=" -f2)"  -o \
- "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" \
- -a "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" \
+ "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN_IPV4 | cut -d"=" -f2)"  -o \
+ "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX_IPV4 | cut -d"=" -f2)"  -o \
+ "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" -o \
+ "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" \
+ -a "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$ip_i_WAN_ipv6" != "" \
  -a "$DNS1" != "" ];then
 # on sauvegarde ces chnagement dans le fichier de conf CTparental.
-$SED "/^I_WAN=/d" "$FILE_CONF"
-$SED "/^IP_BOX=/d" "$FILE_CONF"
-$SED "/^IP_IWAN=/d" "$FILE_CONF"
+$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
+$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
+$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
+$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
 $SED "/^DNS1=/d" "$FILE_CONF"
 $SED "/^DNS2=/d" "$FILE_CONF"
-{ echo I_WAN="$i_WAN_ipv4"
-  echo IP_BOX="$ipbox_ipv4"
-  echo IP_IWAN="$ip_i_WAN_ipv4"
+{ echo I_WAN_IPV4="$i_WAN_ipv4"
+  echo IP_BOX_IPV4="$ipbox_ipv4"
+  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
+  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
   echo DNS1="$DNS1"
   echo DNS2="$DNS2"
 } >> $FILE_CONF
