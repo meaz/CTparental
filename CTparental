@@ -94,7 +94,8 @@ MD5DREAB=
 I_WAN_IPV4= 
 IP_BOX_IPV4= 
 IP_IWAN_IPV4= 
-IP_IWAN_IPV6= 
+IP_IWAN_IPV6=
+I_WAN_IPV6= 
 DNS1= 
 DNS2= 
 EOF
@@ -1761,27 +1762,31 @@ if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
  "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN_IPV4 | cut -d"=" -f2)"  -o \
  "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX_IPV4 | cut -d"=" -f2)"  -o \
  "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" -o \
- "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" \
- -a "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$ip_i_WAN_ipv6" != "" \
- -a "$DNS1" != "" ];then
-# on sauvegarde ces chnagement dans le fichier de conf CTparental.
-$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
-$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
-$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
-$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
-$SED "/^DNS1=/d" "$FILE_CONF"
-$SED "/^DNS2=/d" "$FILE_CONF"
-{ echo I_WAN_IPV4="$i_WAN_ipv4"
-  echo IP_BOX_IPV4="$ipbox_ipv4"
-  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
-  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
-  echo DNS1="$DNS1"
-  echo DNS2="$DNS2"
-} >> $FILE_CONF
-# on modifi la conf dnsmasq
-dnsmasqon
-# on reconfigure les règle du parfeux.
-iptablesreload
+ "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" -o \
+ "$i_WAN_ipv6" != "$(cat < $FILE_CONF | grep I_WAN_IPV6 | cut -d"=" -f2)" \
+ ];then
+	if [ "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$DNS1" != "" ] || [ "$ip_i_WAN_ipv6" != "" -a "$i_WAN_ipv6" != ""  ]; then
+		# on sauvegarde ces chnagement dans le fichier de conf CTparental.
+		$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
+		$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
+		$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
+		$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
+    	$SED "/^I_WAN_IPV6=/d" "$FILE_CONF"
+		$SED "/^DNS1=/d" "$FILE_CONF"
+		$SED "/^DNS2=/d" "$FILE_CONF"
+		{ echo I_WAN_IPV4="$i_WAN_ipv4"
+		  echo IP_BOX_IPV4="$ipbox_ipv4"
+		  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
+		  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
+		  echo I_WAN_IPV6="$i_WAN_ipv6"
+		  echo DNS1="$DNS1"
+		  echo DNS2="$DNS2"
+		} >> $FILE_CONF
+		# on modifi la conf dnsmasq
+		dnsmasqon
+		# on reconfigure les règle du parfeux.
+		iptablesreload
+	fi
 fi
 
 }
