@@ -1,10 +1,9 @@
-ctparental (4.20.2-1.0) unstable; urgency=medium
+ctparental (4.20.3-1.0) unstable; urgency=medium
 
-  * e2guardian ne gérent pas actuelement ipv6 , on force uniquement le passage par privoxy qui interoge dnsmasq dans le cas d'une requet ipv6.
-  en ipv4 on force toujour a passer par e2guardian qui lui inéroge privoxy qui lui interoge dnsmasq .
+  * correction detection parramètres ipv6.
  
- -- Guillaume marsat <CTparental@laposte.net>  Thu, 03 Nov 2016 22:34:01 +0100
- 
+ -- Guillaume marsat <CTparental@laposte.net>  Sun, 06 Nov 2016 19:42:50 +0100
+
 ctparental (4.20.1-1.0) unstable; urgency=medium
 
   * ipv6 ayant toujours du mal a ce désactiver quant on utilise network manager un début d’intégration de celui si et mis en place via ip6tables,
