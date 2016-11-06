@@ -247,48 +247,64 @@ if [ -z "$CMDINSTALL" ] ; then
    exit 1
 fi
 
-ip_route="$(ip route | tr '\n' ' ')"
-interface_WAN="$(awk '{print $5}' <<< ${ip_route})" # GW!
-ipbox="$(awk '{print $3}' <<< ${ip_route})"   
+ip_route_ipv4="$(ip route | tr '\n' ' ')"
+i_WAN_ipv4="$(awk '{print $5}' <<< ${ip_route_ipv4})" # GW!
+ipbox_ipv4="$(awk '{print $3}' <<< ${ip_route_ipv4})"   
 if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
 	## jessie et infèrieur
-	ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/adr:/{print substr($2,5)}')"
-	ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/{ print substr($3,7)}')"	
+	ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/adr:/{print substr($2,5)}')"
+	ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/Bcast:/{ print substr($3,7)}')"	
 else
 	if [ "$(ifconfig | grep -c "addr" )" -ge 1 ];then 
 		## elementaryos
-		ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/addr:/{print substr($2,6)}')"
-		ip_broadcast="$(ifconfig "$interface_WAN" | awk '/Bcast:/{ print substr($3,7)}')"
+		ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/addr:/{print substr($2,6)}')"
+		ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/Bcast:/{ print substr($3,7)}')"
 	else
 		## testing/sid
-		ipinterface_WAN="$(ifconfig "$interface_WAN" | awk '/inet /{print substr($2,1)}')"
-		ip_broadcast="$(ifconfig "$interface_WAN" | awk '/broadcast /{print substr($6,1)}')"
+		ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
+		ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/broadcast /{print substr($6,1)}')"
 	fi
 fi
-reseau_box="$(awk '//{print $10}' <<< ${ip_route})"
-if [ "$reseau_box" = "$interface_WAN" ];then # cat de mageia mais peut ètre dans d'autres aussi
-	reseau_box="$(awk '//{print $8}' <<< ${ip_route})"
-	#echo "reseau_boxif1"
-	if [ "$reseau_box" = "$ipbox" ];then # cat de debian jessie pour RPi3
-		#echo "reseau_boxif2"
-		reseau_box="$(awk '//{print $13}' <<< ${ip_route})"
-		if [ "$reseau_box" = "metric" ];then # cat de https://github.com/marsat/CTparental/issues/25
-			reseau_box="$(awk '//{print $15}' <<< ${ip_route})"
+reseau_box_ipv4="$(awk '//{print $10}' <<< ${ip_route_ipv4})"
+if [ "$reseau_box_ipv4" = "$i_WAN_ipv4" ];then # cat de mageia mais peut ètre dans d'autres aussi
+	reseau_box_ipv4="$(awk '//{print $8}' <<< ${ip_route_ipv4})"
+	#echo "reseau_box_ipv4if1"
+	if [ "$reseau_box_ipv4" = "$ipbox_ipv4" ];then # cat de debian jessie pour RPi3
+		#echo "reseau_box_ipv4if2"
+		reseau_box_ipv4="$(awk '//{print $13}' <<< ${ip_route_ipv4})"
+		if [ "$reseau_box_ipv4" = "metric" ];then # cat de https://github.com/marsat/CTparental/issues/25
+			reseau_box_ipv4="$(awk '//{print $15}' <<< ${ip_route_ipv4})"
 		fi
 	fi	
 fi
-export interface_WAN
-export ipbox
-export ipinterface_WAN
-export reseau_box
-export ip_broadcast
-unset ip_route
+export i_WAN_ipv4
+export ipbox_ipv4
+export ip_i_WAN_ipv4
+export reseau_box_ipv4
+export ip_broadcast_ipv4
+unset ip_route_ipv4
 nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
-DNS1="$(echo "${nameserver}" | awk '{ print $1}')"
-DNS2="$(echo "${nameserver}" | awk '{ print $2}')"
-#echo "intefaceWAN="$interface_WAN" ipbox="$ipbox" ipinterfaceWan="$ipinterface_WAN" reseau_box="$reseau_box" broadcast="$ip_broadcast" dns1="$DNS1" dns2="$DNS2
+DNS1="$(echo "${nameserver}" | awk '{ print $1}' | cut -d"%" -f1)"
+DNS2="$(echo "${nameserver}" | awk '{ print $2}' | cut -d"%" -f1)"
+#echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
 DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
 DNS2=${DNS2:=208.67.222.222} #
+
+ip_route_ipv6="$(ip -6 route | tr '\n' ' ')"
+i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
+ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
+ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
+
+reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
+reseau_box_ipv6_l="fe80::/64"
+
+export i_WAN_ipv6
+export ipbox_ipv6
+export ip_i_WAN_ipv6
+export reseau_box_ipv6_g
+export reseau_box_ipv6_l
+unset ip_route_ipv6
+
 ipMaskValide() {
 ip=$(echo "$1" | cut -d"/" -f1)
 mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
@@ -332,12 +348,14 @@ done
 }
 
 networkisoknext() {
-if [ "$(echo "$interface_WAN" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox" )" -eq 0 -o "$( ipMaskValide "$ipinterface_WAN" )" -eq 0 \
- -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast" )" -eq 0 \
- -o "$( ipMaskValide "$reseau_box" )" -eq 0 ];then
-gettext 'error recovery network settings'
-echo
-exit 0
+if [ "$(echo "$i_WAN_ipv4" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox_ipv4" )" -eq 0 -o "$( ipMaskValide "$ip_i_WAN_ipv4" )" -eq 0 \
+ -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast_ipv4" )" -eq 0 \
+ -o "$( ipMaskValide "$reseau_box_ipv4" )" -eq 0 ];then
+	if [ "$ip_i_WAN_ipv6" =  "" ];then
+		gettext 'error recovery network settings'
+		echo
+		exit 0
+	fi
 fi 
 }
 
@@ -911,7 +929,7 @@ conf-dir=$DIR_DNS_BLACKLIST_ENABLED
 interface=lo
 listen-address=127.0.0.1
 port=54
-no-dhcp-interface=$interface_WAN
+no-dhcp-interface=$i_WAN_ipv4
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -949,9 +967,9 @@ ipglobal () {
     $IPTABLES -P OUTPUT DROP
     $IPTABLES -P FORWARD DROP
     # TCP Syn Flood
-    $IPTABLES -A INPUT -i "$interface_WAN" -p tcp --syn -m limit --limit 3/s -j ACCEPT
+    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
-    $IPTABLES -A INPUT -i "$interface_WAN" -p udp -m limit --limit 10/s -j ACCEPT
+    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp -m limit --limit 10/s -j ACCEPT
     
 	### IP indésirables
  
@@ -978,8 +996,8 @@ ipglobal () {
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
      
     ### DHCP
-    $IPTABLES -A OUTPUT -o "$interface_WAN" -p udp --sport 68 --dport 67 -j ACCEPT
-    $IPTABLES -A INPUT -i "$interface_WAN" -p udp --sport 67 --dport 68 -j ACCEPT
+    $IPTABLES -A OUTPUT -o "$i_WAN_ipv4" -p udp --sport 68 --dport 67 -j ACCEPT
+    $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp --sport 67 --dport 68 -j ACCEPT
  
     ### DNS indispensable pour naviguer facilement sur le web ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
@@ -1023,9 +1041,9 @@ cat << EOF >  $FILEIPTABLES
 ## on autorise tous le trafic sortant .
 \$IPTABLES -A OUTPUT -j ACCEPT
 ## on autorise tous le trafic sortant à destination de notre lan (PC imprimante de la maison)
-#\$IPTABLES -A OUTPUT -d \$reseau_box -j ACCEPT
+#\$IPTABLES -A OUTPUT -d \$reseau_box_ipv4 -j ACCEPT
 ## on acepte tous le trafic entrant en provenence de notre lan (PC imprimante de la maison)
-\$IPTABLES -A INPUT -s \$reseau_box -j ACCEPT 
+\$IPTABLES -A INPUT -s \$reseau_box_ipv4 -j ACCEPT 
 
 ### smtp + pop ssl thunderbird ...  ####
 \$IPTABLES -A OUTPUT -p tcp -m tcp --dport 993 -j ACCEPT		# imap/ssl
@@ -1036,8 +1054,8 @@ cat << EOF >  $FILEIPTABLES
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 27000:27015 -j ACCEPT  		# (trafic pour le client jeu)
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 27015:27030 -j ACCEPT  		# (en général pour les matchs et HLTV)
 #\$IPTABLES -A OUTPUT -p tcp -m tcp --dport 27014:27050 -j ACCEPT  		# (pour les téléchargements sur Steam)
-#\$IPTABLES -A INPUT  -s \$reseau_box -p udp -m multiport --sports 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
-#\$IPTABLES -A INPUT  -s \$reseau_box -p tcp -m multiport --sports 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A INPUT  -s \$reseau_box_ipv4 -p udp -m multiport --sports 27031,27036 -j ACCEPT 				# (entrant, pour le Streaming local)
+#\$IPTABLES -A INPUT  -s \$reseau_box_ipv4 -p tcp -m multiport --sports 27036,27037 -j ACCEPT 				# (entrant, pour le Streaming local)
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport 4380 -j ACCEPT 			# chat audio Steam
 ## certains jeux néssesite un acces direct sans proxy pour l'autentification https a ouvrir au cas par cas.
 ## exemple steam.goldenfrog.org
@@ -1059,13 +1077,13 @@ cat << EOF >  $FILEIPTABLES
 #\$IPTABLES -A OUTPUT -p udp -m udp --dport udp 28960 -j ACCEPT
 
 # Ping Externe
-# \$IPTABLES -A INPUT -i \$interface_WAN -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
-# \$IPTABLES -A INPUT -i \$interface_WAN -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT
+# \$IPTABLES -A INPUT -i \$i_WAN_ipv4 -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
+# \$IPTABLES -A INPUT -i \$i_WAN_ipv4 -p icmp --icmp-type echo-reply -m limit --limit 1/s -j ACCEPT
 
 ### cups serveur , impriment partager sous cups
-#\$IPTABLES -A OUTPUT -d \$ip_broadcast -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
-#\$IPTABLES -A INPUT -s \$reseau_box -m state --state NEW -p TCP --dport 631 -j ACCEPT
-#\$IPTABLES -I INPUT -s \$ipbox -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
+#\$IPTABLES -A OUTPUT -d \$ip_broadcast_ipv4 -p udp -m udp --sport 631 --dport 631 -j ACCEPT # diffusion des imprimantes partager sur le réseaux
+#\$IPTABLES -A INPUT -s \$reseau_box_ipv4 -m state --state NEW -p TCP --dport 631 -j ACCEPT
+#\$IPTABLES -I INPUT -s \$ipbox_ipv4 -m state --state NEW -p TCP --dport 631 -j DROP # drop les requette provenent de la passerelle
 
 ### emesene,pidgin,amsn...  ####
 #\$IPTABLES -A OUTPUT -p tcp -m tcp --dport 1863 -j ACCEPT     
@@ -1235,7 +1253,7 @@ conf-dir=$DIR_DNS_WHITELIST_ENABLED
 interface=lo
 listen-address=127.0.0.1
 port=54
-no-dhcp-interface=$interface_WAN
+no-dhcp-interface=$i_WAN_ipv4
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -1737,10 +1755,10 @@ nomade () {
 #### si il y a un changement dan la conf réseaux ####
 if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
  "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
- "$interface_WAN" != "$(cat < $FILE_CONF | grep I_WAN | cut -d"=" -f2)"  -o \
- "$ipbox" != "$(cat < $FILE_CONF | grep IP_BOX | cut -d"=" -f2)"  -o \
- "$ipinterface_WAN" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" \
- -a "$interface_WAN" != "" -a "$ipbox" != "" -a "$ipinterface_WAN" != "" \
+ "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN | cut -d"=" -f2)"  -o \
+ "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX | cut -d"=" -f2)"  -o \
+ "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN | cut -d"=" -f2)" \
+ -a "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" \
  -a "$DNS1" != "" ];then
 # on sauvegarde ces chnagement dans le fichier de conf CTparental.
 $SED "/^I_WAN=/d" "$FILE_CONF"
@@ -1748,9 +1766,9 @@ $SED "/^IP_BOX=/d" "$FILE_CONF"
 $SED "/^IP_IWAN=/d" "$FILE_CONF"
 $SED "/^DNS1=/d" "$FILE_CONF"
 $SED "/^DNS2=/d" "$FILE_CONF"
-{ echo I_WAN="$interface_WAN"
-  echo IP_BOX="$ipbox"
-  echo IP_IWAN="$ipinterface_WAN"
+{ echo I_WAN="$i_WAN_ipv4"
+  echo IP_BOX="$ipbox_ipv4"
+  echo IP_IWAN="$ip_i_WAN_ipv4"
   echo DNS1="$DNS1"
   echo DNS2="$DNS2"
 } >> $FILE_CONF
