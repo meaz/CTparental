@@ -1,3 +1,9 @@
+ctparental (4.20.5-1.0) unstable; urgency=medium
+
+  * correction d'un bug d'affichage des catégories .
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 08 Nov 2016 19:14:49 +0100
+ 
 ctparental (4.20.4-1.0) unstable; urgency=medium
 
   * correction sur le nomadisme du poste .
