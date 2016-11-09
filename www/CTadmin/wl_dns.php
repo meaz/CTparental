@@ -33,6 +33,7 @@ echo "<div class='row'>";
 //on lit et on interprète le fichier de catégories
 $count = 5;
 $cols  = 1; 
+$str = file_get_contents($bl_categories_enabled);
 if (file_exists($bl_categories))
 {
     $pointeur = fopen($bl_categories, "r");
@@ -51,11 +52,12 @@ if (file_exists($bl_categories))
             echo "<label>";
             echo "<input type='checkbox' name='chk-$categorie'";
             
-            // la catégorie n'existe pas dans le fichier de catégorie activé -> categorie non selectionnée
-            $str = file_get_contents($bl_categories_enabled);
+            // la catégorie existe pas dans le fichier de catégorie activé -> categorie selectionnée
             
-            if (strpos($str, $categorie) === false) { echo ">"; }
-            else { echo "checked>"; }
+            $a= preg_match('/\n'.$categorie.'\n/', $str);
+            $b= preg_match('/^'.$categorie.'\n/', $str);
+            if ( $a or $b  )  { echo "checked>";   }
+            else { echo ">"; }
             
             echo "<a href='bl_categories_help.php?cat=$categorie' target='cat_help' onclick=window.open('bl_categories_help.php','cat_help','width=600,height=150,toolbar=no,scrollbars=no,resizable=yes') title='categories help page'>$categorie</a>";
             echo "</label>";
