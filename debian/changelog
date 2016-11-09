@@ -1,5 +1,6 @@
 ctparental (4.20.5-1.0) unstable; urgency=medium
 
+  * correction d'un bug sur les Safesearch qui n'été prit en compte qu'aprés une modif sur le catégorie activées.
   * correction d'un bug d'affichage des catégories .
  
  -- Guillaume marsat <CTparental@laposte.net>  Tue, 08 Nov 2016 19:14:49 +0100
