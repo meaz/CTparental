@@ -1160,12 +1160,12 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
     
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
-	  $IPTABLES -I OUTPUT -d ::1 -p tcp --dport 80 -j REJECT
-	  $IPTABLES -I OUTPUT -d ::1 -p tcp --dport 443 -j REJECT
+	  #$IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 80 -j REJECT
+	  #$IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 443 -j REJECT
      fi
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	  $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
+	  #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 		  # on interdit l'accès a bing en https .
 		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
@@ -1182,18 +1182,18 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 			 #on rediriges les requet DNS ipv6 des usagers filtrés sur dnsmasq
-			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54 
-			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
+			 #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54 
+			 #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
 			 #force passage par dansguardian pour les utilisateurs filtrés 
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 # e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
-			 $IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
 			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
-			 $IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
+			 #$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
 			 # on interdit l'utilisation d'IPv6.	
 		  fi
 		  done
