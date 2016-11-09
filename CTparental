@@ -292,20 +292,20 @@ DNS2="$(echo "${nameserver}" | awk '{ print $2}' | cut -d"%" -f1)"
 DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
 DNS2=${DNS2:=208.67.222.222} #
 
-ip_route_ipv6="$(ip -6 route | tr '\n' ' ')"
-i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
-ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
-ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
+#ip_route_ipv6="$(ip -6 route | tr '\n' ' ')"
+#i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
+#ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
+#ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
 
-reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
-reseau_box_ipv6_l="fe80::/64"
+#reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
+#reseau_box_ipv6_l="fe80::/64"
 
-export i_WAN_ipv6
-export ipbox_ipv6
-export ip_i_WAN_ipv6
-export reseau_box_ipv6_g
-export reseau_box_ipv6_l
-unset ip_route_ipv6
+#export i_WAN_ipv6
+#export ipbox_ipv6
+#export ip_i_WAN_ipv6
+#export reseau_box_ipv6_g
+#export reseau_box_ipv6_l
+#unset ip_route_ipv6
 
 ipMaskValide() {
 ip=$(echo "$1" | cut -d"/" -f1)
@@ -353,11 +353,11 @@ networkisoknext() {
 if [ "$(echo "$i_WAN_ipv4" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox_ipv4" )" -eq 0 -o "$( ipMaskValide "$ip_i_WAN_ipv4" )" -eq 0 \
  -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast_ipv4" )" -eq 0 \
  -o "$( ipMaskValide "$reseau_box_ipv4" )" -eq 0 ];then
-	if [ "$ip_i_WAN_ipv6" =  "" ];then
+	#if [ "$ip_i_WAN_ipv6" =  "" ];then
 		gettext 'error recovery network settings'
 		echo
 		exit 0
-	fi
+	#fi
 fi 
 }
 
@@ -496,11 +496,11 @@ confprivoxy () {
 echo "<confprivoxy>"
 $SED "s?^debug.*?debug = 0?g"  "$PRIVOXYCONF"
 ligneipv4=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '1q;d' )
-ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
+#ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
 #echo "nlisten-adress4=$ligneipv4"
 #echo "nlisten-adress6=$ligneipv6"
 $SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
-$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
+#$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
 	test=$(grep -c "actionsfile ctparental.action" "$PRIVOXYCONF" )
 	if [ "$test" -ge "1" ] ; then
 		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" "$PRIVOXYCONF"
@@ -931,7 +931,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
-no-dhcp-interface=$i_WAN_ipv6
+#no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -941,8 +941,8 @@ bogus-priv
 server=$DNS1
 server=$DNS2  
 ## dns ipv6 Opendns
-server=2620:0:ccc::2 
-server=2620:0:ccd::2
+#server=2620:0:ccc::2 
+#server=2620:0:ccd::2
 
 EOF
 
@@ -1258,7 +1258,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
-no-dhcp-interface=$i_WAN_ipv6
+#no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -1463,18 +1463,18 @@ server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
 }
 
-\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
+#\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
 	
-server.document-root = "$DIRHTML"
-server.error-handler-404 ="err404.php"
-}
+#server.document-root = "$DIRHTML"
+#server.error-handler-404 ="err404.php"
+#}
 
-\$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
-ssl.engine = "enable"
-ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
-server.document-root = "$DIRHTML"
-server.error-handler-404 ="err404.php"
-}
+#\$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
+#ssl.engine = "enable"
+#ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
+#server.document-root = "$DIRHTML"
+#server.error-handler-404 ="err404.php"
+#}
 
 EOF
 if [ -e "$DIRHTML/index.php" ] ;  then
