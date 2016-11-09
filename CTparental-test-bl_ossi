@@ -1,0 +1,29 @@
+#!/bin/sh
+isinlist () {
+
+dirblen="/etc/CTparental/dnsfilter-available/"
+domain=$(echo "$1" | sed -e "s/^www././g")
+ndom=$(( $(echo "$domain" | awk -F "." "{print NF-1}")+1 ))
+i=2
+while [ "$return" = "" ]
+do
+	if [ "$i" -gt "$ndom" ] ;then
+		#on sort de la boucle même si on ne trouve rien avec les domains parents .
+		break
+	fi
+	return="$( grep -E "address=/(\.$domain|$domain)" -r $dirblen | sed -e "s|$dirblen||g" | cut -d":" -f1 | sed -e "s|.conf||g" | sort -u)"
+	domain="$(echo "$1" | sed -e "s/^www././g" | cut -d"." -f$i-$ndom)"
+	i=$((i+1))
+done
+echo "$return"
+return=""
+}
+
+while read dn
+do
+if  [ ! "$( isinlist $dn )" = "ossi" ];then
+    echo "$dn est présent dans les listes suivante de toulouse : $( isinlist $dn )"
+fi
+    
+done < /etc/CTparental/blacklist-local.conf
+
