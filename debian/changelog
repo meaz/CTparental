@@ -1,3 +1,38 @@
+ctparental (4.20.5-1.0) unstable; urgency=medium
+
+  * correction d'un bug sur les Safesearch qui n'été prit en compte qu'aprés une modif sur le catégorie activées.
+  * correction d'un bug d'affichage des catégories .
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Tue, 08 Nov 2016 19:14:49 +0100
+ 
+ctparental (4.20.4-1.0) unstable; urgency=medium
+
+  * correction sur le nomadisme du poste .
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Sun, 06 Nov 2016 19:42:50 +0100
+ 
+ctparental (4.20.3-1.0) unstable; urgency=medium
+
+  * correction detection parramètres ipv6.
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Sun, 06 Nov 2016 19:42:50 +0100
+
+ctparental (4.20.1-1.0) unstable; urgency=medium
+
+  * ipv6 ayant toujours du mal a ce désactiver quant on utilise network manager un début d’intégration de celui si et mis en place via ip6tables,
+   point bloquant actuel e2guardian ne semble pas écouter sur une ipv6.
+  * ajout de 2 paramètre cachés (-logqueryon et -logqueryoff )pour activer les log query de dnsmasq, 
+  utile pour savoir quel domaine, on doit bloquer. paramètre pour espère car ne doit pas être activer tous le temps, 
+  trop gourmand en ressource et en espace disque.  
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Thu, 03 Nov 2016 17:16:42 +0100
+ 
+ctparental (4.18.8-1.0) unstable; urgency=medium
+
+  * ipv6 nétais pas bien désativer dans sertain cas , c'est chause faite maintenent.
+ 
+ -- Guillaume marsat <CTparental@laposte.net>  Wed, 02 Nov 2016 00:32:49 +0100
+ 
 ctparental (4.18.7-1.0) unstable; urgency=medium
 
   * correction d'un bug sur le temps de navigation otorisé.
