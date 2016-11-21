@@ -2640,11 +2640,15 @@ case $arg1 in
 	  FILTRAGEISOFF=0
       dnsmasqon
       iptablesreload
+      { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
+	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
+	  activegourpectoff
       exit 0
       ;;
    -off )
+      rm -f /etc/cron.d/CTparental*
   	  desactivegourpectoff
-      autoupdateoff 
+  	  autoupdateoff 
       dnsmasqoff
       FILTRAGEISOFF=1
       iptablesreload
