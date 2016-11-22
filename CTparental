@@ -1209,6 +1209,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
+	setproxy
 else
 unsetproxy
 fi
@@ -1222,7 +1223,7 @@ fi
 if [ -e "$DIRHTML"/cactparental.crt ];then   
 	updatecauser
 fi
-setproxy
+
 echo "</iptablesreload>"
 }
 updatecauser () {
