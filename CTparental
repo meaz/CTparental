@@ -548,6 +548,7 @@ echo "</confprivoxy>"
 }
 
 unsetproxy () {
+echo "<unsetproxy>"
 for user in $(listeusers) ; do	
 	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
 	if [  -f "$HOMEPCUSER"/.profile ] ; then
@@ -575,8 +576,10 @@ test=$(grep -c "^### CTparental ###" "$XSESSIONFILE" )
 		 $SED  2d "$XSESSIONFILE"
 		fi
 unset test
+echo "<unsetproxy/>"
 }
 setproxy () {
+echo "<setproxy>"
 if [  -f "$XSESSIONFILE" ] ; then
 test=$(grep -c "^### CTparental ###" "$XSESSIONFILE" )
 		if [ "$test" -eq "0" ] ; then	 
@@ -607,6 +610,7 @@ for user in $(listeusers) ; do
 	fi
 	
 done
+echo "<setproxy/>"
 }
 
 addadminhttpd() {
@@ -957,7 +961,7 @@ echo "</dnsmasqon>"
 dnsmasqoff () {
 echo "<dnsmasqoff>"
 $SED "s?^DNSMASQ.*?DNSMASQ=OFF?g" $FILE_CONF
-resolvconffixoff
+resolvconffixon
 $E2GUARDIANrestart
 $PRIVOXYrestart
 echo "</dnsmasqoff>"
@@ -1886,6 +1890,7 @@ uninstall () {
    desactivegourpectoff
    autoupdateoff 
    dnsmasqoff
+   resolvconffixoff
    FILTRAGEISOFF=1
    iptablesreload
    $LIGHTTPDstop
