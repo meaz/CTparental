@@ -1,9 +1,8 @@
-
 ctparental (4.20.7-1.0) unstable; urgency=medium
 
   * correction d'un bug setproxy,unsetproxy et resolvconf durant CTparental -off / -on .
 
-  -- Guillaume marsat <CTparental@laposte.net> Tue, 22 Nov 2016 20:32:02 +0100
+ -- Guillaume marsat <CTparental@laposte.net> Tue, 22 Nov 2016 20:32:02 +0100
 
 ctparental (4.20.6-1.0) unstable; urgency=medium
 
