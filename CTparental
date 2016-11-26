@@ -973,6 +973,9 @@ ipglobal () {
     $IPTABLES -P INPUT DROP
     $IPTABLES -P OUTPUT DROP
     $IPTABLES -P FORWARD DROP
+    $IPTABLES6 -P INPUT DROP
+	$IPTABLES6 -P OUTPUT DROP
+	$IPTABLES6 -P FORWARD DROP 
     # TCP Syn Flood
     $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
@@ -998,31 +1001,43 @@ ipglobal () {
     ### ACCEPT ALL interface loopback ###
     $IPTABLES -A INPUT  -i lo -j ACCEPT
     $IPTABLES -A OUTPUT -o lo -j ACCEPT
+    $IPTABLES6 -A INPUT  -i lo -j ACCEPT
+    $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
     ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter 
     ### les connexions initiées par sont propre PC)
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-     
+    $IPTABLES6 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT 
     ### DHCP
     $IPTABLES -A OUTPUT -o "$i_WAN_ipv4" -p udp --sport 68 --dport 67 -j ACCEPT
     $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp --sport 67 --dport 68 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -o "$i_WAN_ipv6" -p udp --sport 68 --dport 67 -j ACCEPT
+    $IPTABLES6 -A INPUT -i "$i_WAN_ipv6" -p udp --sport 67 --dport 68 -j ACCEPT
  
     ### DNS indispensable pour naviguer facilement sur le web ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
     $IPTABLES -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
     $IPTABLES -A OUTPUT -d 127.0.0.1 -p tcp -m tcp --dport 54 -j ACCEPT
     $IPTABLES -A OUTPUT -d 127.0.0.1 -p udp -m udp --dport 54 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -d ::1 -p tcp -m tcp --dport 54 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -d ::1 -p udp -m udp --dport 54 -j ACCEPT
  
     ### HTTP navigation internet non sécurisée ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
     
     ### HTTPS pour le site des banques .... ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
     
     ### ping ... autorise à "pinger" un ordinateur distant ###
     $IPTABLES -A OUTPUT -p icmp -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p icmp -j ACCEPT
     
     ### clientNTP ... syncro à un serveur de temps ###
     $IPTABLES -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
     
     # On autorise les requêtes FTP 
 	modprobe ip_conntrack_ftp
@@ -1036,6 +1051,9 @@ ipglobal () {
 	    source "$FILEIPTABLES"
     fi
 ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
+$IPTABLES6 -A OUTPUT -j LOG  --log-prefix "iptables6: "
+$IPTABLES6 -A INPUT -j LOG   --log-prefix "iptables6: "
+$IPTABLES6 -A FORWARD -j LOG  --log-prefix "iptables6: "
 $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
 $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
 $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
