@@ -537,6 +537,12 @@ http://localhost.*
 # par http://www.dailymotion.com/family_filter?enable=true...
 {+redirect{s@enable=[^&]+@enable=true@}}
  .dailymotion.*/.*enable=(?!true)
+ 
+# remplace http://ay8ou8ohth.com/images/close_gray.png            
+# par http://ay8ou8ohth.com/images/close_red.png
+{+redirect{s@close_[^&]+@close_red.png@}}
+.com/images/close_.*(?!red)\.png
+
               
 EOF
 if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
