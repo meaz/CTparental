@@ -1,3 +1,9 @@
+ctparental (4.20.9-1.0) unstable; urgency=medium
+
+  * ajout d'une blackliste CTparental en plus de la blackliste de toulouse a activer dans les diférente catégories.
+  
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 22 Dec 2016 17:34:48 +0100
+ 
 ctparental (4.20.8-1.0) unstable; urgency=medium
 
   * suppression des infos de résont de blocage de domaine car trop gourmande en cpu.
