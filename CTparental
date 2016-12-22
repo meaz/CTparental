@@ -666,10 +666,17 @@ download() {
       set -e
       exit 1
    fi
-   wget -P $tempDIR http://$BL_SERVER/blacklists/download/blacklists.tar.gz 2>&1 | cat
+   # on télécharge aussi la blackliste personalisé de ctparental
+   wget -P $tempDIR https://github.com/marsat/CTparental/raw/master/blacklist.tar.gz 2>&1 | cat
    if [ ! $? -eq 0 ]; then
       gettext 'error when downloading, interrupted process'
       rm -rf $tempDIR
+      set -e
+      exit 1
+   fi
+   tar -xzf $tempDIR/blacklist.tar.gz -C $tempDIR
+   if [ ! $? -eq 0 ]; then
+      gettext 'archive extraction error , interrupted process'
       set -e
       exit 1
    fi
