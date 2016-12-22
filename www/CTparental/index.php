@@ -10,11 +10,11 @@ include 'locale.php';
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="css/main.css" type="text/css">
+        <link rel="stylesheet" href="http://127.0.0.1/CTparental/css/bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="http://127.0.0.1/CTparental/css/main.css" type="text/css">
         
-        <script src="js/jquery-1.12.3.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        <script src="http://127.0.0.1/CTparental/js/jquery-1.12.3.min.js"></script>
+        <script src="http://127.0.0.1/CTparental/js/bootstrap.min.js"></script>
     </head>
 
     <body>
