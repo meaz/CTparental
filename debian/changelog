@@ -1,11 +1,11 @@
 ctparental (4.20.8-1.0) unstable; urgency=medium
 
   * suppression des infos de résont de blocage de domaine car trop gourmande en cpu.
-	lancer la commande CTparental-bl-infos pour avoir les infos au besoins.
-	exemple : CTparental-bl-infos www.youporn.com
+  lancer la commande CTparental-bl-infos pour avoir les infos au besoins.
+  exemple : CTparental-bl-infos www.youporn.com
 	
   * correction de l'affichage de la page de redirection pour qu'elle prenne bien les css en comptes.
-	dans tous les cas de figures.
+  dans tous les cas de figures.
  
  -- Guillaume marsat <CTparental1@laposte.net>  Thu, 22 Dec 2016 10:34:05 +0100
  
