@@ -410,6 +410,7 @@ GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
+CTparental
 dangerous_material
 dating
 drogue
