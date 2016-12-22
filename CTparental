@@ -666,6 +666,13 @@ download() {
       set -e
       exit 1
    fi
+   wget -P $tempDIR http://$BL_SERVER/blacklists/download/blacklists.tar.gz 2>&1 | cat
+   if [ ! $? -eq 0 ]; then
+      gettext 'error when downloading, interrupted process'
+      rm -rf $tempDIR
+      set -e
+      exit 1
+   fi
    rm -rf ${DIR_DNS_FILTER_AVAILABLE:?}/
    mkdir $DIR_DNS_FILTER_AVAILABLE
    $SED "s?^MD5DREAB.*?MD5DREAB=?g" $FILE_CONF
