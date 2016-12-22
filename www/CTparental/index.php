@@ -29,6 +29,7 @@ include 'locale.php';
                 <h1><?php echo gettext("Access to the page:");?></h1>
                 <h2><?php echo $_SERVER["HTTP_HOST"]; ?></h2>
                 <hr />
+                <h3><?php echo gettext("... has been denied.");?></h3>
             </div>
             
             <p class="text-justify text-warning">
