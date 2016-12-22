@@ -536,6 +536,11 @@ http://localhost.*
 # par http://www.dailymotion.com/family_filter?enable=true...
 {+redirect{s@enable=[^&]+@enable=true@}}
  .dailymotion.*/.*enable=(?!true)
+ 
+# remplace http://xxxxxxxx.com/images/close_gray.png            
+# par http://xxxxxxx.com/images/close_red.png
+{+redirect{s@close_[^&]+@close_red.png@}}
+.com/images/close_.*(?!red)\.png
               
 EOF
 if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
@@ -1305,6 +1310,7 @@ server.modules = (
 "mod_access",
 "mod_alias",
 "mod_redirect",
+"mod_rewrite", # pour eviter erreur 404 l'aure de redirection dnsmasq sur 127.0.0.10
 "mod_auth",	#pour interface admin
 "mod_fastcgi",  #pour interface admin (activation du php)
 )
@@ -1465,7 +1471,7 @@ fastcgi.server = (
 
 \$SERVER["socket"] == "$PRIVATE_IP:80" {
 server.document-root = "$DIRHTML"
-server.error-handler-404 ="err404.php"
+url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 }
 
 #\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {

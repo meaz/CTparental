@@ -10,11 +10,11 @@ include 'locale.php';
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="css/main.css" type="text/css">
+        <link rel="stylesheet" href="http://127.0.0.1/CTparental/css/bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="http://127.0.0.1/CTparental/css/main.css" type="text/css">
         
-        <script src="js/jquery-1.12.3.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        <script src="http://127.0.0.1/CTparental/js/jquery-1.12.3.min.js"></script>
+        <script src="http://127.0.0.1/CTparental/js/bootstrap.min.js"></script>
     </head>
 
     <body>
@@ -29,23 +29,7 @@ include 'locale.php';
                 <h1><?php echo gettext("Access to the page:");?></h1>
                 <h2><?php echo $_SERVER["HTTP_HOST"]; ?></h2>
                 <hr />
-                <h3><?php echo gettext("... has been denied for the following reason:");?></h3>
-                <h3>
-                    <strong>
-                    <?php
-                        exec ("/usr/bin/CTparental-bl-infos ".$_SERVER["HTTP_HOST"], $blinfosliste);
-                        
-                        //$var1 = $blinfosliste[0];
-                        //$tab1 = explode(" ", $var1);
-                        
-                        //foreach ($tab1 as $categorie)
-                        foreach ( $blinfosliste as $categorie )
-                        {
-                            echo "<a href='http://127.0.0.1/CTparental/bl_categories_help.php?cat=$categorie' title='categories help page'>$categorie</a><br />";
-                        }
-                    ?>
-                    </strong>
-                </h3>
+                <h3><?php echo gettext("... has been denied.");?></h3>
             </div>
             
             <p class="text-justify text-warning">
