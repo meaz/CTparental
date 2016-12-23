@@ -73,6 +73,7 @@ $l_explain_strong_redirector  = gettext("Malformed URL in a 'google' query");
 $l_explain_tricheur           = gettext("Sites related to cheating (tests, examinations, etc.)");
 $l_explain_webmail            = gettext("Web sites for e-mail consultation");
 $l_explain_warez              = gettext("Sites related to cracked softwares");
+$l_explain_CTparental         = gettext("Site related to as pop up advertising or pornography not present in the blacklist of Toulouse.");
 
 if (isset($_GET['cat']))
 {

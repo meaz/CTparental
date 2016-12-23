@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Poedit 1.8.11\n"
 "Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Language: fr\n"
@@ -683,8 +683,8 @@ msgstr "ACCÈS REFUSÉ"
 msgid "Access to the page:"
 msgstr "L'accès à au domaine :"
 
-msgid "... has been denied for the following reason:"
-msgstr "... a été refusé pour la(les) raison(s) suivante(s) :"
+msgid "... has been denied."
+msgstr "... a été refuser."
 
 msgid "You are seeing this error because what you attempted to access appears to contain,"
 msgstr "Vous tentez d'accéder à une ressource dont le contenu est réputé"
@@ -699,10 +699,10 @@ msgid "Filtered by "
 msgstr "Filtré par "
 
 msgid "extensions has filtered"
-msgstr "extensions a filtré"
+msgstr "extensions a filtrer"
 
 msgid "mimetype has filtered"
-msgstr "type MIME a filtré"
+msgstr "type MIME a filtrer"
 
 msgid "web filtering"
 msgstr "filtrage web"
@@ -711,10 +711,13 @@ msgid "Select the extensions has filtered"
 msgstr "Sélectionnez les extensions a filtrées"
 
 msgid "Select the mimetype has filtered"
-msgstr "Sélectionnez le type MIME a filtré"
+msgstr "Sélectionnez le type MIME a filtrer"
 
 msgid "e2guardian configuration"
 msgstr "Configuration de e2guardian"
+
+msgid "Select the safesearch has enebled"
+msgstr "Sélectionnez le/les safesearch a activer."
 
 msgid "Default filter Pivoxy is activated"
 msgstr "Le filtrage par défaut de privoxy est activé."
@@ -727,3 +730,6 @@ msgstr "Activer la page de redirection."
 
 msgid "Disabled rectidect page."
 msgstr "Désactiver la page de redirection."
+
+msgid "Site related to as pop up advertising or pornography not present in the blacklist of Toulouse."
+msgstr "Site référencé , comme pop up de publicité ou de pornographie  non présent dans la blacklist de Toulouse."
