@@ -57,7 +57,7 @@ include 'locale.php';
   $l_explain_tricheur=gettext("Sites related to cheating (tests, examinations, etc.)");
   $l_explain_webmail=gettext("Web sites for e-mail consultation");
   $l_explain_warez=gettext("Sites related to cracked softwares");
-
+  $l_explain_ctparental= gettext("Site related to as pop up advertising or pornography not present in the blacklist of Toulouse.");
 if (isset($_GET['cat'])){$categorie=$_GET['cat'];} 
 $bl_categorie_domain_file=$bl_dir.$categorie.".conf";
 if (file_exists($bl_categorie_domain_file))

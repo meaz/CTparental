@@ -410,6 +410,7 @@ GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 cat << EOF > $CATEGORIES_ENABLED
 adult
 agressif
+ctparental
 dangerous_material
 dating
 drogue
@@ -659,6 +660,20 @@ download() {
       exit 1
    fi
    tar -xzf $tempDIR/blacklists.tar.gz -C $tempDIR
+   if [ ! $? -eq 0 ]; then
+      gettext 'archive extraction error , interrupted process'
+      set -e
+      exit 1
+   fi
+   # on télécharge aussi la blackliste personalisé de ctparental
+   wget -P $tempDIR https://github.com/marsat/CTparental/raw/master/blacklist.tar.gz 2>&1 | cat
+   if [ ! $? -eq 0 ]; then
+      gettext 'error when downloading, interrupted process'
+      rm -rf $tempDIR
+      set -e
+      exit 1
+   fi
+   tar -xzf $tempDIR/blacklist.tar.gz -C $tempDIR
    if [ ! $? -eq 0 ]; then
       gettext 'archive extraction error , interrupted process'
       set -e
