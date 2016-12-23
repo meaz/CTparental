@@ -1,19 +1,20 @@
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 1.8.11\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: fr\n"
 
 # Copyright: © 2013-2016 Guillaume Marsat <guillaume.marsat@laposte.net>
 # License: GPL-3+
-# ## CTparental ###
+# # CTparental
 msgid "It root of the need to run this script."
 msgstr ""
 
@@ -119,7 +120,7 @@ msgstr ""
 msgid "Install a packet was detected please use this command to uninstall ctparental."
 msgstr ""
 
-msgid "Want to filter by, Blacklist or Whitelist:"
+msgid "Want to filter by, Blacklist or Whitelist B/W :"
 msgstr ""
 
 msgid "Choice of filtered categories."
@@ -235,7 +236,7 @@ msgid "all users of the system undergo the filtering !!"
 msgstr ""
 
 msgid "\t=> Add remove Users added in sytem on the config file ,"
-msgstr ""
+msgstr "\t=> Mais a jour le fichier de configuration,"
 
 msgid "\t=> Add / delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
 msgstr ""
@@ -653,7 +654,7 @@ msgstr ""
 msgid "Access to the page:"
 msgstr ""
 
-msgid "... has been denied for the following reason:"
+msgid "... has been denied."
 msgstr ""
 
 msgid "You are seeing this error because what you attempted to access appears to contain,"
@@ -686,6 +687,9 @@ msgstr ""
 msgid "e2guardian configuration"
 msgstr ""
 
+msgid "Select the safesearch has enebled"
+msgstr ""
+
 msgid "Default filter Pivoxy is activated"
 msgstr ""
 
@@ -698,3 +702,5 @@ msgstr ""
 msgid "Disabled rectidect page."
 msgstr ""
 
+msgid "Site related to as pop up advertising or pornography not present in the blacklist of Toulouse."
+msgstr ""
