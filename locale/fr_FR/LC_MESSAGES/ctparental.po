@@ -542,8 +542,8 @@ msgstr "Nombre de noms de domaine filtrés :"
 msgid "Number of filtered URL :"
 msgstr "Nombre d'URL filtrés :"
 
-msgid "Sites related to eroticism and pornography"
-msgstr "Sites relatifs à l'érotisme et à la pornographie"
+msgid "Some adult site from erotic to hard pornography."
+msgstr "Des sites adultes allant de l'érotique à la pornographie dure."
 
 msgid "Sites extremist, racist, anti-Semitic or hate"
 msgstr "Sites extrémistes, racistes, antisémites ou incitant à la haine"
@@ -599,14 +599,14 @@ msgstr "Sites de jeux d'argent en ligne (casino, grattage virtuel, etc.)"
 msgid "Online games sites"
 msgstr "Sites de jeux en ligne"
 
-msgid "Sites related to hacking"
-msgstr "Sites relatifs au piratage informatique"
+msgid "Hacking sites."
+msgstr "Sites de piratage et d'agressions informatiques."
 
 msgid "Job search sites"
 msgstr "Sites de recherche d'emplois"
 
-msgid "List of educational sites for library"
-msgstr "Liste de sites éducatifs pour bibliothèque"
+msgid "A french list for educational sites. VERY locally oriented. may help libraries."
+msgstr "Une liste très  « univ-tlse1.fr  » de sites éducatifs pour notre bibliothèque."
 
 msgid "Malware sites (viruses, worms, trojans, etc.)."
 msgstr "Site relatifs au logiciels malveillants (virus, vers, trojans, etc.)"
@@ -661,6 +661,39 @@ msgstr "Sites de vente et d'achat en ligne"
 
 msgid "Sport sites"
 msgstr "Sites de sport"
+
+msgid "Sites which propose to download software"
+msgstr "Sites qui permettent de télécharger des logiciels"
+
+msgid "educational games sites (flash and online games )"
+msgstr "Sites de jeux éducatifs"
+
+msgid "Sites for cooking"
+msgstr "Sites de cuisine"
+
+msgid "Sites for lingerie"
+msgstr "Sites de lingerie"
+
+msgid "Sites for translation"
+msgstr "Sites de traduction"
+
+msgid "Sites for bitcoin mining"
+msgstr "Sites de bitcoin"
+
+msgid "Sites for dialer"
+msgstr "Sites de dialer"
+
+msgid "distributed denial of service attack sites"
+msgstr "Sites d'attaque par déni de service"
+
+msgid "Sites of update"
+msgstr "Sites de mise à jour"
+
+msgid "Sites of Religious Associations"
+msgstr "Sites d'associations religieuses"
+
+msgid "URLs shortening sites"
+msgstr "Raccoursisseur d'URL"
 
 msgid "Intentionally malformed URL"
 msgstr "URL intentionnellement mal formées"

@@ -59,7 +59,7 @@ if (file_exists($bl_categories))
             if ( $a or $b  )  { echo "checked>";   }
             else { echo ">"; }
             
-            echo "<a href='bl_categories_help.php?cat=$categorie' target='cat_help' onclick=window.open('bl_categories_help.php','cat_help','width=600,height=150,toolbar=no,scrollbars=no,resizable=yes') title='categories help page'>$categorie</a>";
+            echo "<a href='bl_categories_help.php?cat=$categorie' target='cat_help' onclick=window.open('bl_categories_help.php','cat_help','width=600,height=300,toolbar=no,scrollbars=no,resizable=yes') title='categories help page'>$categorie</a>";
             echo "</label>";
             echo "</div>";
 
