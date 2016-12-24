@@ -1,3 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><!-- written by Rexy -->
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <?php
 include 'locale.php';
 $dirconf="/etc/CTparental";
@@ -54,7 +58,6 @@ $l_explain_tricheur           = gettext("Sites related to cheating (tests, exami
 $l_explain_webmail            = gettext("Web sites for e-mail consultation");
 $l_explain_warez              = gettext("Sites related to cracked softwares");
 $l_explain_ctparental         = gettext("Site related to as pop up advertising or pornography not present in the blacklist of Toulouse.");
-
 if (isset($_GET['cat']))
 {
     $categorie = $_GET['cat'];
@@ -97,7 +100,7 @@ else
     </head>
 
     <body>
-        <div class="container">
+   <div class="container">
             <div class="header clearfix">
                 <nav>
                     <ul class="nav nav-pills pull-right">
