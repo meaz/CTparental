@@ -136,7 +136,7 @@ PROXYport=${PROXYport:="8888"}
 E2GUport=${E2GUport:="8080"}
 PROXYuser=${PROXYuser:="privoxy"}
 #### DEPENDANCES par DEFAULT #####
-DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
+DEPENDANCES=${DEPENDANCES:=" console-data e2guardian dnsmasq lighttpd lighttpd-mod-magnet php-cgi libnotify-bin notification-daemon iptables-persistent rsyslog privoxy openssl libnss3-tools whiptail "}
 #### PACKETS EN CONFLI par DEFAULT #####
 CONFLICTS=${CONFLICTS:=" dansguardian mini-httpd apache2 firewalld "}
 
@@ -1340,6 +1340,7 @@ chown root:"$GROUPHTTPD" "$FILE_CONF"
 cat << EOF > "$MAINCONFHTTPD"
 server.modules = (
 "mod_access",
+"mod_magnet", # patch vulnerabilitie httpoxy
 "mod_alias",
 "mod_redirect",
 "mod_rewrite", # pour eviter erreur 404 l'aure de redirection dnsmasq sur 127.0.0.10
@@ -1349,7 +1350,7 @@ server.modules = (
 auth.debug                 = 0
 auth.backend               = "htdigest" 
 auth.backend.htdigest.userfile = "$PASSWORDFILEHTTPD" 
-
+magnet.attract-raw-url-to = ( "$DIR_CONF/deny-proxy.lua" ) 
 server.document-root = "/var/www"
 server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
 #server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
@@ -1423,6 +1424,13 @@ chmod +x /usr/share/lighttpd/include-conf-enabled.pl
 
 fi
 
+### patch vulnerabilitie httpoxy
+if [ ! -f $DIR_CONF/deny-proxy.lua ];then
+cat << EOF > $DIR_CONF/deny-proxy.lua
+if (lighty.request["Proxy"] == nil) then return 0 else return 403 end
+EOF
+fi
+###
 mkdir -p "$DIRCONFENABLEDHTTPD"
 
 
