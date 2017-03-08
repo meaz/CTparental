@@ -1,7 +1,7 @@
 #!/bin/sh
 SED="/bin/sed -i"
 echo " génération Blacklist pour ubound"
-uboundfile=unbound_bl.conf
+uboundfile=service.conf
 
 cat << EOF > $uboundfile 
 # Configuration file for "unbound with blackhole"
@@ -36,11 +36,24 @@ server:
 EOF
 
 FILE_tmp=tmpfile
-cat /etc/CTparental/blacklist-enabled/* | sed -e "s/address=\///g" | sed -e "s/\/127.0.0.10//g" | sed -e "s/^\.\{1,10\}//g"| sort -u > "$FILE_tmp"
+FILE_tmp2=tmpfile2
 
+cat /etc/CTparental/blacklist-enabled/* | sed -e "s/address=\///g" | sed -e "s/^\.\{1,10\}//g" | grep -v "127.0.0.10"  | grep -v "#" | sort -u > "$FILE_tmp"
+
+while read line
+do
+domain=$(echo $line | cut -d"/" -f1)
+ip=$(echo $line | cut -d"/" -f2)
+{
+echo "local-zone: \"$domain\" redirect" 
+echo "local-data: \"$domain A $ip\""
+} >> $FILE_tmp2
+done < "$FILE_tmp"
+
+cat "$FILE_tmp2" >> $uboundfile 
+
+cat /etc/CTparental/blacklist-enabled/* | sed -e "s/address=\///g" | sed -e "s/^\.\{1,10\}//g" | grep "127.0.0.10" | sed -e "s/\/127.0.0.10//g" | grep -v "#" | sort -u > "$FILE_tmp"
 $SED "s?.*?local-zone: \"&\" redirect \nlocal-data: \"& A 127.0.0.10\"?g" "$FILE_tmp" # Mise en forme unbound des listes noires
-
 cat  "$FILE_tmp" >> $uboundfile 
-
-
-
+rm -f $FILE_tmp
+rm -f $FILE_tmp2
