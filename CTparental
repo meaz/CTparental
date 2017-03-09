@@ -538,11 +538,13 @@ http://localhost.*
 # par http://www.dailymotion.com/family_filter?enable=true...
 {+redirect{s@enable=[^&]+@enable=true@}}
  .dailymotion.*/.*enable=(?!true)
- 
-# remplace http://ay8ou8ohth.com/images/close_gray.png            
-# par http://ay8ou8ohth.com/images/close_red.png
-{+redirect{s@close_[^&]+@close_red.png@}}
-.com/images/close_.*(?!red)\.png
+             
+
+{+redirect{s@.*/images/close_.*@http://127.0.0.1/CTparental/images/edit-clear.png@}}
+.com/images/close.*.png
+
+{+redirect{s@http://*.tv/close1.png@http://127.0.0.1/CTparental/images/edit-clear.png@}}
+.tv
 
               
 EOF
