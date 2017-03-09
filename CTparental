@@ -543,7 +543,7 @@ http://localhost.*
 {+redirect{s@.*/images/close_.*@http://127.0.0.1/CTparental/images/edit-clear.png@}}
 .com/images/close.*.png
 
-{+redirect{s@http://*.tv/close1.png@http://127.0.0.1/CTparental/images/edit-clear.png@}}
+{+redirect{s@http://.*.tv/close1.png@http://127.0.0.1/CTparental/images/edit-clear.png@}}
 .tv
 
               
