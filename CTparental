@@ -540,11 +540,11 @@ http://localhost.*
  .dailymotion.*/.*enable=(?!true)
              
 
-{+redirect{s@.*/images/close_.*@http://127.0.0.1/CTparental/images/edit-clear.png@}}
-.com/images/close.*.png
+{+redirect{s@http://.*/images/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+.*
 
-{+redirect{s@http://.*.tv/close1.png@http://127.0.0.1/CTparental/images/edit-clear.png@}}
-.tv
+{+redirect{s@http://.*/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+.*
 
               
 EOF
