@@ -1,8 +1,9 @@
 ctparental (4.20.10-1.0) unstable; urgency=medium
 
-  * ajout patch httpoxy.
+  * ajout patch httpoxy https://httpoxy.org/.
+  * ajout de bouton pout tous cocher ou tous décocher dans "type MIME a filtrer" et "extensions a filtrées".
     
- -- Guillaume marsat <CTparental1@laposte.net>  Sun, 26 Feb 2017 12:32:37 +0100
+ -- Guillaume marsat <CTparental1@laposte.net>  Mon, 20 Mar 2017 17:49:09 +0100
  
 ctparental (4.20.9-1.0) unstable; urgency=medium
 
