@@ -292,20 +292,20 @@ DNS2="$(echo "${nameserver}" | awk '{ print $2}' | cut -d"%" -f1)"
 DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
 DNS2=${DNS2:=208.67.222.222} #
 
-#ip_route_ipv6="$(ip -6 route | tr '\n' ' ')"
-#i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
-#ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
-#ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
+ip_route_ipv6="$(ip -6 route | tr '\n' ' ')"
+i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
+ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
+ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
 
-#reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
-#reseau_box_ipv6_l="fe80::/64"
+reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
+reseau_box_ipv6_l="fe80::/64"
 
-#export i_WAN_ipv6
-#export ipbox_ipv6
-#export ip_i_WAN_ipv6
-#export reseau_box_ipv6_g
-#export reseau_box_ipv6_l
-#unset ip_route_ipv6
+export i_WAN_ipv6
+export ipbox_ipv6
+export ip_i_WAN_ipv6
+export reseau_box_ipv6_g
+export reseau_box_ipv6_l
+unset ip_route_ipv6
 
 ipMaskValide() {
 ip=$(echo "$1" | cut -d"/" -f1)
@@ -353,11 +353,11 @@ networkisoknext() {
 if [ "$(echo "$i_WAN_ipv4" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox_ipv4" )" -eq 0 -o "$( ipMaskValide "$ip_i_WAN_ipv4" )" -eq 0 \
  -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast_ipv4" )" -eq 0 \
  -o "$( ipMaskValide "$reseau_box_ipv4" )" -eq 0 ];then
-	#if [ "$ip_i_WAN_ipv6" =  "" ];then
+	if [ "$ip_i_WAN_ipv6" =  "" ];then
 		gettext 'error recovery network settings'
 		echo
 		exit 0
-	#fi
+	fi
 fi 
 }
 
@@ -497,11 +497,11 @@ confprivoxy () {
 echo "<confprivoxy>"
 $SED "s?^debug.*?debug = 0?g"  "$PRIVOXYCONF"
 ligneipv4=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '1q;d' )
-#ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
+ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
 #echo "nlisten-adress4=$ligneipv4"
 #echo "nlisten-adress6=$ligneipv6"
 $SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
-#$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
+$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
 	test=$(grep -c "actionsfile ctparental.action" "$PRIVOXYCONF" )
 	if [ "$test" -ge "1" ] ; then
 		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" "$PRIVOXYCONF"
@@ -538,11 +538,12 @@ http://localhost.*
 {+redirect{s@enable=[^&]+@enable=true@}}
  .dailymotion.*/.*enable=(?!true)
  
-# remplace http://xxxxxxxx.com/images/close_gray.png            
-# par http://xxxxxxx.com/images/close_red.png
-{+redirect{s@close_[^&]+@close_red.png@}}
-.com/images/close_.*(?!red)\.png
-              
+{+redirect{s@http://.*/images/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+.*
+
+{+redirect{s@http://.*/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
+.*
+
 EOF
 if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
 	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
@@ -666,7 +667,7 @@ download() {
       exit 1
    fi
    # on télécharge aussi la blackliste personalisé de ctparental
-   wget -P $tempDIR https://github.com/marsat/CTparental/raw/master/blacklist.tar.gz 2>&1 | cat
+   wget -P $tempDIR https://github.com/marsat/bl_ctparental/raw/master/blacklist.tar.gz 2>&1 | cat
    if [ ! $? -eq 0 ]; then
       gettext 'error when downloading, interrupted process'
       rm -rf $tempDIR
@@ -955,7 +956,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
-#no-dhcp-interface=$i_WAN_ipv6
+no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -965,8 +966,8 @@ bogus-priv
 server=$DNS1
 server=$DNS2  
 ## dns ipv6 Opendns
-#server=2620:0:ccc::2 
-#server=2620:0:ccd::2
+server=2620:0:ccc::2 
+server=2620:0:ccd::2
 
 EOF
 
@@ -992,6 +993,9 @@ ipglobal () {
     $IPTABLES -P INPUT DROP
     $IPTABLES -P OUTPUT DROP
     $IPTABLES -P FORWARD DROP
+    $IPTABLES6 -P INPUT DROP
+	$IPTABLES6 -P OUTPUT DROP
+	$IPTABLES6 -P FORWARD DROP 
     # TCP Syn Flood
     $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p tcp --syn -m limit --limit 3/s -j ACCEPT
     # UDP Syn Flood
@@ -1017,31 +1021,43 @@ ipglobal () {
     ### ACCEPT ALL interface loopback ###
     $IPTABLES -A INPUT  -i lo -j ACCEPT
     $IPTABLES -A OUTPUT -o lo -j ACCEPT
+    $IPTABLES6 -A INPUT  -i lo -j ACCEPT
+    $IPTABLES6 -A OUTPUT -o lo -j ACCEPT
     ### accepte en entrée les connexions déjà établies (en gros cela permet d'accepter 
     ### les connexions initiées par sont propre PC)
     $IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-     
+    $IPTABLES6 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT 
     ### DHCP
     $IPTABLES -A OUTPUT -o "$i_WAN_ipv4" -p udp --sport 68 --dport 67 -j ACCEPT
     $IPTABLES -A INPUT -i "$i_WAN_ipv4" -p udp --sport 67 --dport 68 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -o "$i_WAN_ipv6" -p udp --sport 68 --dport 67 -j ACCEPT
+    $IPTABLES6 -A INPUT -i "$i_WAN_ipv6" -p udp --sport 67 --dport 68 -j ACCEPT
  
     ### DNS indispensable pour naviguer facilement sur le web ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
     $IPTABLES -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
     $IPTABLES -A OUTPUT -d 127.0.0.1 -p tcp -m tcp --dport 54 -j ACCEPT
     $IPTABLES -A OUTPUT -d 127.0.0.1 -p udp -m udp --dport 54 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -d ::1 -p tcp -m tcp --dport 54 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -d ::1 -p udp -m udp --dport 54 -j ACCEPT
  
     ### HTTP navigation internet non sécurisée ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 80 -j ACCEPT
     
     ### HTTPS pour le site des banques .... ###
     $IPTABLES -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p tcp -m tcp --dport 443 -j ACCEPT
     
     ### ping ... autorise à "pinger" un ordinateur distant ###
     $IPTABLES -A OUTPUT -p icmp -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p icmp -j ACCEPT
     
     ### clientNTP ... syncro à un serveur de temps ###
     $IPTABLES -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    $IPTABLES6 -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
     
     # On autorise les requêtes FTP 
 	modprobe ip_conntrack_ftp
@@ -1055,6 +1071,9 @@ ipglobal () {
 	    source "$FILEIPTABLES"
     fi
 ### LOG ### Log tout ce qui qui n'est pas accepté par une règles précédente
+$IPTABLES6 -A OUTPUT -j LOG  --log-prefix "iptables6: "
+$IPTABLES6 -A INPUT -j LOG   --log-prefix "iptables6: "
+$IPTABLES6 -A FORWARD -j LOG  --log-prefix "iptables6: "
 $IPTABLES -A OUTPUT -j LOG  --log-prefix "iptables: "
 $IPTABLES -A INPUT -j LOG   --log-prefix "iptables: "
 $IPTABLES -A FORWARD -j LOG  --log-prefix "iptables: "
@@ -1161,9 +1180,9 @@ iptablesreload () {
    $IPTABLES6 -t nat -F  
    $IPTABLES6 -t nat -X  
    $IPTABLES6 -t nat -N ctparental
-   $IPTABLES6 -P INPUT DROP
-   $IPTABLES6 -P OUTPUT DROP
-   $IPTABLES6 -P FORWARD DROP 
+   $IPTABLES6 -P INPUT ACCEPT
+   $IPTABLES6 -P OUTPUT ACCEPT
+   $IPTABLES6 -P FORWARD ACCEPT 
    $IPTABLES -F
    $IPTABLES -X
    $IPTABLES -t nat -F  
@@ -1174,7 +1193,6 @@ iptablesreload () {
    $IPTABLES -P FORWARD ACCEPT 
    
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	 $IPTABLES -t nat -N ctparental
      $IPTABLES -t nat -A OUTPUT -j ctparental
      $IPTABLES6 -t nat -A OUTPUT -j ctparental
      if [ ! "$REDIRECT" -eq 1 ];then
@@ -1184,12 +1202,12 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
     
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
 	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
-	  #$IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 80 -j REJECT
-	  #$IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 443 -j REJECT
+	  $IPTABLES -I OUTPUT -d ::1 -p tcp --dport 80 -j REJECT
+	  $IPTABLES -I OUTPUT -d ::1 -p tcp --dport 443 -j REJECT
      fi
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-	  #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
+	  $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to [::1]:54
 	  if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 		  # on interdit l'accès a bing en https .
 		  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
@@ -1206,22 +1224,21 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 			 #on rediriges les requet DNS ipv6 des usagers filtrés sur dnsmasq
-			 #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54 
-			 #$IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
+			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54 
+			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
 			 #force passage par dansguardian pour les utilisateurs filtrés 
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to 127.0.0.1:"$E2GUport"
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 # e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
-			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			 $IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
 			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
-			 #$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
+			 $IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
 			 # on interdit l'utilisation d'IPv6.	
 		  fi
 		  done
-   
    if [ -e "$FILEIPTIMEWEB" ] ;  then
 		source "$FILEIPTIMEWEB"
    fi
@@ -1229,7 +1246,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
-	setproxy
+   setproxy
 else
 unsetproxy
 fi
@@ -1243,7 +1260,6 @@ fi
 if [ -e "$DIRHTML"/cactparental.crt ];then   
 	updatecauser
 fi
-
 echo "</iptablesreload>"
 }
 updatecauser () {
@@ -1283,7 +1299,7 @@ interface=lo
 listen-address=127.0.0.1
 port=54
 no-dhcp-interface=$i_WAN_ipv4
-#no-dhcp-interface=$i_WAN_ipv6
+no-dhcp-interface=$i_WAN_ipv6
 no-dhcp-interface=lo
 bind-interfaces
 cache-size=1024
@@ -1323,6 +1339,7 @@ chown root:"$GROUPHTTPD" "$FILE_CONF"
 cat << EOF > "$MAINCONFHTTPD"
 server.modules = (
 "mod_access",
+"mod_magnet", # patch vulnerabilitie httpoxy
 "mod_alias",
 "mod_redirect",
 "mod_rewrite", # pour eviter erreur 404 l'aure de redirection dnsmasq sur 127.0.0.10
@@ -1332,7 +1349,7 @@ server.modules = (
 auth.debug                 = 0
 auth.backend               = "htdigest" 
 auth.backend.htdigest.userfile = "$PASSWORDFILEHTTPD" 
-
+magnet.attract-raw-url-to = ( "$DIR_CONF/deny-proxy.lua" ) 
 server.document-root = "/var/www"
 server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
 #server.errorlog = "/var/log/lighttpd/error.log" # ne pas decommenter sur les eeepc qui on /var/log  en tmpfs
@@ -1341,7 +1358,6 @@ server.username = "$USERHTTPD"
 server.groupname = "$GROUPHTTPD"
 server.port = 80
 server.bind = "127.0.0.1"
-
 
 index-file.names = ( "index.php", "index.html" )
 url.access-deny = ( "~", ".inc" )
@@ -1407,6 +1423,13 @@ chmod +x /usr/share/lighttpd/include-conf-enabled.pl
 
 fi
 
+### patch vulnerabilitie httpoxy
+if [ ! -f $DIR_CONF/deny-proxy.lua ];then
+cat << EOF > $DIR_CONF/deny-proxy.lua
+if (lighty.request["Proxy"] == nil) then return 0 else return 403 end
+EOF
+fi
+###
 mkdir -p "$DIRCONFENABLEDHTTPD"
 
 
@@ -1489,18 +1512,18 @@ server.document-root = "$DIRHTML"
 url.rewrite-once = ( ".*" => "/index.php" ) # on réécrit l'url en interne serveur pour que tous passe sur index.php
 }
 
-#\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
+\$SERVER["socket"] == "[$PRIVATE_IP6]:80" {
 	
-#server.document-root = "$DIRHTML"
-#server.error-handler-404 ="err404.php"
-#}
+server.document-root = "$DIRHTML"
+server.error-handler-404 ="err404.php"
+}
 
-#\$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
-#ssl.engine = "enable"
-#ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
-#server.document-root = "$DIRHTML"
-#server.error-handler-404 ="err404.php"
-#}
+\$SERVER["socket"] == "[$PRIVATE_IP6]:443" {
+ssl.engine = "enable"
+ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
+server.document-root = "$DIRHTML"
+server.error-handler-404 ="err404.php"
+}
 
 EOF
 if [ -e "$DIRHTML/index.php" ] ;  then
@@ -1734,7 +1757,7 @@ install () {
 	     cmd="${CMDINSTALL} ${DEPENDANCES}"
 	     $cmd
       fi
-
+      
       # on charge le(s) module(s) indispensable(s) pour iptables.
 		if [ "$( grep -c ip_conntrack_ftp "$FILEMODULESLOAD" )" -ge "1" ] ; then
 			$SED "s?.*ip_conntrack_ftp.*?#ip_conntrack_ftp?g" "$FILEMODULESLOAD"
@@ -1789,22 +1812,24 @@ if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
  "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
  "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN_IPV4 | cut -d"=" -f2)"  -o \
  "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX_IPV4 | cut -d"=" -f2)"  -o \
- "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" \
+ "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" -o \
+ "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" -o \
+ "$i_WAN_ipv6" != "$(cat < $FILE_CONF | grep I_WAN_IPV6 | cut -d"=" -f2)" \
  ];then
-	if [ "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$DNS1" != "" ] ; then
+	if [ "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$DNS1" != "" ] || [ "$ip_i_WAN_ipv6" != "" -a "$i_WAN_ipv6" != ""  ]; then
 		# on sauvegarde ces chnagement dans le fichier de conf CTparental.
 		$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
 		$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
 		$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
-		#$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
-    	#$SED "/^I_WAN_IPV6=/d" "$FILE_CONF"
+		$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
+    	$SED "/^I_WAN_IPV6=/d" "$FILE_CONF"
 		$SED "/^DNS1=/d" "$FILE_CONF"
 		$SED "/^DNS2=/d" "$FILE_CONF"
 		{ echo I_WAN_IPV4="$i_WAN_ipv4"
 		  echo IP_BOX_IPV4="$ipbox_ipv4"
 		  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
-		  #echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
-		  #echo I_WAN_IPV6="$i_WAN_ipv6"
+		  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
+		  echo I_WAN_IPV6="$i_WAN_ipv6"
 		  echo DNS1="$DNS1"
 		  echo DNS2="$DNS2"
 		} >> $FILE_CONF
@@ -1896,6 +1921,7 @@ desactivegourpectoff () {
 
 uninstall () {
 
+   # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
    if [ $nomanuel -eq 0 ]; then 
 	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
 	   if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
@@ -2672,9 +2698,9 @@ case $arg1 in
       exit 0
       ;;
    -off )
-	  rm -f /etc/cron.d/CTparental*
+      rm -f /etc/cron.d/CTparental*
   	  desactivegourpectoff
-      autoupdateoff 
+  	  autoupdateoff 
       dnsmasqoff
       FILTRAGEISOFF=1
       iptablesreload
