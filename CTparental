@@ -496,12 +496,20 @@ confprivoxy () {
 	
 echo "<confprivoxy>"
 $SED "s?^debug.*?debug = 0?g"  "$PRIVOXYCONF"
+test=$( grep -c "^listen-address.*" "$PRIVOXYCONF" )
 ligneipv4=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '1q;d' )
-ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
-#echo "nlisten-adress4=$ligneipv4"
-#echo "nlisten-adress6=$ligneipv6"
-$SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
-$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
+if [ "$test" -eq "1" ] ; then
+	ligneipv6=$((ligneipv4 + 1))
+	$SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" 	
+	$SED "$ligneipv6""i\listen-address  [::1]:$PROXYport" "$PRIVOXYCONF"
+else
+	ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
+	#echo "nlisten-adress4=$ligneipv4"
+	#echo "nlisten-adress6=$ligneipv6"
+	$SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
+	$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
+fi
+unset test
 	test=$(grep -c "actionsfile ctparental.action" "$PRIVOXYCONF" )
 	if [ "$test" -ge "1" ] ; then
 		$SED "s?actionsfile.*ctparental.*?actionsfile ctparental\.action      # ctparental customizations?g" "$PRIVOXYCONF"
