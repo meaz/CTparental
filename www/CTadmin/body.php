@@ -134,6 +134,55 @@ case 'change_file1' :
 		}
 	exec ($cmdCT."-dgreload");
 	break;
+case 'change_file2' :
+	$tab=file($dg_file_edit);
+	if ($tab)
+		{
+		$pointeur=fopen($dg_file_edit,"w+") or die(gettext('Error opening the file')." ".$dg_file_edit);
+		$numline=1;
+		foreach ($tab as $ligne)
+			{
+			$line=$ligne ;
+			if (trim($ligne) != '') # the line isn't empty
+			{
+				$ext_lignes=explode(" ", $line);
+					if(preg_match('/^#/',$ligne)) {
+						$line=substr($ligne,1);
+					}
+				//echo $line."<br>";
+				fwrite($pointeur,$line);
+		    }	
+		    $numline=$numline+1;			
+			}
+		fclose($pointeur);
+		}
+	exec ($cmdCT."-dgreload");
+	break;
+case 'change_file3' :
+	$tab=file($dg_file_edit);
+	if ($tab)
+		{
+		$pointeur=fopen($dg_file_edit,"w+") or die(gettext('Error opening the file')." ".$dg_file_edit);
+		$numline=1;
+		foreach ($tab as $ligne)
+			{
+			$line=$ligne ;
+			if (trim($ligne) != '') # the line isn't empty
+			{
+				$ext_lignes=explode(" ", $line);
+					if(!preg_match('/^#/',$ligne)) {
+						$line="#".$ligne;			
+					}
+			
+				//echo $line."<br>";
+				fwrite($pointeur,$line);
+		    }	
+		    $numline=$numline+1;			
+			}
+		fclose($pointeur);
+		}
+	exec ($cmdCT."-dgreload");
+	break;	
 case 'change_safesearch' :
 	$tab=file($dg_file_edit);
 	if ($tab)
