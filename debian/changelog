@@ -1,3 +1,13 @@
+ctparental (4.20.12-1.0) unstable; urgency=medium
+
+  * on ne bloque plus l'https direct , car privory ne fait que forwarder 
+  ce type de flux et n'aport aucune pluvalus au filtrage https seul dnsmasq et utilisé pour l'https.
+  cela évite les bugs de conexion dans les jeux dont on ne pouvait parramétrer le proxy https.
+  * on ne parramètre plus les variables http_proxy et https_proxy car cela est devenu inutiles 
+  grace au raigles iptables.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Thu, 23 Mar 2017 22:09:32 +0100
+ 
 ctparental (4.20.11-1.0) unstable; urgency=medium
 
   * corection de bug dans le paramétrage de privoxy.
