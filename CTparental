@@ -1263,7 +1263,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
     ipglobal
    fi
    #setproxy
-else
+#else
 #unsetproxy
 fi
 
