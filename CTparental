@@ -558,7 +558,7 @@ if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
 fi
 echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
 $PRIVOXYrestart
-setproxy
+#setproxy
 echo "</confprivoxy>"
 }
 
@@ -1242,9 +1242,14 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
-			 $IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
-			 $IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
+			 #$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
+			 #$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
 			 # on interdit l'utilisation d'IPv6.	
+			if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
+			  # on interdit l'accès a bing en https .
+			  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
+			  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
+			fi
 		  fi
 		  done
    if [ -e "$FILEIPTIMEWEB" ] ;  then
@@ -1254,9 +1259,9 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
    if [ "$(cat < $FILE_CONF | grep -c IPRULES=ON )" -eq 1 ];then
     ipglobal
    fi
-   setproxy
+   #setproxy
 else
-unsetproxy
+#unsetproxy
 fi
 
 # Save configuration so that it survives a reboot
@@ -2021,7 +2026,7 @@ uninstall () {
 			done
 		fi
    done
-   unsetproxy
+   #unsetproxy
    # on réouvre l'ipv6
    $IPTABLES6 -F
    $IPTABLES6 -X
@@ -2798,7 +2803,7 @@ case $arg1 in
           networkisoknext
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
 			updatecauser
-			setproxy
+			#setproxy
 		  fi
 		  unset test
 		  applistegctoff
@@ -2839,7 +2844,7 @@ then run the command CTparental -ipton") $Fcolor"
 		  if [ "$(updatelistgctoff)" -eq 1 ];then
 			applistegctoff
 			updatecauser
-			setproxy
+			#setproxy
 			iptablesreload
 		  fi
 		  unset test
