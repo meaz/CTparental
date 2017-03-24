@@ -545,13 +545,15 @@ http://localhost.*
 # par http://www.dailymotion.com/family_filter?enable=true...
 {+redirect{s@enable=[^&]+@enable=true@}}
  .dailymotion.*/.*enable=(?!true)
- 
+             
+
 {+redirect{s@http://.*/images/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
 .*
 
 {+redirect{s@http://.*/close.*.png@http://127.0.0.1/CTparental/images/X32px.png@}}
 .*
 
+              
 EOF
 if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
 	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
@@ -820,10 +822,10 @@ do
 done < $CATEGORIES_ENABLED
 reabdomaine
 $SED "s?^MD5DREAB.*?MD5DREAB=$md5new?g" $FILE_CONF
+iptablesreload
 fi
 cp $DIR_DNS_FILTER_AVAILABLE/ossi.conf $DIR_DNS_BLACKLIST_ENABLED/
 echo "</catChoice>"
-
 }
 
 reabdomaine () {
@@ -910,10 +912,9 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEYOUTUBE" )" -eq 1 ];then
 fi
 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEDUCK" )" -eq 1 ];then
 	echo "# on force a passer par safe.duckduckgo.com" 
-	for ipsafeduckduckgo in $(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias)
-	do
-		echo "address=/safe.duckduckgo.com/$ipsafeduckduckgo" 
-	done
+	#ipsafeduckduckgo=$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')
+	echo "address=/safe.duckduckgo.com/$(host -ta safe.duckduckgo.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
+	
 	## les requette sur http(s)://duckduckgo.com sont rediriger vers lighttpd qui les renvois vers safe.duckduckgo.com
 	echo "address=/duckduckgo.com/127.0.0.1" 
 fi
@@ -922,8 +923,11 @@ if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
 	## on attribut une seul ip pour les recherches sur bing de manière a pouvoir bloquer sont acces en https dans iptables.
 	## et ainci forcer le safesearch via privoxy.
 	## tous les sous domaines type fr.bing.com ... retourneront l'ip de www.bing.com
-	echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4 | sed '1q;d')"
+	echo "address=/.bing.com/$(host -ta bing.com|cut -d" " -f4 | grep -v alias | sed '1q;d')"
 fi
+
+echo "address=/.dailymotion.com/$(host -ta dailymotion.com|cut -d" " -f4 | grep -v alias | sed '1q;d')" 
+
 ## on force a passer par search.yahoo.com pour redirection url par lighttpd
 #ipsearchyahoo=`host -ta search.yahoo.com|cut -d" " -f4 | grep [0-9]`
 #echo "address=/safe.search.yahoo.com/$ipsearchyahoo" >> $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf
@@ -1222,16 +1226,16 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 		  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 	  fi
 	  
-	  for ipdailymotion in $(host -ta dailymotion.com|cut -d" " -f4)  
-	  do 
+
+	    ipdailymotion=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.dailymotion.com/" | cut -d "/" -f3)
 		$IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
-	  done
+
 	  	  for user in $(listeusers) ; do
 		  if  [ "$(groups "$user" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )" )" -eq 0 ];then
-			 #on rediriges les requet DNS ipv4 des usagers filtrés sur dnsmasq
+			 #on rediriges les requet DNS ipv4 des usagers filtrés sur dnsmasq très importent pour l'https. 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to 127.0.0.1:54 
 			 $IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
-			 #on rediriges les requet DNS ipv6 des usagers filtrés sur dnsmasq
+			 #on rediriges les requet DNS ipv6 des usagers filtrés sur dnsmasq très importent pour l'https.
 			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 53 -j DNAT --to [::1]:54 
 			 $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$user" -p udp --dport 53 -j DNAT --to [::1]:54
 			 #force passage par dansguardian pour les utilisateurs filtrés 
@@ -1239,17 +1243,18 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			 $IPTABLES -t nat -A ctparental ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to 127.0.0.1:"$E2GUport"
 			 # e2guardian ne gérent pas encore ipv6 on ce contente de privoxy + dnsmasq on force donc le passage par privoxy pour le http.
 			 $IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$PROXYport"
+			 if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
+				  # on interdit l'accès a bing en https .
+				  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
+				  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
+			 fi
+			 $IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
+			 #le proxy ne faisent que forwarder les flux https forcet le passage par celui ci pour https n'apport pas de sécuritée seul dnsmasq peut bloquer.
 			 #$IPTABLES -t nat -A ctparental -m owner --uid-owner "$user" -p tcp --dport 443 -j DNAT --to 127.0.0.1:$E2GUport  # proxy https transparent n'est pas possible avec privoxy
 			 #$IPTABLES -A OUTPUT ! -d 127.0.0.1/8 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on interdit l'aces https sans passer par le proxy pour les utilisateur filtré.
 			 #$IPTABLES6 -A OUTPUT ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # pareil en ipv6
-			 # on interdit l'utilisation d'IPv6.	
-			if [ "$(cat < $SAFE_CONF | grep -c "^SAFEBING" )" -eq 1 ];then
-			  # on interdit l'accès a bing en https .
-			  ipbing=$(cat < $DIR_DNS_BLACKLIST_ENABLED/forcesafesearch.conf | grep "address=/.bing.com/" | cut -d "/" -f3)
-			  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
-			fi
 		  fi
 		  done
    if [ -e "$FILEIPTIMEWEB" ] ;  then
