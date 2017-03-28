@@ -370,7 +370,7 @@ resolvconf -u 2&> /dev/null
 if [ $? -eq 1 ];then # si resolvconf et bien installé
 resolvconf -u
 # on s'assure que les dns du FAI soit bien ajoutés au fichier /etc/resolv.conf malgré l'utilisation de dnsmasq.
-cat < /etc/resolv.conf | grep ^nameserver | sort -u > /etc/resolvconf/resolv.conf.d/tail
+cat < /etc/resolv.conf | grep ^nameserver | grep -v 127.0.0.1 | sort -u > /etc/resolvconf/resolv.conf.d/tail
 fi
 $DNSMASQstart
 sleep 1
