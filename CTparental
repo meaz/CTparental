@@ -39,7 +39,9 @@ fi
 
 noinstalldep="0"
 nomanuel="0"
-for arg in "$@" ; do
+x=("$@")
+narg=0
+for arg in "$x" ; do
 	case $arg in
 		-nodep )
 			noinstalldep="1"
@@ -49,9 +51,25 @@ for arg in "$@" ; do
 		;;
 		-dirhtml )
 			narg=$(( "$narg" +1 ))
-			DIRhtmlPersonaliser=${ARGS[$narg]}
+			DIRhtmlPersonaliser=${x[$narg]}
 			if [ ! -d "$DIRhtmlPersonaliser" ];then
 				gettext 'Invalid directory path!'
+				exit 0
+			fi	
+		;;
+		-exp )
+			narg=$(( "$narg" +1 ))
+			DIRexpconf=${x[$narg]}
+			if [ ! -d "$DIRexpconf" ];then
+				gettext 'Invalid directory path!'
+				exit 0
+			fi	
+		;;
+		-imp )
+			narg=$(( "$narg" +1 ))
+			FILEimpconf=${x[$narg]}
+			if [ ! -e "$FILEimpconf" ];then
+				gettext 'Error opening the file'
 				exit 0
 			fi	
 		;;
@@ -422,6 +440,7 @@ mixed_adult
 phishing
 redirector
 publicite
+ddos
 sect
 strict_redirector
 strong_redirector
@@ -2605,6 +2624,61 @@ update-grub2
 
 }
 
+exportconf () {
+	
+if [ ! -e "$FILEIPTABLES" ] ;  then
+	echo > "$FILEIPTABLES"
+fi
+date="$( date +%y.%m.%d )"    
+tar -cvzf "$DIRexpconf"/CTparental.conf."$date".tar.gz "$DIR_CONF"/wl-categories-available "$DIR_CONF"/categories-enabled.conf \
+"$DIR_CONF"/CThourscompteur "$DIR_CONF"/CTsafe.conf "$DIR_CONF"/blacklist-local.conf "$DIR_CONF"/bl-categories-available \
+"$DIR_CONF"/CThours.conf  "$DIR_CONF"/dnsfilter-available/ "$DIR_CONF"/CTparental.conf "$DIR_CONF"/domaine-rehabiliter.conf \
+"$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYCTA" \
+"$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
+"$FILEIPTABLES" 
+
+chmod 744 "$DIRexpconf"/CTparental.conf."$date".tar.gz
+eval_gettext "Conf exported to \$DIRexpconf/CTparental.conf.\$date.tar.gz
+"
+	
+}
+
+importconf () {
+# si l'archive contient bien la bonne liste de fichiers.
+if [ "$(tar -tf "$FILEimpconf" | md5sum | grep -c 2a417d5a577ef37a9d4ca67fc0542bc2)" -eq 1 ] ;then
+
+	tar -xvzf "$FILEimpconf" -C /
+	$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
+	FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"	
+	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+		adapt
+		catChoice
+		dnsmasqon
+	else
+		rm -f /etc/cron.d/CTparental*
+		desactivegourpectoff
+		autoupdateoff 
+		dnsmasqoff
+		FILTRAGEISOFF=1
+	fi
+	if [ "$(cat < $FILE_CONF | grep -c GCTOFF=ON )" -eq 1 ];then
+		activegourpectoff
+	else
+		desactivegourpectoff
+	fi
+	if [ "$(cat < $FILE_CONF | grep -c HOURSCONNECT=ON )" -eq 1 ];then
+		readTimeFILECONF
+	else
+		desactivetimelogin
+	fi
+
+	iptablesreload
+else
+eval_gettext "\$FILEimpconf is not a configuration file
+"
+fi
+}
+
 # and func # ne pas effacer cette ligne !!
 
 usage="$(gettext "Use"): CTparental    {-i }|{ -u }|{ -dl }|{ -ubl }|{ -rl }|{ -on }|{ -off }|{ -cble }|{ -dble }
@@ -2908,6 +2982,14 @@ then run the command CTparental -ipton") $Fcolor"
 	  rm -f "$DIR_DNS_BLACKLIST_ENABLED"/dnsmasq.query.log.conf
 	  resolvconffixon
 	  rm -f /var/log/dnsmasq.query.log
+      exit 0
+      ;;
+	-exp )
+	  exportconf
+      exit 0
+      ;;
+	-imp )
+	  importconf
       exit 0
       ;;
       
