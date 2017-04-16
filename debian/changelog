@@ -1,6 +1,7 @@
 ctparental (4.20.13-1.0) unstable; urgency=medium
 
-  * ajout de l'export,import de configuration /root/CTparental.conf.tar.gz
+  * ajout de l'export,import de configuration via CTparental -exp /rep/export/ 
+  et CTparental -imp /chemin/absolut/fileconf.tar.gz.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Sun, 16 Apr 2017 11:05:18 +0200
  
