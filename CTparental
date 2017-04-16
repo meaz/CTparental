@@ -2624,24 +2624,34 @@ gettext 'Conf exported to /root/CTparental.conf.tar.gz.'
 
 importconf () {
 if [ -e /root/CTparental.conf.tar.gz ] ;  then
-tar -xvzf /root/CTparental.conf.tar.gz -C /
-$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
-FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"	
-if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	adapt
-	catChoice
-	dnsmasqon
-fi
-if [ "$(cat < $FILE_CONF | grep -c GCTOFF=ON )" -eq 1 ];then
-	activegourpectoff
-fi
-if [ "$(cat < $FILE_CONF | grep -c HOURSCONNECT=ON )" -eq 1 ];then
-	readTimeFILECONF
-fi
+	tar -xvzf /root/CTparental.conf.tar.gz -C /
+	$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
+	FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"	
+	if [ ! "$FILTRAGEISOFF" -eq 1 ];then
+		adapt
+		catChoice
+		dnsmasqon
+	else
+		rm -f /etc/cron.d/CTparental*
+		desactivegourpectoff
+		autoupdateoff 
+		dnsmasqoff
+		FILTRAGEISOFF=1
+	fi
+	if [ "$(cat < $FILE_CONF | grep -c GCTOFF=ON )" -eq 1 ];then
+		activegourpectoff
+	else
+		desactivegourpectoff
+	fi
+	if [ "$(cat < $FILE_CONF | grep -c HOURSCONNECT=ON )" -eq 1 ];then
+		readTimeFILECONF
+	else
+		desactivetimelogin
+	fi
 
-iptablesreload
+	iptablesreload
 else
-gettext 'First copy the file CTparental.conf.tar.gz into the /root/ directory.'
+	gettext 'First copy the file CTparental.conf.tar.gz into the /root/ directory.'
 fi
 
 }
