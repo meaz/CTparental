@@ -50,7 +50,7 @@ for arg in "$x" ; do
 			nomanuel="1"
 		;;
 		-dirhtml )
-			narg=$(( "$narg" +1 ))
+			narg=$(( $narg + 1 ))
 			DIRhtmlPersonaliser=${x[$narg]}
 			if [ ! -d "$DIRhtmlPersonaliser" ];then
 				gettext 'Invalid directory path!'
@@ -58,15 +58,16 @@ for arg in "$x" ; do
 			fi	
 		;;
 		-exp )
-			narg=$(( "$narg" +1 ))
+			narg=$(( $narg + 1 ))
 			DIRexpconf=${x[$narg]}
+			echo $DIRexpconf
 			if [ ! -d "$DIRexpconf" ];then
 				gettext 'Invalid directory path!'
 				exit 0
 			fi	
 		;;
 		-imp )
-			narg=$(( "$narg" +1 ))
+			narg=$(( $narg + 1 ))
 			FILEimpconf=${x[$narg]}
 			if [ ! -e "$FILEimpconf" ];then
 				gettext 'Error opening the file'
@@ -2645,7 +2646,7 @@ eval_gettext "Conf exported to \$DIRexpconf/CTparental.conf.\$date.tar.gz
 
 importconf () {
 # si l'archive contient bien la bonne liste de fichiers.
-if [ "$(tar -tf "$FILEimpconf" | md5sum | grep -c 2a417d5a577ef37a9d4ca67fc0542bc2)" -eq 1 ] ;then
+if [ "$(tar -tf "$FILEimpconf" | md5sum | grep -c 3407e396bafd3c465ed60d938918c70e)" -eq 1 ] ;then
 
 	tar -xvzf "$FILEimpconf" -C /
 	$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
