@@ -51,7 +51,7 @@ narg=$(( $narg + 1 ))
 			nomanuel=1
 		;;
 		-dirhtml )
-			nomanuel=${x[$narg]}
+			DIRhtmlPersonaliser=${x[$narg]}
 			if [ ! -d "$DIRhtmlPersonaliser" ];then
 				gettext 'Invalid directory path!'
 				exit 0
