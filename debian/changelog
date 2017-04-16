@@ -1,3 +1,10 @@
+ctparental (4.20.13-1.0) unstable; urgency=medium
+
+  * ajout de l'export,import de configuration via CTparental -exp /rep/export 
+  et CTparental -imp /chemin/absolut/CTparental.conf.xx.xx.xx.tar.gz.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Sun, 16 Apr 2017 11:05:18 +0200
+ 
 ctparental (4.20.12-1.0) unstable; urgency=medium
 
   * on ne bloque plus l'https direct , car privory ne fait que forwarder 
