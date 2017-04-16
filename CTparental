@@ -2639,7 +2639,9 @@ tar -cvzf "$DIRexpconf"/CTparental.conf."$date".tar.gz "$DIR_CONF"/wl-categories
 "$FILEIPTABLES" 
 
 chmod 744 "$DIRexpconf"/CTparental.conf."$date".tar.gz
-gettext 'Conf exported to /root/CTparental.conf.tar.gz.'	
+eval_gettext "Conf exported to \$DIRexpconf/CTparental.conf.\$date.tar.gz
+"
+	
 }
 
 importconf () {
@@ -2673,7 +2675,8 @@ if [ "$(tar -tf "$FILEimpconf" | md5sum | grep -c 2a417d5a577ef37a9d4ca67fc0542b
 
 	iptablesreload
 else
-gettext "$FILEimpconf it is not a conf file."
+eval_gettext "\$FILEimpconf is not a configuration file
+"
 fi
 }
 
