@@ -39,35 +39,32 @@ fi
 
 noinstalldep="0"
 nomanuel="0"
-x=("$@")
+x=($*) 
 narg=0
-for arg in "$x" ; do
+for arg in $* ; do
+narg=$(( $narg + 1 ))
 	case $arg in
 		-nodep )
-			noinstalldep="1"
+			noinstalldep=1
 		;;
 		-nomanuel )
-			nomanuel="1"
+			nomanuel=1
 		;;
 		-dirhtml )
-			narg=$(( $narg + 1 ))
-			DIRhtmlPersonaliser=${x[$narg]}
+			nomanuel=${x[$narg]}
 			if [ ! -d "$DIRhtmlPersonaliser" ];then
 				gettext 'Invalid directory path!'
 				exit 0
 			fi	
 		;;
 		-exp )
-			narg=$(( $narg + 1 ))
-			DIRexpconf=${x[$narg]}
-			echo $DIRexpconf
+			DIRexpconf=${x[$narg]}		
 			if [ ! -d "$DIRexpconf" ];then
 				gettext 'Invalid directory path!'
 				exit 0
 			fi	
 		;;
 		-imp )
-			narg=$(( $narg + 1 ))
 			FILEimpconf=${x[$narg]}
 			if [ ! -e "$FILEimpconf" ];then
 				gettext 'Error opening the file'
