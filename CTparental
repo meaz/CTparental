@@ -2619,7 +2619,7 @@ tar -cvzf /root/CTparental.conf.tar.gz "$DIR_CONF"/wl-categories-available "$DIR
 "$DIR_CONF"/GCToff.conf "$PRIVOXYCONF" "$PRIVOXYCTA" \
 "$DIRE2G"lists/bannedmimetypelist "$DIRE2G"lists/bannedextensionlist "$DIRE2G"lists/bannedsitelist \
 "$FILEIPTABLES" 
-	
+gettext 'Conf exported to /root/CTparental.conf.tar.gz.'	
 }
 
 importconf () {
