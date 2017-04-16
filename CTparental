@@ -2628,7 +2628,6 @@ tar -xvzf /root/CTparental.conf.tar.gz -C /
 
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"	
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
-	networkisoknext
 	adapt
 	catChoice
 	dnsmasqon
@@ -2642,7 +2641,7 @@ fi
 
 iptablesreload
 else
-gettext 'First copy the file CTparental.conf.tar.gz into the root directory.'
+gettext 'First copy the file CTparental.conf.tar.gz into the /root/ directory.'
 fi
 
 }
