@@ -37,17 +37,17 @@ else
   unset HTTP_PROXY
 fi
 
-noinstalldep="0"
-nomanuel="0"
+noinstalldep=0
+nomanuel=0
 x=("$@")
 narg=0
 for arg in "$x" ; do
 	case $arg in
 		-nodep )
-			noinstalldep="1"
+			noinstalldep=1
 		;;
 		-nomanuel )
-			nomanuel="1"
+			nomanuel=1
 		;;
 		-dirhtml )
 			narg=$(( $narg + 1 ))
