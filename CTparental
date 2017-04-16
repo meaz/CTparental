@@ -2625,7 +2625,7 @@ gettext 'Conf exported to /root/CTparental.conf.tar.gz.'
 importconf () {
 if [ -e /root/CTparental.conf.tar.gz ] ;  then
 tar -xvzf /root/CTparental.conf.tar.gz -C /
-
+$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
 FILTRAGEISOFF="$(cat < $FILE_CONF | grep -c "DNSMASQ=OFF" )"	
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 	adapt
