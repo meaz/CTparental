@@ -14,17 +14,12 @@ exit
 ## téléchargement du scripte CTparental pour mageia
 git clone https://github.com/marsat/CTparental.git
 cd CTparental/
-
-## install et configuration de CTparental
-su -
+su 
 cp -f CTparental /usr/bin
 cp -f CTparental-bl-infos /usr/bin
+cp -f mageia/dist.conf ./
 mkdir /etc/CTparental
 mkdir /usr/share/CTparental
-cp -rf www /usr/share/CTparental
-cp -rf confDansgouardian /usr/share/CTparental
-cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
-cd mageia
 CTparental -i
 exit
 
