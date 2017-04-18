@@ -17,25 +17,15 @@ export TEXTDOMAINDIR="$DIRLOCALE"
 export TEXTDOMAIN="ctparental"
 CHEMINCTPARENTLE="$(readlink -f "$0")"
 
+#### UID MINIMUM pour les UTILISATEUR
+UIDMINUSER=${UIDMINUSER:=1000}
 
-
-if [ ! $UID -le 499 ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
+if [ ! $UID -lt $UIDMINUSER ]; then # considère comme root tous les utilisateurs avec un uid inferieur ou egale a 499,ce qui permet à apt-get,urpmi,yum... de lancer le script sans erreur.
 	gettext 'It root of the need to run this script.'
 	echo ""
 	exit 1
 fi
 
-if  [ "$(groups "$(whoami)" | grep -c -E "( ctoff$)|( ctoff )|( root$)|( root )|( sudo$)|( sudo )")" -eq 0 ];then
-  export https_proxy=http://127.0.0.1:8080
-  export HTTPS_PROXY=http://127.0.0.1:8080
-  export http_proxy=http://127.0.0.1:8080
-  export HTTP_PROXY=http://127.0.0.1:8080
-else
-  unset https_proxy
-  unset HTTPS_PROXY
-  unset http_proxy
-  unset HTTP_PROXY
-fi
 
 noinstalldep="0"
 nomanuel="0"
@@ -189,8 +179,6 @@ ENDNSMASQ=${ENDNSMASQ:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 ENE2GUARDIAN=${ENE2GUARDIAN:=""}
-#### UID MINIMUM pour les UTILISATEUR
-UIDMINUSER=${UIDMINUSER:=1000}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/e2guardian/"}
@@ -522,8 +510,6 @@ if [ "$test" -eq "1" ] ; then
 	$SED "$ligneipv6""i\listen-address  [::1]:$PROXYport" "$PRIVOXYCONF"
 else
 	ligneipv6=$( sed -n '/^listen-address.*/=' "$PRIVOXYCONF" | sed '2q;d' )
-	#echo "nlisten-adress4=$ligneipv4"
-	#echo "nlisten-adress6=$ligneipv6"
 	$SED "$ligneipv4 s?^listen-address.*?listen-address  127.0.0.1:$PROXYport?"  "$PRIVOXYCONF" #ipv4
 	$SED "$ligneipv6 s?^listen-address.*?listen-address  [::1]:$PROXYport?"  "$PRIVOXYCONF" #ipv6
 fi
@@ -578,75 +564,9 @@ if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
 fi
 echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
 $PRIVOXYrestart
-#setproxy
 echo "</confprivoxy>"
 }
 
-unsetproxy () {
-echo "<unsetproxy>"
-for user in $(listeusers) ; do	
-	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [  -f "$HOMEPCUSER"/.profile ] ; then
-	test=$(grep -c "^### CTparental ###" "$HOMEPCUSER"/.profile )
-		if [ "$test" -eq "1" ] ; then	 
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		 $SED  2d "$HOMEPCUSER"/.profile
-		fi
-	unset test
-	fi	
-done
-test=$(grep -c "^### CTparental ###" "$XSESSIONFILE" )
-		if [ "$test" -eq "1" ] ; then	 
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		 $SED  2d "$XSESSIONFILE"
-		fi
-unset test
-echo "<unsetproxy/>"
-}
-setproxy () {
-echo "<setproxy>"
-if [  -f "$XSESSIONFILE" ] ; then
-test=$(grep -c "^### CTparental ###" "$XSESSIONFILE" )
-		if [ "$test" -eq "0" ] ; then	 
-		 $SED  2"i\### CTparental ###" "$XSESSIONFILE"
-		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )|( root\$)|( root )|( sudo\$)|( sudo )\") -eq 0 ];then" "$XSESSIONFILE"
-		 $SED  4"i\  export https_proxy=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
-		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
-		 $SED  6"i\  export http_proxy=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
-		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$E2GUport" "$XSESSIONFILE"
-		 $SED  8"i\fi" "$XSESSIONFILE"
-		fi
-unset test
-fi
-for user in $(listeusers) ; do	
-	HOMEPCUSER=$(getent passwd "$user" | cut -d ':' -f6)
-	if [  -f "$HOMEPCUSER"/.profile ] ; then
-	test=$(grep -c "^### CTparental ###" "$HOMEPCUSER"/.profile )
-		if [ "$test" -eq "0" ] ; then	 
-		 $SED  2"i\### CTparental ###" "$HOMEPCUSER"/.profile
-		 $SED  3"i\if  [ \$(groups \$(whoami) | grep -c -E \"( ctoff\$)|( ctoff )|( root\$)|( root )|( sudo\$)|( sudo )\") -eq 0 ];then" "$HOMEPCUSER"/.profile
-		 $SED  4"i\  export https_proxy=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
-		 $SED  5"i\  export HTTPS_PROXY=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
-		 $SED  6"i\  export http_proxy=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
-		 $SED  7"i\  export HTTP_PROXY=http://127.0.0.1:$E2GUport" "$HOMEPCUSER"/.profile
-		 $SED  8"i\fi" "$HOMEPCUSER"/.profile
-		fi
-	unset test
-	fi
-	
-done
-echo "<setproxy/>"
-}
 
 addadminhttpd() {
 if [ ! -f "$PASSWORDFILEHTTPD" ]; then touch "$PASSWORDFILEHTTPD"; fi
@@ -1716,10 +1636,7 @@ install () {
 	fi
 	iptablesreload
 	groupadd ctoff
-	unset https_proxy
-	unset HTTPS_PROXY
-	unset http_proxy
-	unset HTTP_PROXY
+
 	if [ $nomanuel -eq 0 ]; then 
 		vim -h 2&> /dev/null
 		if [ $? -eq 0 ] ; then
@@ -1782,14 +1699,14 @@ install () {
 			initblenabled
       fi
       cat /etc/resolv.conf > $DIR_CONF/resolv.conf.sav
-      if [ $noinstalldep = "0" ]; then
+      if [ $noinstalldep -eq 0 ]; then
 	  for PACKAGECT in $CONFLICTS
          do
 			cmd="${CMDREMOVE} ${PACKAGECT}"
 			$cmd 2> /dev/null
          done
 	  fi
-      if [ "$noinstalldep" = "0" ]; then
+      if [ $noinstalldep -eq 0 ]; then
 	     cmd="${CMDINSTALL} ${DEPENDANCES}"
 	     $cmd
       fi
@@ -2009,12 +1926,11 @@ uninstall () {
   	sleep 5
    fi
 
-   if [ $noinstalldep = "0" ]; then
-	 for PACKAGECT in $DEPENDANCES
-         do
-			
+   if [ $noinstalldep -eq 0 ]; then
+		for PACKAGECT in $DEPENDANCES
+		do
 			$CMDREMOVE "$PACKAGECT" 2> /dev/null
-         done
+		done
    fi
    # desactivation du modules ip_conntrack_ftp
 
