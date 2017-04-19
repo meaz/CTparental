@@ -1882,7 +1882,7 @@ uninstall () {
 			echo "$CMDREMOVE ctparental"
 			exit 0
 	   fi
-	   if [ "$(rpm -q -a | grep ctparental )" -eq 1 ] ;then
+	   if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
 			echo "$muninstall"
 			echo "$CMDREMOVE ctparental"
 			exit 0
