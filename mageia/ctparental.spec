@@ -1,6 +1,6 @@
 %define	name ctparental
 %define version	4.20.13m
-%define release	1
+%define release	2
 
 Summary: Parental Controls
 Name: %{name}
@@ -9,11 +9,10 @@ Release: %{release}
 BuildArch: noarch
 License: GPL
 Group: Amusements/Graphics
-BuildArch: noarch
 BuildRoot: %{_builddir}/%{name}-root
 URL: https://github.com/marsat/CTparental
 Provides: %{name}
-Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , lib64nss3 
+Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , /usr/bin/certutil
 
 %description
 CTparental est un Contrôle parental 
