@@ -1145,16 +1145,18 @@ iptablesreload () {
 if [ ! "$FILTRAGEISOFF" -eq 1 ];then
      $IPTABLES -t nat -A OUTPUT -j ctparental
      $IPTABLES6 -t nat -A OUTPUT -j ctparental
-     if [ ! "$REDIRECT" -eq 1 ];then
-      # on rejet les connection a la page de redirection .
-      # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
-      # le visuel des pages visitées sen retrouve améliorée.
-    
-	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 80 -j REJECT
-	  $IPTABLES -I OUTPUT -d $PRIVATE_IP -p tcp --dport 443 -j REJECT
-	  $IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 80 -j REJECT
-	  $IPTABLES6 -I OUTPUT -d ::1 -p tcp --dport 443 -j REJECT
-     fi
+     
+      if [ ! "$REDIRECT" -eq 1 ];then
+			  # on rejet les connection a la page de redirection pour PROXYuser.
+			  # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
+			  # le visuel des pages visitées sen retrouve améliorée.
+			
+			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+			  $IPTABLES6 -I OUTPUT -d ::1 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+			  $IPTABLES6 -I OUTPUT -d ::1 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+	  fi
+
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
 	  $IPTABLES6 -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to ::1:54
@@ -1187,6 +1189,7 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 				  $IPTABLES -A OUTPUT -d "$ipbing" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a bing
 			 fi
 			 $IPTABLES -A OUTPUT -d "$ipdailymotion" -m owner --uid-owner "$user" -p tcp --dport 443 -j REJECT # on rejet l'acces https a dailymotion.com
+
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport 80 -j DNAT --to [::1]:"$E2GUport"
 			 #$IPTABLES6 -t nat -A ctparental ! -d ::1 -m owner --uid-owner "$user" -p tcp --dport "$PROXYport" -j DNAT --to [::1]:"$E2GUport"
 			 #le proxy ne faisent que forwarder les flux https forcet le passage par celui ci pour https n'apport pas de sécuritée seul dnsmasq peut bloquer.
