@@ -160,6 +160,7 @@ DNSMASQrestart=${DNSMASQrestart:="$CMDSERVICE dnsmasq restart "}
 NWMANAGERstop=${NWMANAGERstop:="$CMDSERVICE network-manager stop"}
 NWMANAGERstart=${NWMANAGERstart:="$CMDSERVICE network-manager start"}
 NWMANAGERrestart=${NWMANAGERrestart:="$CMDSERVICE network-manager restart"}
+NETWORKINGrestart=${NETWORKINGrestart:="$CMDSERVICE networking restart"}
 IPTABLESsave=${IPTABLESsave:="$CMDSERVICE netfilter-persistent save"}
 IPTABLESsaveFILE=${IPTABLESsaveFILE:=""}
 E2GUARDIANrestart=${E2GUARDIANrestart:="$CMDSERVICE e2guardian restart"}
@@ -394,7 +395,8 @@ echo "</resolvconffixoff>"
 
 
 PRIVATE_IP="127.0.0.10"
-PRIVATE_IP6="::1"
+PRIVATE_IP6="fc00::127:10"
+
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
 FILE_tmpSizeMax=${FILE_tmpSizeMax:="128M"}  # 70 Min, Recomend 128M 
@@ -1153,8 +1155,8 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
 			
 			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
 			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d ::1/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d ::1/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
 	  fi
 
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
@@ -1631,7 +1633,27 @@ echo "</CActparental>"
 
 
 install () {
-	FILTRAGEISOFF=1
+FILTRAGEISOFF=1
+if [ -f /etc/sysconfig/network-scripts/ifcfg-lo ] ;then
+cat << EOF > /etc/sysconfig/network-scripts/ifcfg-lo
+DEVICE=lo
+IPADDR=127.0.0.1
+NETMASK=255.0.0.0
+NETWORK=127.0.0.0
+BROADCAST=127.255.255.255
+ONBOOT=yes
+NAME=loopback
+IPV6ADDR=$PRIVATE_IP6/128
+EOF
+fi
+if [ -d /etc/network/interfaces.d/ ];then
+cat << EOF > /etc/network/interfaces.d/ctparentallo
+auto lo:1
+iface lo:1 inet loopback
+up ip addr add $PRIVATE_IP6/128 dev lo:1
+EOF
+fi
+$NETWORKINGrestart
 	if [ $nomanuel -eq 0 ]; then  
 		cp -rf www /usr/share/CTparental
 		cp -rf confe2guardian /usr/share/CTparental
