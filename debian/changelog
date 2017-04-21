@@ -1,3 +1,9 @@
+ctparental (4.20.14-1.0) unstable; urgency=medium
+
+  * correctif pour l'ipv6 et pour mageia 6.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Fri, 21 Apr 2017 17:52:54 +0200
+ 
 ctparental (4.20.13-1.0) unstable; urgency=medium
 
   * ajout de l'export,import de configuration via CTparental -exp /rep/export 
