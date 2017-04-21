@@ -917,9 +917,6 @@ expand-hosts
 bogus-priv
 server=$DNS1
 server=$DNS2  
-## dns ipv6 Opendns
-server=2620:0:ccc::2 
-server=2620:0:ccd::2
 
 EOF
 
@@ -1484,6 +1481,14 @@ ssl.engine = "enable"
 ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
 server.document-root = "$DIRHTML"
 server.error-handler-404 ="err404.php"
+}
+
+\$SERVER["socket"] == "[::1]:80" {
+}
+
+\$SERVER["socket"] == "[::1]:443" {
+ssl.engine = "enable"
+ssl.pemfile = "$PEMSRVDIR/localhost.pem" 
 }
 
 EOF
