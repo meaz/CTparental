@@ -1,6 +1,6 @@
 %define	name ctparental
-%define version	4.20.13m
-%define release	2
+%define version	4.20.14m
+%define release	1
 
 Summary: Parental Controls
 Name: %{name}
@@ -32,14 +32,14 @@ mkdir -p $RPM_BUILD_ROOT/etc/CTparental
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/fr_FR/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/CTparental
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
-install -m755 $RPM_BUILD_DIR/%{name}-%{version}/CTparental $RPM_BUILD_ROOT/usr/bin
-install -m755 $RPM_BUILD_DIR/%{name}-%{version}/CTparental-bl-infos $RPM_BUILD_ROOT/usr/bin
-install -m644 $RPM_BUILD_DIR/%{name}-%{version}/debian/CTparental.conf $RPM_BUILD_ROOT/etc/CTparental
-install -m644 $RPM_BUILD_DIR/%{name}-%{version}/mageia/dist.conf $RPM_BUILD_ROOT/etc/CTparental
-install -m644 $RPM_BUILD_DIR/%{name}-%{version}/locale/fr_FR/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/fr_FR/LC_MESSAGES/
-cp -r $RPM_BUILD_DIR/%{name}-%{version}/www $RPM_BUILD_ROOT/usr/share/CTparental
-cp -r $RPM_BUILD_DIR/%{name}-%{version}/confe2guardian $RPM_BUILD_ROOT/usr/share/CTparental
-install -m644 $RPM_BUILD_DIR/%{name}-%{version}/man/CTparental.1.gz $RPM_BUILD_ROOT/usr/share/man/man1
+install -m755 $RPM_BUILD_DIR/CTparental $RPM_BUILD_ROOT/usr/bin
+install -m755 $RPM_BUILD_DIR/CTparental-bl-infos $RPM_BUILD_ROOT/usr/bin
+install -m644 $RPM_BUILD_DIR/debian/CTparental.conf $RPM_BUILD_ROOT/etc/CTparental
+install -m644 $RPM_BUILD_DIR/mageia/dist.conf $RPM_BUILD_ROOT/etc/CTparental
+install -m644 $RPM_BUILD_DIR/locale/fr_FR/LC_MESSAGES/ctparental.mo $RPM_BUILD_ROOT/usr/share/locale/fr_FR/LC_MESSAGES/
+cp -r $RPM_BUILD_DIR/www $RPM_BUILD_ROOT/usr/share/CTparental
+cp -r $RPM_BUILD_DIR/confe2guardian $RPM_BUILD_ROOT/usr/share/CTparental
+install -m644 $RPM_BUILD_DIR/man/CTparental.1.gz $RPM_BUILD_ROOT/usr/share/man/man1
 
 exit 0
 

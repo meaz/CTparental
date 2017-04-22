@@ -4,7 +4,7 @@ git clone https://github.com/marsat/CTparental.git
 mkdir -p  $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp}
 mkdir -p  $HOME/rpmbuild/RPMS/{i586,x86_64,noarch}
 
-echo '%_topdir                %(echo $HOME)/rpm
+echo '%_topdir                %(echo $HOME)/rpmbuild
 %_tmppath               %(echo $HOME)/rpmbuild/tmp
 
 # If you want your packages to be GPG signed automatically, add these three lines
@@ -28,4 +28,4 @@ echo '%_topdir                %(echo $HOME)/rpm
 cp -rf CTparental/* $HOME/rpmbuild/BUILD/
 cp -f CTparental/mageia/ctparental.spec $HOME/rpmbuild/SPECS/
 
-rpm -ba ctparental.spec
+rpmbuild -ba $HOME/rpmbuild/SPECS/ctparental.spec
