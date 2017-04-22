@@ -1914,8 +1914,8 @@ ONBOOT=yes
 NAME=loopback
 EOF
 fi
-if [ -d /etc/network/interfaces.d/ ];then
-rm -f etc/network/interfaces.d/ctparentallo
+if [ -f /etc/network/interfaces.d/ctparentallo ];then
+rm -f /etc/network/interfaces.d/ctparentallo
 fi
 $NETWORKINGrestart
    # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
