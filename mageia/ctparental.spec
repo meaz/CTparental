@@ -9,7 +9,7 @@ Release: %{release}
 BuildArch: noarch
 License: GPL
 Group: Amusements/Graphics
-BuildRoot: %{_builddir}/%{name}-root
+BuildRoot: %{_builddir}/%{name}-%{version}-root
 URL: https://github.com/marsat/CTparental
 Provides: %{name}
 Requires: dnsmasq , lighttpd , lighttpd-mod_auth , lighttpd-mod_magnet , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , e2guardian , privoxy , newt , shorewall , shorewall-ipv6 , shorewall-core , /usr/bin/certutil
