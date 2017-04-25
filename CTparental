@@ -228,6 +228,8 @@ DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
 DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
 THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
+USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
+GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
@@ -1145,16 +1147,16 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
      $IPTABLES -t nat -A OUTPUT -j ctparental
      $IPTABLES6 -t nat -A OUTPUT -j ctparental
      
-      if [ ! "$REDIRECT" -eq 1 ];then
+#      if [ ! "$REDIRECT" -eq 1 ];then
 			  # on rejet les connection a la page de redirection pour PROXYuser.
 			  # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
 			  # le visuel des pages visitées sen retrouve améliorée.
 			
-			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-	  fi
+#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+#	  fi
 
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1290,8 +1292,6 @@ cp -rf /usr/share/CTparental/www/CTparental/* "$DIRHTML"
 fi
 cp -rf /usr/share/CTparental/www/CTadmin/* "$DIRadminHTML"
 
-USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
-GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 chmod 644 "$FILE_CONF"
 chown root:"$GROUPHTTPD" "$FILE_CONF"
 cat << EOF > "$MAINCONFHTTPD"
@@ -2912,20 +2912,24 @@ then run the command CTparental -ipton") $Fcolor"
       exit 0
       ;;
     -ron )	
-	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
-	  REDIRECT=1
+	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
+	  #REDIRECT=1
+	  cp -f /usr/share/CTparental/www/CTparental/index.php "$DIRHTML"/index.php
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
+	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  echo $E2GUARDIANrestart
 	  $E2GUARDIANrestart
 	  iptablesreload
 	  exit 0
       ;;
     -roff )
-	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
-	  REDIRECT=0
-	  echo -n > "$DIRE2GLANG"ukenglish/template.html
-	  echo -n > "$DIRE2GLANG"french/template.html
+	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
+	  #REDIRECT=0
+	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRHTML"/index.php
+	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
+	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
+	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  $E2GUARDIANrestart
 	  iptablesreload
       exit 0
