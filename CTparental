@@ -563,10 +563,10 @@ http://localhost.*
 
               
 EOF
-if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
-	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
-fi
-echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
+#if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
+#	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
+#fi
+#echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
 $PRIVOXYrestart
 echo "</confprivoxy>"
 }
