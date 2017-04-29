@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+# Source debconf library
+. /usr/share/debconf/confmodule
+
+CTparental -u -nodep -nomanuel  1>&2
+exit 0
+
+
