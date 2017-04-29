@@ -1,27 +1,32 @@
 #!/bin/sh
 
 set -e
-
+# Source debconf library
 . /usr/share/debconf/confmodule
 
 #DEBCONF_DEBUG="developer"
 # on ne demande le login/mot de pass que durant l'installation ou une reconfiguration de ctparental
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
-	
-while (true)
+
+
+while ( true )
 do
 		RET=""
-		db_input critical ctparental/httplogin || true
-		db_input critical ctparental/httppassword || true
-		db_input critical ctparental/httppassword2 || true
-	    db_go
-	    db_get ctparental/httplogin
+		db_input high ctparental/httplogin || true
+		db_input high ctparental/httppassword || true
+		db_input high ctparental/httppassword2 || true
+	    db_go || true
+	    db_get ctparental/httplogin || true
+	    if [ "$RET" = "" ]; then
+			db_purge || true
+			break
+	    fi
 		RET="$(echo $RET | grep -E "^([a-zA-Z0-9])*$")"
 		if [ "${#RET}" -ge 5  ];then 
-			db_get ctparental/httppassword
+			db_get ctparental/httppassword || true
 			p1=$RET
 			RET=""
-			db_get ctparental/httppassword2
+			db_get ctparental/httppassword2 || true
 			p2=$RET
 			RET=""
 				if [ $p1 = $p2 ] ; then
@@ -29,19 +34,20 @@ do
 					if [ "${#p1}" -ge 8 ] ; then
 						p1=""
 						p2=""
+						db_go
 						break
 					else
-						db_input critical ctparental/httppassword_trop_simple
+						db_input critical ctparental/httppassword_trop_simple || true
 						p1=""
 						p2=""
 					fi
 				else
-					db_input critical ctparental/httppassword_non_ident
+					db_input critical ctparental/httppassword_non_ident || true
 					p1=""
 					p2=""
 				fi
 		else
-			db_input critical ctparental/httplogin_erreur
+			db_input critical ctparental/httplogin_erreur || true
 			db_purge
 			db_go
 		fi	
@@ -50,4 +56,4 @@ do
 
 fi
 
-#DEBHELPER#
+

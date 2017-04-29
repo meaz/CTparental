@@ -1,7 +1,6 @@
 #!/bin/bash
-
 set -e
-# Source debconf library.
+# Source debconf library
 . /usr/share/debconf/confmodule
 db_go
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
@@ -10,21 +9,27 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		test="$?"
 		if [ "$test" -eq 0 ];then
 			RET=""
-			db_get ctparental/httplogin
-			export debconfloginhttp=$RET
+			db_get ctparental/httplogin || true
+			if [ "$RET" = "" ]; then
+				export debconfloginhttp="admin"
+			else
+				export debconfloginhttp=$RET
+			fi
 			RET=""
-			db_get ctparental/httppassword
-			export debconfpassword=$RET
-			
-			CTparental -i -nodep -nomanuel  1>&2   # redirection de la sortie standard sur l'erreur standad pour eviter des interactions avec debconf
+			db_get ctparental/httppassword || true
+			if [ "$RET" = "" ]; then
+				export debconfpassword="admin"
+			else
+				export debconfpassword=$RET
+			fi
+			CTparental -i -nodep -nomanuel
 		fi
 	
 else
 	
     echo "postinst called with unknown argument '$1'" 1>&2
-    exit 1
+    exit 0
 fi
 
-#DEBHELPER#
 db_stop
 exit 0
