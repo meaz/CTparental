@@ -1,9 +1,10 @@
 ctparental (4.20.16-1.0) unstable; urgency=medium
 
+  * Correctif de bugs , avec gnome-software et ipv6.
   * CTparental -roff , Active la fermeture auto des popup bloqué et ne retourne plus de page d'intercéption.
   CTparental -ron réactive les pages d'intercéption.
     
- -- Guillaume marsat <CTparental1@laposte.net>  Tue, 25 Apr 2017 13:37:47 +0200
+ -- Guillaume marsat <CTparental1@laposte.net>  Sat, 29 Apr 2017 19:39:36 +0200
  
 ctparental (4.20.15-1.0) unstable; urgency=medium
 
