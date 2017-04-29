@@ -7,7 +7,9 @@ set -e
 #DEBCONF_DEBUG="developer"
 # on ne demande le login/mot de pass que durant l'installation ou une reconfiguration de ctparental
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
-
+db_set ctparental/httplogin ""
+db_set ctparental/httppassword ""
+db_set ctparental/httppassword2 ""
 
 while ( true )
 do
