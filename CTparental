@@ -1651,12 +1651,17 @@ NAME=loopback
 IPV6ADDR=$PRIVATE_IP6/128
 EOF
 fi
-if [ -d /etc/network/interfaces.d/ ];then
+if [ -f /etc/network/interfaces ];then
+mkdir /etc/network/interfaces.d 2&> /dev/null
 cat << EOF > /etc/network/interfaces.d/ctparentallo
 auto lo:1
 iface lo:1 inet loopback
 up ip addr add $PRIVATE_IP6/128 dev lo:1
 EOF
+
+	if [ $(cat < /etc/network/interfaces | grep -c "source.*/etc/network/interfaces.d/*") -eq 0 ];then
+		echo "source /etc/network/interfaces.d/*" >> /etc/network/interfaces
+	fi
 fi
 $NETWORKINGrestart
 	if [ $nomanuel -eq 0 ]; then  
