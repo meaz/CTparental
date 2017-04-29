@@ -33,6 +33,5 @@ else
 fi
 
 db_stop
-db_purge
 #DEBHELPER#
 exit 0
