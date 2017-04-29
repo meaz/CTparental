@@ -23,7 +23,9 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 			else
 				export debconfpassword=$RET
 			fi
-			db_purge
+			db_set ctparental/httplogin ""
+			db_set ctparental/httppassword ""
+			db_set ctparental/httppassword2 ""
 			db_go
 			CTparental -i -nodep -nomanuel
 		fi
