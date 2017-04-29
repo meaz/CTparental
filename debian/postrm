@@ -3,7 +3,7 @@ set -e
 # Source debconf library
 . /usr/share/debconf/confmodule
 db_purge
-
+#DEBHELPER#
 
 
   

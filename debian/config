@@ -3,7 +3,7 @@
 set -e
 # Source debconf library
 . /usr/share/debconf/confmodule
-
+#DEBHELPER#
 #DEBCONF_DEBUG="developer"
 # on ne demande le login/mot de pass que durant l'installation ou une reconfiguration de ctparental
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
