@@ -23,6 +23,7 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 			else
 				export debconfpassword=$RET
 			fi
+			echo PURGE | debconf-communicate ctparental
 			CTparental -i -nodep -nomanuel
 		fi
 	
