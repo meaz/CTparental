@@ -2,6 +2,7 @@
 set -e
 # Source debconf library
 . /usr/share/debconf/confmodule
+
 db_go
 if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
   
@@ -32,4 +33,5 @@ else
 fi
 
 db_stop
+#DEBHELPER#
 exit 0

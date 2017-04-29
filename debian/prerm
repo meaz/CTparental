@@ -2,7 +2,7 @@
 set -e
 # Source debconf library
 . /usr/share/debconf/confmodule
-
+#DEBHELPER#
 CTparental -u -nodep -nomanuel
 exit 0
 
