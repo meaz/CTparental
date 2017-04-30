@@ -17,7 +17,6 @@ do
 	    db_go || true
 	    db_get ctparental/httplogin || true
 	    if [ "$RET" = "" ]; then
-			db_purge || true
 			break
 	    fi
 		RET="$(echo $RET | grep -E "^([a-zA-Z0-9])*$")"
