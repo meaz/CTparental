@@ -2609,7 +2609,8 @@ eval_gettext "Conf exported to \$FILEexpconf
 
 importconf () {
 # si l'archive contient bien la bonne liste de fichiers.
-if [ "$(tar -tf "$FILEimpconf" | grep -c etc/CTparental/CTparental.conf)" -eq 1 ] ;then
+dirtar=$(echo "$DIR_CONF" | sed -e "s/\///1")
+if [ "$(tar -tf "$FILEimpconf" | grep -c $dirtar/CTparental.conf )" -eq 1 ] ;then
 
 	tar -xvzf "$FILEimpconf" -C /
 	$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
@@ -2916,8 +2917,9 @@ then run the command CTparental -ipton") $Fcolor"
       exit 0
       ;;
     -ron )	
-	  $SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
-	  REDIRECT=1
+	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
+	  #REDIRECT=1
+	  cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
 	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
