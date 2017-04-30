@@ -1,5 +1,7 @@
 urpmi rpm-build
 git clone https://github.com/marsat/CTparental.git
+git branch mageia6
+git checkout mageia6
 
 mkdir -p  $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp}
 mkdir -p  $HOME/rpmbuild/RPMS/{i586,x86_64,noarch}

@@ -1921,6 +1921,21 @@ desactivegourpectoff () {
 }
 
 uninstall () {
+
+   # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
+   if [ $nomanuel -eq 0 ]; then 
+	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
+	   if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
+			echo "$muninstall"
+			echo "$CMDREMOVE ctparental"
+			exit 0
+	   fi
+	   if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
+			echo "$muninstall"
+			echo "$CMDREMOVE ctparental"
+			exit 0
+	   fi
+   fi
 if [ -f /etc/sysconfig/network-scripts/ifcfg-lo ] ;then
 cat << EOF > /etc/sysconfig/network-scripts/ifcfg-lo
 DEVICE=lo
@@ -1936,20 +1951,6 @@ if [ -f /etc/network/interfaces.d/ctparentallo ];then
 rm -f /etc/network/interfaces.d/ctparentallo
 fi
 $NETWORKINGrestart
-   # On force la désinstall par dpkg ou rpm si l'install a était effectuer par un paquage.
-   if [ $nomanuel -eq 0 ]; then 
-	   muninstall=$(gettext "Install a packet was detected please use this command to uninstall ctparental.")
-	   if [ "$(dpkg -l ctparental | grep -c ^i)" -eq 1 ] ;then
-			echo "$muninstall"
-			echo "$CMDREMOVE ctparental"
-			exit 0
-	   fi
-	   if [ "$(rpm -q -a | grep -c ctparental )" -eq 1 ] ;then
-			echo "$muninstall"
-			echo "$CMDREMOVE ctparental"
-			exit 0
-	   fi
-   fi
    desactivegourpectoff
    autoupdateoff 
    dnsmasqoff
