@@ -1,6 +1,6 @@
 ctparental (4.20.16-1.0) unstable; urgency=medium
 
-  * Correctif de bugs , avec gnome-software et ipv6.
+  * Correctif de bugs , avec gnome-software , dpkg-reconfigure et ipv6.
   * CTparental -roff , Active la fermeture auto des popup bloqué et ne retourne plus de page d'intercéption.
   CTparental -ron réactive les pages d'intercéption.
     
@@ -11,7 +11,7 @@ ctparental (4.20.15-1.0) unstable; urgency=medium
   * correctif bug d'import configuration.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Sat, 22 Apr 2017 10:41:02 +0200
- 
+
 ctparental (4.20.14-1.0) unstable; urgency=medium
 
   * correctif pour l'ipv6 et pour mageia 6.
