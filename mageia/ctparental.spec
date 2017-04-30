@@ -1,5 +1,5 @@
 %define	name ctparental
-%define version	4.20.15e
+%define version	4.20.16e
 %define release	1
 
 Summary: Parental Controls
@@ -48,7 +48,60 @@ exit 0
 
 %files
 %defattr(-,root,root)
-/
+/etc/CTparental/CTparental.conf
+/etc/CTparental/dist.conf
+/usr/bin/CTparental
+/usr/bin/CTparental-bl-infos
+/usr/share/CTparental/confe2guardian/template-fr.html
+/usr/share/CTparental/confe2guardian/template.html
+/usr/share/CTparental/www/CTadmin/bl_categories_help.php
+/usr/share/CTparental/www/CTadmin/bl_dns.php
+/usr/share/CTparental/www/CTadmin/body.php
+/usr/share/CTparental/www/CTadmin/css/bootstrap-theme.min.css
+/usr/share/CTparental/www/CTadmin/css/bootstrap-theme.min.css.map
+/usr/share/CTparental/www/CTadmin/css/bootstrap.min.css
+/usr/share/CTparental/www/CTadmin/css/bootstrap.min.css.map
+/usr/share/CTparental/www/CTadmin/css/dashboard.css
+/usr/share/CTparental/www/CTadmin/css/main.css
+/usr/share/CTparental/www/CTadmin/css/sticky-footer.css
+/usr/share/CTparental/www/CTadmin/dg_extensions.php
+/usr/share/CTparental/www/CTadmin/dg_mimetype.php
+/usr/share/CTparental/www/CTadmin/dg_sitelist.php
+/usr/share/CTparental/www/CTadmin/fonts/glyphicons-halflings-regular.eot
+/usr/share/CTparental/www/CTadmin/fonts/glyphicons-halflings-regular.svg
+/usr/share/CTparental/www/CTadmin/fonts/glyphicons-halflings-regular.ttf
+/usr/share/CTparental/www/CTadmin/fonts/glyphicons-halflings-regular.woff
+/usr/share/CTparental/www/CTadmin/fonts/glyphicons-halflings-regular.woff2
+/usr/share/CTparental/www/CTadmin/gctoff.php
+/usr/share/CTparental/www/CTadmin/hours.php
+/usr/share/CTparental/www/CTadmin/index.php
+/usr/share/CTparental/www/CTadmin/js/bootstrap.min.js
+/usr/share/CTparental/www/CTadmin/js/jquery-1.12.3.min.js
+/usr/share/CTparental/www/CTadmin/js/npm.js
+/usr/share/CTparental/www/CTadmin/locale.php
+/usr/share/CTparental/www/CTadmin/safesearch.php
+/usr/share/CTparental/www/CTadmin/update.php
+/usr/share/CTparental/www/CTadmin/wl_dns.php
+/usr/share/CTparental/www/CTparental/css/bootstrap-theme.min.css
+/usr/share/CTparental/www/CTparental/css/bootstrap-theme.min.css.map
+/usr/share/CTparental/www/CTparental/css/bootstrap.min.css
+/usr/share/CTparental/www/CTparental/css/bootstrap.min.css.map
+/usr/share/CTparental/www/CTparental/css/main.css
+/usr/share/CTparental/www/CTparental/fonts/glyphicons-halflings-regular.eot
+/usr/share/CTparental/www/CTparental/fonts/glyphicons-halflings-regular.svg
+/usr/share/CTparental/www/CTparental/fonts/glyphicons-halflings-regular.ttf
+/usr/share/CTparental/www/CTparental/fonts/glyphicons-halflings-regular.woff
+/usr/share/CTparental/www/CTparental/fonts/glyphicons-halflings-regular.woff2
+/usr/share/CTparental/www/CTparental/images/2518388623_1.png
+/usr/share/CTparental/www/CTparental/images/X32px.png
+/usr/share/CTparental/www/CTparental/index.php
+/usr/share/CTparental/www/CTparental/index2.php
+/usr/share/CTparental/www/CTparental/js/bootstrap.min.js
+/usr/share/CTparental/www/CTparental/js/jquery-1.12.3.min.js
+/usr/share/CTparental/www/CTparental/js/npm.js
+/usr/share/CTparental/www/CTparental/locale.php
+/usr/share/locale/fr_FR/LC_MESSAGES/ctparental.mo
+/usr/share/man/man1/CTparental.1.gz
 
 
 %post
