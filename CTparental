@@ -8,6 +8,7 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
+DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
@@ -85,7 +86,7 @@ FILE_HCOMPT="$DIR_CONF/CThourscompteur"
 FILE_HCONF="$DIR_CONF/CThours.conf"
 if [ ! -f $FILE_CONF ] ; then
 mkdir -p $DIR_CONF
-mkdir -p /usr/share/CTparental/
+mkdir -p "$DIR_SHARE"/
 cat << EOF > $FILE_CONF
 LASTUPDATE=0
 DNSMASQ=BLACK
@@ -184,7 +185,7 @@ ENE2GUARDIAN=${ENE2GUARDIAN:=""}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/e2guardian/"}
 DIRE2GLANG=${DIRE2GLANG:="/usr/share/e2guardian/languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confe2guardian}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:="$DIR_SHARE"/confe2guardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"e2guardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"e2guardianf1.conf"}
 DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
@@ -1288,9 +1289,9 @@ mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
    cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
-cp -rf /usr/share/CTparental/www/CTparental/* "$DIRHTML"
+cp -rf "$DIR_SHARE"/www/CTparental/* "$DIRHTML"
 fi
-cp -rf /usr/share/CTparental/www/CTadmin/* "$DIRadminHTML"
+cp -rf "$DIR_SHARE"/www/CTadmin/* "$DIRadminHTML"
 
 chmod 644 "$FILE_CONF"
 chown root:"$GROUPHTTPD" "$FILE_CONF"
@@ -1665,8 +1666,8 @@ EOF
 fi
 $NETWORKINGrestart
 	if [ $nomanuel -eq 0 ]; then  
-		cp -rf www /usr/share/CTparental
-		cp -rf confe2guardian /usr/share/CTparental
+		cp -rf www "$DIR_SHARE"
+		cp -rf confe2guardian "$DIR_SHARE"
 		cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
 	fi
 	iptablesreload
@@ -1687,16 +1688,16 @@ $NETWORKINGrestart
 		fi
 	
 		if [ -f gpl-3.0.fr.txt ] ; then
-			cp -f gpl-3.0.fr.txt /usr/share/CTparental/
+			cp -f gpl-3.0.fr.txt "$DIR_SHARE"/
 		fi
 		if [ -f gpl-3.0.txt ] ; then
-			cp -f gpl-3.0.txt /usr/share/CTparental/
+			cp -f gpl-3.0.txt "$DIR_SHARE"/
 		fi
 		if [ -f CHANGELOG ] ; then
-			cp -f CHANGELOG /usr/share/CTparental/
+			cp -f CHANGELOG "$DIR_SHARE"/
 		fi
 		if [ -f dist.conf ];then
-			cp -f dist.conf /usr/share/CTparental/dist.conf.orig
+			cp -f dist.conf "$DIR_SHARE"/dist.conf.orig
 			cp -f dist.conf $DIR_CONF/
 		fi
 		while (true); do
@@ -1949,7 +1950,6 @@ $NETWORKINGrestart
 	   # en install par le deb on n'efface pas les fichiers installer par celuis si
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRHTML"
-       rm -rf /usr/share/CTparental
        cd "$DIR_CONF"
        for file in *
        do
@@ -1962,7 +1962,7 @@ $NETWORKINGrestart
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRadminHTML"
        rm -rf "$DIRHTML"
-       rm -rf /usr/share/CTparental
+       rm -rf "$DIR_SHARE"
        rm -rf "$DIR_CONF"
    fi
    
@@ -2919,7 +2919,7 @@ then run the command CTparental -ipton") $Fcolor"
     -ron )	
 	  #$SED "s?^REDIRECT.*?REDIRECT=ON?g" $FILE_CONF 
 	  #REDIRECT=1
-	  cp -f /usr/share/CTparental/www/CTparental/index.php "$DIRHTML"/index.php
+	  cp -f "$DIR_SHARE"/www/CTparental/index.php "$DIRHTML"/index.php
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
 	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
@@ -2931,9 +2931,9 @@ then run the command CTparental -ipton") $Fcolor"
     -roff )
 	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
 	  #REDIRECT=0
-	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRHTML"/index.php
-	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
-	  cp -f /usr/share/CTparental/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
 	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  $E2GUARDIANrestart
 	  iptablesreload
