@@ -2610,7 +2610,8 @@ eval_gettext "Conf exported to \$FILEexpconf
 
 importconf () {
 # si l'archive contient bien la bonne liste de fichiers.
-if [ "$(tar -tf "$FILEimpconf" | grep -c etc/CTparental/CTparental.conf )" -eq 1 ] ;then
+dirtar=$(echo "$DIR_CONF" | sed -e "s/\///1")
+if [ "$(tar -tf "$FILEimpconf" | grep -c $dirtar/CTparental.conf )" -eq 1 ] ;then
 
 	tar -xvzf "$FILEimpconf" -C /
 	$SED "s?^MD5DREAB.*?MD5DREAB=old?g" $FILE_CONF
