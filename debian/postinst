@@ -11,16 +11,12 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ]; then
 		if [ "$test" -eq 0 ];then
 			RET=""
 			db_get ctparental/httplogin || true
-			if [ "$RET" = "" ]; then
-				export debconfloginhttp="admin"
-			else
+			if [ ! "$RET" = "" ]; then
 				export debconfloginhttp=$RET
 			fi
 			RET=""
 			db_get ctparental/httppassword || true
-			if [ "$RET" = "" ]; then
-				export debconfpassword="admin"
-			else
+			if [ ! "$RET" = "" ]; then
 				export debconfpassword=$RET
 			fi
 			CTparental -i -nodep -nomanuel
