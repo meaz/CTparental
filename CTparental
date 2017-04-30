@@ -8,6 +8,7 @@
 
 # This script is distributed under the Gnu General Public License (GPL)
 DIR_CONF="/etc/CTparental"
+DIR_SHARE="/usr/share/CTparental"
 DIRLOCALE=${DIRLOCALE:="/usr/share/locale"}
 #chargement des locales.
 set -a
@@ -85,7 +86,7 @@ FILE_HCOMPT="$DIR_CONF/CThourscompteur"
 FILE_HCONF="$DIR_CONF/CThours.conf"
 if [ ! -f $FILE_CONF ] ; then
 mkdir -p $DIR_CONF
-mkdir -p /usr/share/CTparental/
+mkdir -p "$DIR_SHARE"/
 cat << EOF > $FILE_CONF
 LASTUPDATE=0
 DNSMASQ=BLACK
@@ -184,7 +185,7 @@ ENE2GUARDIAN=${ENE2GUARDIAN:=""}
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
 DIRE2GLANG=${DIRE2GLANG:=$DIRE2G"languages/"}
-NEWTEMPLETE2G=${NEWTEMPLETE2G:=/usr/share/CTparental/confDansgouardian}
+NEWTEMPLETE2G=${NEWTEMPLETE2G:="$DIR_SHARE"/confDansgouardian}
 FILEConfe2gu=${FILEConfe2gu:=$DIRE2G"dansguardian.conf"}
 FILEConfe2guf1=${FILEConfe2guf1:=$DIRE2G"dansguardianf1.conf"}
 DREAB="$DIR_CONF/domaine-rehabiliter.conf" 
@@ -228,6 +229,8 @@ DIR_DNS_WHITELIST_ENABLED="$DIR_CONF/whitelist-enabled"
 DNS_FILTER_OSSI="$DIR_CONF/blacklist-local.conf"
 THISDAYS=$(( $(date +%Y) * 365 + $(date +%j | sed -e "s/^0*//g") ))
 MAXDAYSFORUPDATE="7" # update tous les 7 jours
+USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
+GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 
 
 if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
@@ -560,10 +563,10 @@ http://localhost.*
 
               
 EOF
-if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
-	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
-fi
-echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
+#if [ ! -f "$ETCPRIVOXY"/templates/connect-failed.old ]; then
+#	mv "$ETCPRIVOXY"/templates/connect-failed "$ETCPRIVOXY"/templates/connect-failed.old
+#fi
+#echo -n > "$ETCPRIVOXY"/templates/connect-failed # privoxy ne retour aucun code html en cas de refus (erreur 503)
 $PRIVOXYrestart
 echo "</confprivoxy>"
 }
@@ -1144,16 +1147,16 @@ if [ ! "$FILTRAGEISOFF" -eq 1 ];then
      $IPTABLES -t nat -A OUTPUT -j ctparental
      $IPTABLES6 -t nat -A OUTPUT -j ctparental
      
-      if [ ! "$REDIRECT" -eq 1 ];then
+#      if [ ! "$REDIRECT" -eq 1 ];then
 			  # on rejet les connection a la page de redirection pour PROXYuser.
 			  # ce qui procoque l'afichage du templates pricoxy connect-failed que l'on a vider , donc ne retourne plus aucune page d'interdiction!
 			  # le visuel des pages visitées sen retrouve améliorée.
 			
-			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
-			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
-	  fi
+#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+#			  $IPTABLES -I OUTPUT -d $PRIVATE_IP -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 80 -j REJECT
+#			  $IPTABLES6 -I OUTPUT -d $PRIVATE_IP6/128 -m owner --uid-owner "$PROXYuser" -p tcp --dport 443 -j REJECT
+#	  fi
 
       # Force privoxy a utiliser dnsmasq sur le port 54 en ipv6 et en ipv4
 	  $IPTABLES -t nat -A ctparental -m owner --uid-owner "$PROXYuser" -p udp --dport 53 -j DNAT --to 127.0.0.1:54
@@ -1285,12 +1288,10 @@ mkdir -p "$DIRHTML"
 if [ ! -z "$DIRhtmlPersonaliser" ];then
    cp -rf "$DIRhtmlPersonaliser"/* "$DIRHTML"
 else
-cp -rf /usr/share/CTparental/www/CTparental/* "$DIRHTML"
+cp -rf "$DIR_SHARE"/www/CTparental/* "$DIRHTML"
 fi
-cp -rf /usr/share/CTparental/www/CTadmin/* "$DIRadminHTML"
+cp -rf "$DIR_SHARE"/www/CTadmin/* "$DIRadminHTML"
 
-USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
-GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 chmod 644 "$FILE_CONF"
 chown root:"$GROUPHTTPD" "$FILE_CONF"
 cat << EOF > "$MAINCONFHTTPD"
@@ -1664,8 +1665,8 @@ EOF
 fi
 $NETWORKINGrestart
 	if [ $nomanuel -eq 0 ]; then  
-		cp -rf www /usr/share/CTparental
-		cp -rf confDansgouardian /usr/share/CTparental
+		cp -rf www "$DIR_SHARE"
+		cp -rf confDansgouardian "$DIR_SHARE"
 		cp -f locale/fr_FR/LC_MESSAGES/ctparental.mo		/usr/share/locale/fr_FR/LC_MESSAGES/
 	fi
 	iptablesreload
@@ -1686,16 +1687,16 @@ $NETWORKINGrestart
 		fi
 	
 		if [ -f gpl-3.0.fr.txt ] ; then
-			cp -f gpl-3.0.fr.txt /usr/share/CTparental/
+			cp -f gpl-3.0.fr.txt "$DIR_SHARE"/
 		fi
 		if [ -f gpl-3.0.txt ] ; then
-			cp -f gpl-3.0.txt /usr/share/CTparental/
+			cp -f gpl-3.0.txt "$DIR_SHARE"/
 		fi
 		if [ -f CHANGELOG ] ; then
-			cp -f CHANGELOG /usr/share/CTparental/
+			cp -f CHANGELOG "$DIR_SHARE"/
 		fi
 		if [ -f dist.conf ];then
-			cp -f dist.conf /usr/share/CTparental/dist.conf.orig
+			cp -f dist.conf "$DIR_SHARE"/dist.conf.orig
 			cp -f dist.conf $DIR_CONF/
 		fi
 		while (true); do
@@ -1948,7 +1949,6 @@ $NETWORKINGrestart
 	   # en install par le deb on n'efface pas les fichiers installer par celuis si
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRHTML"
-       rm -rf /usr/share/CTparental
        cd "$DIR_CONF"
        for file in *
        do
@@ -1961,7 +1961,7 @@ $NETWORKINGrestart
        rm -f /etc/cron.d/CTparental*
        rm -rf "$DIRadminHTML"
        rm -rf "$DIRHTML"
-       rm -rf /usr/share/CTparental
+       rm -rf "$DIR_SHARE"
        rm -rf "$DIR_CONF"
    fi
    
@@ -2920,16 +2920,19 @@ then run the command CTparental -ipton") $Fcolor"
 	  REDIRECT=1
 	  cp -f "$NEWTEMPLETE2G"/template.html "$DIRE2GLANG"ukenglish/template.html
 	  cp -f "$NEWTEMPLETE2G"/template-fr.html "$DIRE2GLANG"french/template.html
+	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  echo $E2GUARDIANrestart
 	  $E2GUARDIANrestart
 	  iptablesreload
 	  exit 0
       ;;
     -roff )
-	  $SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
-	  REDIRECT=0
-	  echo -n > "$DIRE2GLANG"ukenglish/template.html
-	  echo -n > "$DIRE2GLANG"french/template.html
+	  #$SED "s?^REDIRECT.*?REDIRECT=OFF?g" $FILE_CONF 
+	  #REDIRECT=0
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRHTML"/index.php
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"ukenglish/template.html
+	  cp -f "$DIR_SHARE"/www/CTparental/index2.php "$DIRE2GLANG"french/template.html
+	  chown -R root:"$GROUPHTTPD" "$DIRHTML"
 	  $E2GUARDIANrestart
 	  iptablesreload
       exit 0
