@@ -181,6 +181,7 @@ ENDNSMASQ=${ENDNSMASQ:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 ENE2GUARDIAN=${ENE2GUARDIAN:=""}
+ENPRIVOXY=${ENPRIVOXY:=""}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/e2guardian/"}
@@ -402,7 +403,7 @@ PRIVATE_IP6="fc00::127:10"
 
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
-FILE_tmpSizeMax=${FILE_tmpSizeMax:="128M"}  # 70 Min, Recomend 128M 
+FILE_tmpSizeMax=${FILE_tmpSizeMax:="256M"}  # 70 Min, Recomend 128M 
 LOWRAM=${LOWRAM:=0}
 if [ "$LOWRAM" -eq 0 ] ; then
 MFILEtmp="mount -t tmpfs -o size=$FILE_tmpSizeMax tmpfs $tempDIRRamfs"
@@ -1801,6 +1802,7 @@ $NETWORKINGrestart
       $ENNWMANAGER
       $ENIPTABLESSAVE
       $ENE2GUARDIAN
+      $ENPRIVOXY
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  
