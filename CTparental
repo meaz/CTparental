@@ -181,6 +181,7 @@ ENDNSMASQ=${ENDNSMASQ:=""}
 ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 ENE2GUARDIAN=${ENE2GUARDIAN:=""}
+ENPRIVOXY=${ENPRIVOXY:=""}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/dansguardian/"}
@@ -200,7 +201,6 @@ PASSWORDFILEHTTPD=${PASSWORDFILEHTTPD:="/etc/lighttpd/lighttpd-htdigest.user"}
 REALMADMINHTTPD=${REALMADMINHTTPD:="interface admin"}
 CADIR=${CADIR:="/usr/share/ca-certificates/ctparental"}
 PEMSRVDIR=${PEMSRVDIR:="/etc/ssl/private"}
-CMDINSTALL=""
 IPTABLES=${IPTABLES:="/sbin/iptables"}
 IPTABLES6=${IPTABLES6:="/sbin/ip6tables"}
 ADDUSERTOGROUP=${ADDUSERTOGROUP:="gpasswd -a "}
@@ -233,7 +233,7 @@ USERHTTPD=$(cat < /etc/passwd | grep /var/www | cut -d":" -f1)
 GROUPHTTPD=$(cat < /etc/group | grep "$USERHTTPD" | cut -d":" -f1)
 
 
-if [ "$(yum help 2> /dev/null | wc -l )" -ge 50 ] ; then
+if [ "$(yum help 2> /dev/null | wc -l )" -ge 20 ] ; then
    ## "Distribution basée sur yum exemple redhat, fedora..."
    CMDINSTALL=${CMDINSTALL:="yum install "}
    CMDREMOVE=${CMDREMOVE:="rpm -e "}
@@ -402,7 +402,7 @@ PRIVATE_IP6="fc00::127:10"
 
 
 FILE_tmp=${FILE_tmp:="$tempDIRRamfs/filetmp.txt"}
-FILE_tmpSizeMax=${FILE_tmpSizeMax:="128M"}  # 70 Min, Recomend 128M 
+FILE_tmpSizeMax=${FILE_tmpSizeMax:="256M"}  # 256 Min
 LOWRAM=${LOWRAM:=0}
 if [ "$LOWRAM" -eq 0 ] ; then
 MFILEtmp="mount -t tmpfs -o size=$FILE_tmpSizeMax tmpfs $tempDIRRamfs"
@@ -1800,6 +1800,7 @@ $NETWORKINGrestart
       $ENNWMANAGER
       $ENIPTABLESSAVE
       $ENE2GUARDIAN
+      $ENPRIVOXY
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  
