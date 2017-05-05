@@ -1,0 +1,33 @@
+urpmi rpm-build
+git clone https://github.com/marsat/CTparental.git
+git branch fedora25
+git checkout fedora25
+
+mkdir -p  $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp}
+mkdir -p  $HOME/rpmbuild/RPMS/{i586,x86_64,noarch}
+
+echo '%_topdir                %(echo $HOME)/rpmbuild
+%_tmppath               %(echo $HOME)/rpmbuild/tmp
+
+# If you want your packages to be GPG signed automatically, add these three lines
+# replacing 'Mageialinux' with your GPG name. You may also use rpm --resign
+# to sign the packages later.
+%_signature             gpg
+%_gpg_name              Mageialinux
+%_gpg_path              ~/.gnupg
+
+# Add your name and e-mail into the %packager field below. You may also want to
+# also replace vendor with yourself.
+%packager               Guillaume Marsat <ctparental1@laposte.net>
+%distribution           Mageia Linux
+%distributor            Mageia.org
+
+# If you want your packages to have your own distsuffix instead of mdv, add it
+# here like this
+#%distsuffix             foo
+' > .rpmmacros
+
+cp -rf CTparental/* $HOME/rpmbuild/BUILD/
+cp -f CTparental/fedora25/ctparental.spec $HOME/rpmbuild/SPECS/
+
+rpmbuild -ba $HOME/rpmbuild/SPECS/ctparental.spec
