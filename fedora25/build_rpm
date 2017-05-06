@@ -1,7 +1,12 @@
 urpmi rpm-build
+cd $HOME
 git clone https://github.com/marsat/CTparental.git
+cd CTparental
+git checkout dansguardian
 git branch fedora25
 git checkout fedora25
+cd $HOME
+
 
 mkdir -p  $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp}
 mkdir -p  $HOME/rpmbuild/RPMS/{i586,x86_64,noarch}
