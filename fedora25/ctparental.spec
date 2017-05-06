@@ -12,7 +12,7 @@ Group: Amusements/Graphics
 BuildRoot: %{_builddir}/%{name}-%{version}-root
 URL: https://github.com/marsat/CTparental
 Provides: %{name}
-Requires: dnsmasq , lighttpd , perl , sudo , wget , php-cgi , libnotify , notification-daemon , rsyslog , dansguardian , privoxy , newt , /usr/bin/certutil
+Requires: dnsmasq , lighttpd , lighttpd-fastcgi , perl , sudo , wget , php-cgi , php-xml , libnotify , notification-daemon , rsyslog , dansguardian , privoxy , newt , /usr/bin/certutil
 
 %description
 CTparental est un Contrôle parental 
