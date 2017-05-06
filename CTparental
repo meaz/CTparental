@@ -182,6 +182,7 @@ ENNWMANAGER=${ENNWMANAGER:=""}
 ENIPTABLESSAVE=${ENIPTABLESSAVE:=""}
 ENE2GUARDIAN=${ENE2GUARDIAN:=""}
 ENPRIVOXY=${ENPRIVOXY:=""}
+ENNETWORK=${ENNETWORK:=""}
 
 FILESYSCTL=${FILESYSCTL:="/etc/sysctl.conf"}
 DIRE2G=${DIRE2G:="/etc/e2guardian/"}
@@ -1803,6 +1804,7 @@ $NETWORKINGrestart
       $ENIPTABLESSAVE
       $ENE2GUARDIAN
       $ENPRIVOXY
+      $ENNETWORK
       { echo "PATH=$PATH" ; echo "LANG=$LANG" ; }  > /etc/cron.d/CTparentalnomade
 	  echo "*/1 * * * * root /usr/bin/CTparental -nomade" >> /etc/cron.d/CTparentalnomade
 	  
