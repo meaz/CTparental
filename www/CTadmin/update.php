@@ -31,7 +31,7 @@ echo "<div class='clearfix col-md-6'>";
 
 if ($AUTOUPDATE == "ON")
 {
-    echo "<p>";
+    echo "<p><br /><br />";
     echo gettext('The update of the blacklist Toulouse every 7 days is activated');
     echo "&nbsp;<span class='glyphicon glyphicon-ok' style='color: green;' aria-hidden='true'></span>";
     echo "</p>";
@@ -41,7 +41,7 @@ if ($AUTOUPDATE == "ON")
 }
 else
 {
-    echo "<p>";
+    echo "<p><br /><br />";
     echo gettext('The update of the blacklist Toulouse every 7 days is disabled');
     echo "&nbsp;<span class='glyphicon glyphicon-remove' style='color: red;' aria-hidden='true'></span>";
     echo "</p>";

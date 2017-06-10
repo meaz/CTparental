@@ -89,28 +89,33 @@ echo "<hr />";
 echo "</div>";
 echo "</div>";
 
-echo "<div class='row'>";
-echo "<div class='col-md-6'>";
-echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('1-Enter here domain names that are blocked by the blacklist and you want to rehabilitate.')." ".gettext('Enter one domain name per row (example : .domain.org)');
-echo "<br /><br />";
-echo "</div>";
-echo "<div class='col-md-6'>";
-echo "<h3>".gettext('Filtered domain names')."</h3>".gettext('Enter one domain name per row (example : .domain.org)');
-echo "<br /><br />";
-echo "</div>";
-echo "</div>";
+echo "<tables>";
 
-echo "<div class='row'>";
-echo "<div class='col-md-6'>";
-echo "<textarea class='form-control' name='OSSI_wl_domains' rows=5 cols=40>";
+echo "<tr>";
+echo "<td>";
+echo "<h3>".gettext('Rehabilitated domain names')."</h3>".gettext('1-Enter here domain names that are blocked by the blacklist and you want to rehabilitate.')." ".gettext('Enter one domain name per row (example : .domain.org)'."<br />" );
+echo "</td>";
+echo "<td>";
+echo "<textarea name='OSSI_wl_domains' rows=5 cols=40>";
 echo_file ($wl_domains);
 echo "</textarea>";
-echo "</div>";
-echo "<div class='col-md-6'>";
-echo "<textarea class='form-control' name='OSSI_bl_domains' rows=5 cols=40>";
+echo "</td>";
+
+
+echo "</tr>";
+
+echo "<tr>";
+echo "<td>";
+echo "<h3>".gettext('Filtered domain names')."</h3>".gettext('Enter one domain name per row (example : .domain.org)'."<br />" );
+echo "</td>";
+echo "<td>";
+echo "<textarea name='OSSI_bl_domains' rows=5 cols=40>";
 echo_file ($bl_domains);
 echo "</textarea>";
-echo "</div>";
+echo "<td>";
+echo "</tr>";
+
+echo "</tables>";
 
 echo "<div class='col-md-12'>";
 echo "<br /><br />";
