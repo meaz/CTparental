@@ -5,7 +5,7 @@ echo "<h1 class='page-header'>".gettext('Hours of allowed connections')."</h1>";
 if ($HOURSCONNECT == "ON")
 {
     echo "<div class='row'>";
-    echo "<div class='col-md-4'>";
+#    echo "<div class='col-md-4'>";
     
     echo "<p>";
     echo gettext('Connection schedules are currently enabled');
@@ -106,14 +106,14 @@ if ($HOURSCONNECT == "ON")
         echo "<CENTER><H3>".gettext("Please select a user.")."</H3></CENTER>";
     }
 
-    echo "</div>";
+#    echo "</div>";
     echo "</div>";
 
 }
 else
 {
     echo "<div class='row'>";
-    echo "<div class='col-md-4'>";
+#    echo "<div class='col-md-4'>";
     
     echo "<p>";
     echo gettext('Connection schedules are currently disabled');
@@ -125,6 +125,6 @@ else
     echo "<input class='btn btn-warning' type=submit value=".gettext('Enable logon hours').">";
     echo "</form>";
 
-    echo "</div>";
+#    echo "</div>";
     echo "</div>";
 }
