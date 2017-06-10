@@ -305,7 +305,7 @@ DNS2=${DNS2:=208.67.222.222} #
 ip_route_ipv6="$(ip -6 route | grep -v lo | tr '\n' ' ')"
 i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
 ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
-ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep global | awk '/inet6 /{print $2}' )"
+ip_i_WAN_ipv6="$( cat < ifconfig | grep -i global | awk '/inet6[(" "|":")]/{print $3}' )"
 
 reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
 reseau_box_ipv6_l="fe80::/64"
