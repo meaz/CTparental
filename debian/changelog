@@ -1,4 +1,4 @@
-ctparental (4.20.17-2.0) unstable; urgency=medium
+ctparental (4.20.18-1.0) unstable; urgency=medium
 
   * Amélioration detection ipv6 et web interface à faible résolution.
     
