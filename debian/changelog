@@ -1,3 +1,9 @@
+ctparental (4.20.17-2.0) unstable; urgency=medium
+
+  * Amélioration detection ipv6 et web interface à faible résolution.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Sat, 17 Jun 2017 10:22:17 +0200
+ 
 ctparental (4.20.17-1.0) unstable; urgency=medium
 
   * Correctif du bugs , faisant plater dnsmasq avec la nouvelle bl de toulouse.
