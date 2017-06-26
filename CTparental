@@ -295,7 +295,7 @@ export ip_i_WAN_ipv4
 export reseau_box_ipv4
 export ip_broadcast_ipv4
 unset ip_route_ipv4
-nameserver="$(cat < /etc/resolv.conf | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
+nameserver="$(cat < /etc/resolv.conf | grep -v "^#" | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
 DNS1="$(echo "${nameserver}" | awk '{ print $1}' | cut -d"%" -f1)"
 DNS2="$(echo "${nameserver}" | awk '{ print $2}' | cut -d"%" -f1)"
 #echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2

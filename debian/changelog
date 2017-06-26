@@ -1,3 +1,9 @@
+ctparental (4.20.19-1.0) unstable; urgency=medium
+
+  * correctif detection dns sous ubuntu 17.04.
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Mon, 26 Jun 2017 23:49:51 +0200
+ 
 ctparental (4.20.18-1.0) unstable; urgency=medium
 
   * Amélioration detection ipv6 et web interface à faible résolution.
