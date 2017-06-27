@@ -277,7 +277,6 @@ export ip_i_WAN_ipv4
 export reseau_box_ipv4
 export ip_broadcast_ipv4
 
-nameserver="$(cat < /etc/resolv.conf | grep -v "^#" | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
 DNS1v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
 if [ ! "$DNS1v4" =  "" ];then
 iptables -A OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
@@ -286,8 +285,8 @@ iptables -D OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
 fi
 
 #echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
-DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
-DNS2=${DNS2:=208.67.222.222} #
+export DNS1v4=${DNS1v4:=8.8.8.8} # on utilise les DNS google en cas de problême de detection de ceux du fai
+export DNS2v4=${DNS2v4:=8.8.4.4} #
 
 
 i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
@@ -308,7 +307,8 @@ export ipbox_ipv6
 export ip_i_WAN_ipv6
 export reseau_box_ipv6_g
 export reseau_box_ipv6_l
-
+export DNS1v6=${DNS1v6:=2001:4860:4860::8888} # on utilise les DNS google en cas de problême de detection de ceux du fai
+export DNS2v6=${DNS2v6:=2001:4860:4860::8844} #
 
 networkisoknext() {
 ipv4ok=0
@@ -881,8 +881,10 @@ cache-size=1024
 domain-needed
 expand-hosts
 bogus-priv
-server=$DNS1
-server=$DNS2  
+server=$DNS1v4
+server=$DNS2v4 
+server=$DNS1v6
+server=$DNS2v6 
 
 EOF
 
@@ -1230,8 +1232,10 @@ cache-size=1024
 domain-needed
 expand-hosts
 bogus-priv
-server=$DNS1
-server=$DNS2 
+server=$DNS1v4
+server=$DNS2v4
+server=$DNS1v6
+server=$DNS2v6
 address=/localhost/127.0.0.1
 address=/#/$PRIVATE_IP #redirige vers $PRIVATE_IP pour tout ce qui n'a pas été resolu dans les listes blanches
 EOF
@@ -1772,38 +1776,45 @@ $NETWORKINGrestart
     
 }
 nomade () {
-	
 #### si il y a un changement dan la conf réseaux ####
-if [ "$DNS1" != "$(cat < $FILE_CONF | grep DNS1 | cut -d"=" -f2)"  -o \
- "$DNS2" != "$(cat < $FILE_CONF | grep DNS2 | cut -d"=" -f2)"  -o \
+if [ "$DNS1v4" != "$(cat < $FILE_CONF | grep DNS1v4 | cut -d"=" -f2)"  -o \
+ "$DNS2v4" != "$(cat < $FILE_CONF | grep DNS2v4 | cut -d"=" -f2)"  -o \
+ "$DNS1v6" != "$(cat < $FILE_CONF | grep DNS1v6 | cut -d"=" -f2)"  -o \
+ "$DNS2v6" != "$(cat < $FILE_CONF | grep DNS2v6 | cut -d"=" -f2)"  -o \
  "$i_WAN_ipv4" != "$(cat < $FILE_CONF | grep I_WAN_IPV4 | cut -d"=" -f2)"  -o \
+ "$i_WAN_ipv6" != "$(cat < $FILE_CONF | grep I_WAN_IPV6 | cut -d"=" -f2)"  -o \
  "$ipbox_ipv4" != "$(cat < $FILE_CONF | grep IP_BOX_IPV4 | cut -d"=" -f2)"  -o \
+ "$ipbox_ipv6" != "$(cat < $FILE_CONF | grep IP_BOX_IPV6 | cut -d"=" -f2)"  -o \
  "$ip_i_WAN_ipv4" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV4 | cut -d"=" -f2)" -o \
- "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" -o \
- "$i_WAN_ipv6" != "$(cat < $FILE_CONF | grep I_WAN_IPV6 | cut -d"=" -f2)" \
- ];then
-	if [ "$i_WAN_ipv4" != "" -a "$ipbox_ipv4" != "" -a "$ip_i_WAN_ipv4" != "" -a "$DNS1" != "" ] || [ "$ip_i_WAN_ipv6" != "" -a "$i_WAN_ipv6" != ""  ]; then
-		# on sauvegarde ces chnagement dans le fichier de conf CTparental.
-		$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
-		$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
-		$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
-		$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
-    	$SED "/^I_WAN_IPV6=/d" "$FILE_CONF"
-		$SED "/^DNS1=/d" "$FILE_CONF"
-		$SED "/^DNS2=/d" "$FILE_CONF"
-		{ echo I_WAN_IPV4="$i_WAN_ipv4"
-		  echo IP_BOX_IPV4="$ipbox_ipv4"
-		  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
-		  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
-		  echo I_WAN_IPV6="$i_WAN_ipv6"
-		  echo DNS1="$DNS1"
-		  echo DNS2="$DNS2"
-		} >> $FILE_CONF
-		# on modifi la conf dnsmasq
-		dnsmasqon
-		# on reconfigure les règle du parfeux.
-		iptablesreload
-	fi
+ "$ip_i_WAN_ipv6" != "$(cat < $FILE_CONF | grep IP_IWAN_IPV6 | cut -d"=" -f2)" ]
+then
+networkisoknext
+# on sauvegarde ces chnagement dans le fichier de conf CTparental.
+$SED "/^I_WAN_IPV4=/d" "$FILE_CONF"
+$SED "/^I_WAN_IPV6=/d" "$FILE_CONF"
+$SED "/^IP_BOX_IPV4=/d" "$FILE_CONF"
+$SED "/^IP_BOX_IPV6=/d" "$FILE_CONF"
+$SED "/^IP_IWAN_IPV4=/d" "$FILE_CONF"
+$SED "/^IP_IWAN_IPV6=/d" "$FILE_CONF"
+$SED "/^DNS1v4=/d" "$FILE_CONF"
+$SED "/^DNS2v4=/d" "$FILE_CONF"
+$SED "/^DNS1v6=/d" "$FILE_CONF"
+$SED "/^DNS2v6=/d" "$FILE_CONF"
+{ echo I_WAN_IPV4="$i_WAN_ipv4"
+  echo IP_BOX_IPV4="$ipbox_ipv4"
+  echo IP_IWAN_IPV4="$ip_i_WAN_ipv4"
+  echo IP_IWAN_IPV6="$ip_i_WAN_ipv6"
+  echo I_WAN_IPV6="$i_WAN_ipv6"
+  echo DNS1v4="$DNS1v4"
+  echo DNS2v4="$DNS2v4"
+  echo DNS1v6="$DNS1v6"
+  echo DNS2v6="$DNS2v6"
+} >> $FILE_CONF
+# on modifi la conf dnsmasq
+dnsmasqon
+# on reconfigure les règle du parfeux.
+iptablesreload
+
 fi
 
 }
