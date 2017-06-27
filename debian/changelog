@@ -1,3 +1,10 @@
+ctparental (4.20.20-1.0) unstable; urgency=medium
+
+  * correctif conflit avec systemd-resoled sous ubuntu 17.04.
+  * supression des dépendences net-tools (ifconfig...)
+    
+ -- Guillaume marsat <CTparental1@laposte.net>  Tue, 27 Jun 2017 21:50:40 +0200
+ 
 ctparental (4.20.19-1.0) unstable; urgency=medium
 
   * correctif detection dns sous ubuntu 17.04.

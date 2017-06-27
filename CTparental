@@ -259,55 +259,48 @@ if [ -z "$CMDINSTALL" ] ; then
    exit 1
 fi
 
-ip_route_ipv4="$(ip route | tr '\n' ' ')"
-i_WAN_ipv4="$(awk '{print $5}' <<< ${ip_route_ipv4})" # GW!
-ipbox_ipv4="$(awk '{print $3}' <<< ${ip_route_ipv4})"   
-if [ "$(ifconfig | grep -c "adr" )" -ge 1 ];then 
-	## jessie et infèrieur
-	ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/adr:/{print substr($2,5)}')"
-	ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/Bcast:/{ print substr($3,7)}')"	
+i_WAN_ipv4="$(ip -4 route | grep default | awk '{print $5}')" # GW!
+if [ "$i_WAN_ipv6" =  "" ];then  
+	ipbox_ipv4=""
+	ip_i_WAN_ipv4=""
+	ip_broadcast_ipv4=""
+	reseau_box_ipv4=""
 else
-	if [ "$(ifconfig | grep -c "addr" )" -ge 1 ];then 
-		## elementaryos
-		ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/addr:/{print substr($2,6)}')"
-		ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/Bcast:/{ print substr($3,7)}')"
-	else
-		## testing/sid
-		ip_i_WAN_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
-		ip_broadcast_ipv4="$(ifconfig "$i_WAN_ipv4" | awk '/broadcast /{print substr($6,1)}')"
-	fi
-fi
-reseau_box_ipv4="$(awk '//{print $10}' <<< ${ip_route_ipv4})"
-if [ "$reseau_box_ipv4" = "$i_WAN_ipv4" ];then # cat de mageia mais peut ètre dans d'autres aussi
-	reseau_box_ipv4="$(awk '//{print $8}' <<< ${ip_route_ipv4})"
-	#echo "reseau_box_ipv4if1"
-	if [ "$reseau_box_ipv4" = "$ipbox_ipv4" ];then # cat de debian jessie pour RPi3
-		#echo "reseau_box_ipv4if2"
-		reseau_box_ipv4="$(awk '//{print $13}' <<< ${ip_route_ipv4})"
-		if [ "$reseau_box_ipv4" = "metric" ];then # cat de https://github.com/marsat/CTparental/issues/25
-			reseau_box_ipv4="$(awk '//{print $15}' <<< ${ip_route_ipv4})"
-		fi
-	fi	
+	ipbox_ipv4="$(ip -4 route | grep default | awk '{print $3}')" 
+	ip_i_WAN_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/inet /{print substr($2,1)}')"
+	ip_broadcast_ipv4="$(ip -4 address show "$i_WAN_ipv4" | awk '/brd /{print substr($4,1)}')"
+	reseau_box_ipv4="$(ip -4 route | grep "$i_WAN_ipv4" | grep -v default | awk '//{print substr($1,1)}' )"
 fi
 export i_WAN_ipv4
 export ipbox_ipv4
 export ip_i_WAN_ipv4
 export reseau_box_ipv4
 export ip_broadcast_ipv4
-unset ip_route_ipv4
+
 nameserver="$(cat < /etc/resolv.conf | grep -v "^#" | awk '/nameserver/ { print $2 }' | tr '\n' ' ')"
-DNS1="$(echo "${nameserver}" | awk '{ print $1}' | cut -d"%" -f1)"
-DNS2="$(echo "${nameserver}" | awk '{ print $2}' | cut -d"%" -f1)"
+DNS1v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
+if [ ! "$DNS1v4" =  "" ];then
+iptables -A OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
+DNS2v4="$(dig -4 +all +retry=1 +tries=1 | grep SERVER | cut -d "(" -f2 | sed -e "s/)//g")"
+iptables -D OUTPUT -d "$DNS1v4" -p udp --dport 53 -j REJECT
+fi
+
 #echo "intefaceWAN="$i_WAN_ipv4" ipbox_ipv4="$ipbox_ipv4" ipinterfaceWan="$ip_i_WAN_ipv4" reseau_box_ipv4="$reseau_box_ipv4" broadcast="$ip_broadcast_ipv4" dns1="$DNS1" dns2="$DNS2
 DNS1=${DNS1:=208.67.220.220} # on utilise les DNS OpenDNS en cas de problême de detection de ceux du fai
 DNS2=${DNS2:=208.67.222.222} #
 
-ip_route_ipv6="$(ip -6 route | grep -v lo | tr '\n' ' ')"
-i_WAN_ipv6="$(awk '{print $3}' <<< ${ip_route_ipv6})" # GW!
-ipbox_ipv6="$(awk '{print $30}' <<< ${ip_route_ipv6})"   
-ip_i_WAN_ipv6="$(ifconfig "$i_WAN_ipv6" | grep -i global | awk '/inet6[(" "|":")]/{print $3}' )"
 
-reseau_box_ipv6_g="$(awk '//{print $1}' <<< ${ip_route_ipv6})"
+i_WAN_ipv6="$(ip -6 route | grep default | awk '{print $5}')" # GW!
+if [ "$i_WAN_ipv6" =  "" ];then  
+	ipbox_ipv6="" 
+	ip_i_WAN_ipv6=""
+	reseau_box_ipv6_g=""
+else
+	ipbox_ipv6="$(ip -6 route | grep default | awk '{print $3}')"
+	ip_i_WAN_ipv6="$(ip -6 address show "$i_WAN_ipv6" | awk '/inet/{print substr($2,1)}')"
+	reseau_box_ipv6_g="$(ip -6 route | grep "$i_WAN_ipv6" | grep -v default | awk '//{print substr($1,1)}')"
+fi
+
 reseau_box_ipv6_l="fe80::/64"
 
 export i_WAN_ipv6
@@ -315,7 +308,7 @@ export ipbox_ipv6
 export ip_i_WAN_ipv6
 export reseau_box_ipv6_g
 export reseau_box_ipv6_l
-unset ip_route_ipv6
+
 
 ipMaskValide() {
 ip=$(echo "$1" | cut -d"/" -f1)
