@@ -310,53 +310,21 @@ export reseau_box_ipv6_g
 export reseau_box_ipv6_l
 
 
-ipMaskValide() {
-ip=$(echo "$1" | cut -d"/" -f1)
-mask=$(echo "$1" | grep "/" | cut -d"/" -f2)
-if [ "$(echo "$1" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
-	echo 1
-	return 1
-fi
-if [ ! "$(echo "$ip" | grep -c "^\(\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)\.\)\{3\}\(2[0-5][0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[0-9]\{1,2\}\)$")" -eq 1 ];then
-	echo 0
-	return 0
-fi
-if [ "$(echo "$mask" | grep -c "^\([1-9]\|[1-2][0-9]\|3[0-2]\)$")" -eq 1 ];then
-	echo 1
-	return 1
-fi
-i=1 
-octn=255
-result=1
-while [ $i -le 4 ]
-do
-oct=$( echo "$mask" | grep '\.'| cut -d "." -f$i )
-if [ -z "$oct" ] ; then
-	result=0
-	break
-fi
-if [ ! "$octn" -eq 255 ];then
-	if [ ! "$oct" -eq 0 ];then
-		result=0
-		break
-	fi
-fi 
-octn=$oct
-if [ ! "$oct" -eq 255 ] &&  [ ! "$oct" -eq 254 ]  &&  [ ! "$oct" -eq 252 ] &&  [ ! "$oct" -eq 248 ] &&  [ ! "$oct" -eq 240 ] &&  [ ! "$oct" -eq 224 ] &&  [ ! "$oct" -eq 192 ] &&  [ ! "$oct" -eq 128 ] &&  [ ! "$oct" -eq 0 ]; then
-	result=0
-	break	
-  fi
-i=$(( i + 1 ))
-done
-   echo $result
-   return $result
-}
-
 networkisoknext() {
-if [ "$(echo "$i_WAN_ipv4" | grep -c -E "^[a-zA-Z0-9]*$")" -eq 0 -o  "$( ipMaskValide "$ipbox_ipv4" )" -eq 0 -o "$( ipMaskValide "$ip_i_WAN_ipv4" )" -eq 0 \
- -o "$( ipMaskValide "$DNS1" )" -eq 0  -o "$( ipMaskValide "$DNS2" )" -eq 0 -o "$( ipMaskValide "$ip_broadcast_ipv4" )" -eq 0 \
- -o "$( ipMaskValide "$reseau_box_ipv4" )" -eq 0 ];then
-	if [ "$ip_i_WAN_ipv6" =  "" ];then
+ipv4ok=0
+ping -4 -c1 -w1 "$ipbox_ipv4"
+if [ $? -eq  0 ];then
+ipv4ok=1
+fi
+
+ipv6ok=0
+ping -6 -c1 -w1 "$ipbox_ipv6"
+if [ $? -eq  0 ];then
+ipv6ok=1
+fi
+
+if [ $ipv4ok -eq 0 ];then
+	if [ $ipv6ok -eq 0 ];then
 		gettext 'error recovery network settings'
 		echo
 		exit 0
