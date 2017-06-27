@@ -2,6 +2,7 @@ ctparental (4.20.20-1.0) unstable; urgency=medium
 
   * correctif conflit avec systemd-resoled sous ubuntu 17.04.
   * supression des dépendences net-tools (ifconfig...)
+  * amélioration support ipv6.
     
  -- Guillaume marsat <CTparental1@laposte.net>  Tue, 27 Jun 2017 21:50:40 +0200
  
