@@ -2863,7 +2863,6 @@ then run the command CTparental -ipton") $Fcolor"
       exit 0
       ;;
     -nomade )
-      networkisoknext
 	 # appelé toutes les minutes par cron pour modifier la configuration en cas de changement de réseaux.
 	  nomade
 	  exit 0
