@@ -19,7 +19,7 @@ msgid "It root of the need to run this script."
 msgstr "Il vous faut des droits root pour lancer ce script"
 
 msgid "invalid directory path!"
-msgstr "Chemin de répertoire non valide!"
+msgstr "Chemin de répertoire non valide !"
 
 msgid "continue to press a button:"
 msgstr "pour continuer appuyez sur une touche :"
@@ -46,19 +46,19 @@ msgid "sunday"
 msgstr "dimanche"
 
 msgid "No known package manager, was detected."
-msgstr "Aucun gestionnaire de paquet connu , n'a été détecté."
+msgstr "Aucun gestionnaire de paquet connu, n'a été détecté."
 
 msgid "#the domain filtering is handled by dnsmasq, do not touch this file !!"
-msgstr "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier!!"
+msgstr "#le filtrage de domaines est géré par dnsmasq, ne pas toucher ce fichier !"
 
 msgid "Waiting to Connect to Server from Toulouse:"
-msgstr "attente de connexion au serveur de Toulouse:"
+msgstr "attente de connexion au serveur de Toulouse :"
 
 msgid "The connection to the server of Toulouse is impossible."
 msgstr "connexion au serveur de Toulouse impossible."
 
 msgid "connection established:"
-msgstr "connexion établie:"
+msgstr "connexion établie :"
 
 msgid "error when downloading, interrupted process"
 msgstr "erreur lors du téléchargement, processus interrompu"
@@ -67,10 +67,10 @@ msgid "archive extraction error , interrupted process"
 msgstr "erreur d'extraction de l'archive, processus interrompu"
 
 msgid "blacklist and WhiteList , migration process. Please wait :"
-msgstr "Migration de la Blacklist et de la whitelist de Toulouse.Veuillez patienter."
+msgstr "Migration de la Blacklist et de la whitelist de Toulouse. Veuillez patienter."
 
 msgid "Application whitelisting (restored area):"
-msgstr "Application de la liste blanche (domaine réhabilité):"
+msgstr "Application de la liste blanche (domaine réhabilité) :"
 
 msgid "Error launching of lighttpd Service"
 msgstr "Erreur au lancement du service lighttpd"
@@ -100,7 +100,7 @@ msgid "Password is not complex enough, it must contain at least:"
 msgstr "Mot de passe n'est pas assez complexe, il doit contenir au moins:"
 
 msgid "- 8 characters total, 1 Uppercase, lowercase 1, number 1"
-msgstr "- 8 caractères au total,1 Majuscule,1 minuscule,1 nombre"
+msgstr "- 8 caractères au total, 1 Majuscule, 1 minuscule, 1 nombre"
 
 msgid "and one special character among the following"
 msgstr "et 1 caractère spécial parmi les suivants"
@@ -118,7 +118,7 @@ msgid "Enter any other choice to change settings."
 msgstr "Entrez tout autre choix pour modifier les paramètres."
 
 msgid "Install a packet was detected please use this command to uninstall ctparental."
-msgstr "Une installation par paquet a été détectée veuillez utiliser cette commande pour désinstaller ctparental."
+msgstr "Une installation par paquet a été détectée, veuillez utiliser cette commande pour désinstaller ctparental."
 
 msgid "Want to filter by, Blacklist or Whitelist B/W :"
 msgstr "Voulez-vous filtrer par Blacklist ou Whitelist B/W :"
@@ -142,7 +142,7 @@ msgid "at :"
 msgstr "de :"
 
 msgid "Bad syntax:"
-msgstr "Mauvaise syntaxe:"
+msgstr "Mauvaise syntaxe :"
 
 msgid "No known session manager has been detected."
 msgstr "Aucun gestionnaire de session connu n'a été détecté."
@@ -190,7 +190,7 @@ msgstr ""
 "\t   ainsi que les catégories que l'on veut activer."
 
 msgid "\t=> Resets the default active categories and blacklist filtering."
-msgstr "\t=> Remet les catégories actives par défaut et le filtrage par blackliste."
+msgstr "\t=> Remet les catégories actives par défaut et le filtrage par Blacklist."
 
 msgid "\t=> Enable and configure the login time restrictions for users."
 msgstr "\t=> Active et paramètre les restrictions horaires de login pour les utilisateurs."
@@ -209,13 +209,13 @@ msgstr ""
 "\t   exemples:\n"
 "\t           - avec un répertoire source : CTparental -uhtml -dirhtml /home/toto/html/\n"
 "\t           - par défaut : CTparental -uhtml\n"
-"\t   permet aussi de changer le couple identifiant,mot de passe de l'interface web."
+"\t   permet aussi de changer le couple identifiant-mot de passe de l'interface web."
 
 msgid "\t=> Enable the automatic update of the blacklist of Toulouse (every 7 days)."
-msgstr "\t=> active la mise à jour automatique de la blacklist de Toulouse (tous les 7 jours)."
+msgstr "\t=> active la mise à jour automatique de la Blacklist de Toulouse (tous les 7 jours)."
 
 msgid "\t=> Disable the automatic update of the blacklist of Toulouse."
-msgstr "\t=> désactive la mise à jour automatique de la blacklist de Toulouse."
+msgstr "\t=> désactive la mise à jour automatique de la Blacklist de Toulouse."
 
 msgid "\t=> as -dl but only if there is no update for more than 7 days."
 msgstr "\t=> comme -dl mais seulement si il n'y a pas eu de mise à jour depuis plus de 7 jours."
@@ -255,13 +255,13 @@ msgid "\t=> Disable privileged group."
 msgstr "\t=> supprime le groupe de privilégiés ."
 
 msgid "all users of the system undergo the filtering !!"
-msgstr "tous les utilisateurs du système subissent le filtrages!!"
+msgstr "tous les utilisateurs du système subissent le filtrages !!"
 
 msgid "\t=> Add remove Users added in sytem on the config file ,"
-msgstr "\t=> Mais a jour le fichier de configuration,"
+msgstr "\t=> Met à jour le fichier de configuration,"
 
 msgid "\t=> Add / delete users in the ctoff group based on the config file, $FILE_GCTOFFCONF"
-msgstr "\t=> Ajoute/Supprime les utilisateurs dans le group ctoff en fonction du fichier de configuration, $FILE_GCTOFFCONF"
+msgstr "\t=> Ajoute/Supprime les utilisateurs dans le groupe ctoff en fonction du fichier de configuration, $FILE_GCTOFFCONF"
 
 msgid "\t=> Enable rules of custom firewall."
 msgstr "\t=> Active les règles de pare-feu personnalisées."
@@ -303,10 +303,10 @@ msgid "minutes"
 msgstr "minutes"
 
 msgid "Your surf time as expird!"
-msgstr "Votre temps de surf a expiré!"
+msgstr "Votre temps de navigation a expiré !"
 
 msgid "$PCUSER is allowed to connect 7/7 24/24 O/N?"
-msgstr "$PCUSER est autorisé à se connecter 7j/7 24h/24 O/N?"
+msgstr "$PCUSER est autorisé à se connecter 7j/7 24h/24 O/N ?"
 
 msgid ""
 "$PCUSER is allowed to connect X minutes per day \n"
@@ -369,7 +369,7 @@ msgid "08h00 at 24h00 or 08h00 at 12h00 and 14h00 at 24h00"
 msgstr "08h00 à 24h00 ou 08h00 à 12h00 et 14h00 à 24h00"
 
 msgid "time max pc connection"
-msgstr "Temp de connection maximum au pc"
+msgstr "Temps de connection maximum au pc"
 
 msgid "time max for web surfing"
 msgstr "temps max pour surfer sur le web"
@@ -390,7 +390,7 @@ msgid "You must enter a value between 1 and 1440 minutes."
 msgstr "Vous devez rentrer une valeur entre 1 et 1440 minutes."
 
 msgid "Time surf between 1 to"
-msgstr "Le temp de surf doit ètre entre 1 et"
+msgstr "Le temps de navigation doit ètre entre 1 et"
 
 msgid "Connection schedules are currently enabled"
 msgstr "Les horaires de connexion sont actuellement activés"
@@ -411,10 +411,10 @@ msgid "Init Categories"
 msgstr "Init Catégories"
 
 msgid "The update of the blacklist Toulouse every 7 days is activated"
-msgstr "La mise à jour de la blacklist de Toulouse tous les 7 jours est activée"
+msgstr "La mise à jour de la Blacklist de Toulouse tous les 7 jours est activée"
 
 msgid "The update of the blacklist Toulouse every 7 days is disabled"
-msgstr "La mise à jour de la blacklist de Toulouse tous les 7 jours est désactivée"
+msgstr "La mise à jour de la Blacklist de Toulouse tous les 7 jours est désactivée"
 
 msgid "Enable"
 msgstr "Activer"
@@ -717,7 +717,7 @@ msgid "Access to the page:"
 msgstr "L'accès à au domaine :"
 
 msgid "... has been denied."
-msgstr "... a été refuser."
+msgstr "... a été refusé."
 
 msgid "You are seeing this error because what you attempted to access appears to contain,"
 msgstr "Vous tentez d'accéder à une ressource dont le contenu est réputé"
